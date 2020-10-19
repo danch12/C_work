@@ -10,6 +10,8 @@ typedef int button;
 #define SECSINMIN 60
 button button_presser(time start, time options[]);
 
+void test(void);
+
 int main(void)
 {
    time start;
@@ -18,17 +20,23 @@ int main(void)
    buttons[1]= SECSINMIN;
    buttons[2]= 10;
 
-
-   assert(button_presser(600,buttons)==1);
-   assert(button_presser(120,buttons)==2);
-   assert(button_presser(130,buttons)==3);
-   assert(button_presser(125,buttons)==3);
-   
    printf("enter a time in seconds:\n");
    scanf("%d", &start);
    printf("need to press %d buttons\n",button_presser(start,buttons));
    return 0;
 
+}
+
+void test(void)
+{
+   time buttons[SIZE];
+   buttons[0]= SECSINMIN*10;
+   buttons[1]= SECSINMIN;
+   buttons[2]= 10;
+   assert(button_presser(600,buttons)==1);
+   assert(button_presser(120,buttons)==2);
+   assert(button_presser(130,buttons)==3);
+   assert(button_presser(125,buttons)==3);
 }
 
 button button_presser(time start, time options[])

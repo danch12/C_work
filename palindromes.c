@@ -9,19 +9,18 @@ typedef enum bool {false, true} bool;
 
 
 char* to_lower(char sent[],int size);
+/*returns true if palindrome although effected by casing*/
 bool is_palindrome_cased(char sent[],int size);
+/*not effected by casing*/
 bool is_palindrome(char sent[],int size);
+
+void test(void);
 
 int main(void)
 {
    char user_input[LIMIT];
    int size;
-   char test[]= "kayak";
-   char test_2[]="kayfjb";
-   char test_3[]= "a man, A plan, a Canal: panama!";
-   assert(is_palindrome(test,6)==true);
-   assert(is_palindrome(test_2,6)==false);
-   assert(is_palindrome(test_3,32)==true);
+   test();
 
    printf("enter a palindrome\n");
    if(scanf("%s",user_input)!=1)
@@ -30,7 +29,6 @@ int main(void)
       return 1;
    }
    size= sizeof(user_input)/sizeof(user_input[0]);
-   
    if(is_palindrome(user_input,size)==true)
    {
       printf("it is a palindrome\n");
@@ -41,6 +39,29 @@ int main(void)
    }
 
    return 0;
+}
+
+void test(void)
+{
+
+   int i;
+   char* test_target;
+   char test_arr[]= "kayak";
+   char test_2[]="kayfjb";
+   char test_3[]= "a man, A plan, a Canal: panama!";
+   char test_4[]="HELLO!";
+   char target_4[]="hello!";
+   assert(is_palindrome(test_arr,6)==true);
+   assert(is_palindrome(test_2,6)==false);
+   assert(is_palindrome(test_3,32)==true);
+
+   test_target=to_lower(test_4,7);
+
+   for(i=0;i<7;i++)
+   {
+      assert(test_4[i]==target_4[i]);
+   }
+
 }
 
 bool is_palindrome_cased(char sent[],int size)

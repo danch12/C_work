@@ -15,6 +15,7 @@ typedef int rule;
 state* generate_random_row(int length);
 state* generate_random_1(int length);
 
+/*determines if a cell is on or off given the previous row and a rule*/
 state on_or_off(int position,state previous[],state (*rule)(state,state,state));
 
 /* fills row based on previous row and specified rule*/
@@ -25,9 +26,10 @@ void copy_array(state to_copy[], state target[],int size);
 void print_arr(state arr[],int size);
 
 
-
+/*different rules for generating new rows*/
 state rule110(state start, state mid, state end);
 state rule30(state start, state mid, state end);
+
 void test(void);
 
 int main(void)
