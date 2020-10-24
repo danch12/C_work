@@ -2,9 +2,14 @@
 #include <stdio.h>
 #include <time.h>
 #include <assert.h>
+/*instead of padding the array before hand just create a function
+that returns false if over the size of array else returns the
+number*/
+/*maybe instead of looping over the array turn it into a string and
+do strcmp*/
 
 #define LOWER 1
-#define SIZE 30
+#define SIZE 50
 #define ITERS 10
 #define TOCHAR 48
 
@@ -12,19 +17,27 @@ typedef enum state {off, on} state;
 typedef enum choice {gen_random,only_one} choice;
 typedef int rule;
 
+/*generates row of on or off cells randomly*/
 state* generate_random_row(int length);
+/*generates row of all off except for 1 on*/
 state* generate_random_1(int length);
 
-/*determines if a cell is on or off given the previous row and a rule*/
-state on_or_off(int position,state previous[],state (*rule)(state,state,state));
+/*determines if a cell is on or off given the previous row and a rule
+also checks to see if position is out of bounds and if so returns off*/
+state on_or_off(int position,state previous[],\
+               state (*rule)(state,state,state),int size);
 
 /* fills row based on previous row and specified rule*/
 void fill_row(state above[],state tofill[],int fill_size, \
                state (*rule)(state,state,state));
 
+
 void copy_array(state to_copy[], state target[],int size);
+
 void print_arr(state arr[],int size);
 
+/*returns pointer based on which rule chosen*/
+state (*which_rule(int rule))(state start, state mid, state end);
 
 /*different rules for generating new rows*/
 state rule110(state start, state mid, state end);
@@ -42,37 +55,21 @@ int main(void)
    state (*rule_ptr)(state,state,state);
 
    previous = malloc(sizeof(int)*SIZE);
-
    srand(time(NULL));
    test();
-
    printf("enter a choice 0 for random or 1 for only one\n");
    if(scanf("%d",&decision)!=1)
    {
       printf("invalid number\n");
       return 1;
    }
-
    printf("enter a choice for rule you want 1 for 110 and 3 for 30\n");
    if(scanf("%d", &rulechoice)!=1)
    {
       printf("invalid number\n");
       return 1;
    }
-   /*put this in a function*/
-   if(rulechoice==1)
-   {
-      rule_ptr=&rule110;
-   }
-   else if(rulechoice==3)
-   {
-      rule_ptr=&rule30;
-   }
-   else
-   {
-      printf("invalid rule\n");
-      return 1;
-   }
+   rule_ptr=which_rule(rulechoice);
 
    if(decision==gen_random)
    {
@@ -92,6 +89,7 @@ int main(void)
       print_arr(current,SIZE);
       copy_array(current,previous,SIZE);
       fill_row(previous,current,SIZE,rule_ptr);
+
    }
 
    free(current);
@@ -133,6 +131,7 @@ void test(void)
       }
    }
    assert(on_count==1);
+
    free(test_row);
 
    assert(rule30(1,1,1)==off);
@@ -143,15 +142,14 @@ void test(void)
    assert(rule110(1,1,0)==on);
    assert(rule110(0,0,0)==off);
 
-   /*not going to test the first or last position as
-   will have an assert statement within function that fills array*/
-   assert(on_or_off(1,on_or_off_test,rule110)==off);
-   assert(on_or_off(2,on_or_off_test,rule110)==on);
-   assert(on_or_off(3,on_or_off_test,rule110)==on);
 
-   assert(on_or_off(1,on_or_off_test,rule30)==off);
-   assert(on_or_off(6,on_or_off_test,rule30)==on);
-   assert(on_or_off(5,on_or_off_test,rule30)==on);
+   assert(on_or_off(1,on_or_off_test,rule110,SIZE)==off);
+   assert(on_or_off(2,on_or_off_test,rule110,SIZE)==on);
+   assert(on_or_off(3,on_or_off_test,rule110,SIZE)==on);
+
+   assert(on_or_off(1,on_or_off_test,rule30,SIZE)==off);
+   assert(on_or_off(6,on_or_off_test,rule30,SIZE)==on);
+   assert(on_or_off(5,on_or_off_test,rule30,SIZE)==on);
 
    copy_array(on_or_off_test, copy_arr_test,8);
    for(i=0;i<8;i++)
@@ -199,19 +197,32 @@ state* generate_random_1(int length)
 }
 
 
-state on_or_off(int position,state previous[],state (*rule)(state,state,state))
+
+
+state on_or_off(int position,state previous[],\
+               state (*rule)(state,state,state),int size)
 {
 
    state start, mid, end;
+   if((position-1)<0)
+   {
+      return off;
+   }
    start = previous[position-1];
+
    mid = previous[position];
+   if((position+1)>=size)
+   {
+      return off;
+   }
    end = previous[position+1];
+
    return rule(start,mid,end);
 }
 
 state rule30(state start, state mid, state end)
 {
-   char bin_arr[3];
+   char bin_arr[4];
    char *ptr;
    long result;
    bin_arr[0]= (char) start+TOCHAR;
@@ -230,7 +241,9 @@ state rule30(state start, state mid, state end)
 
 state rule110(state start, state mid, state end)
 {
-   char bin_arr[3];
+   /*needed to give 4 spaces? is this because of \0 even if i dont allocate
+      manually?*/
+   char bin_arr[4];
    char *ptr;
    long result;
    bin_arr[0]= (char) start+TOCHAR;
@@ -255,11 +268,9 @@ void fill_row(state above[],state tofill[],int fill_size, \
 {
    int i;
    /*first and last cant be filled normally*/
-   tofill[0]=0;
-   tofill[fill_size-1]=0;
-   for(i=1;i<fill_size-1;i++)
+   for(i=0;i<fill_size;i++)
    {
-      tofill[i]= on_or_off(i,above,rule);
+      tofill[i]= on_or_off(i,above,rule,fill_size);
    }
 }
 
@@ -280,7 +291,30 @@ void print_arr(state arr[],int size)
    /*want to print on same line for this*/
    for(i=0;i<size;i++)
    {
-      printf("%d ", arr[i]);
+      if(arr[i]==on)
+      {
+         printf("#");
+      }
+      else
+      {
+         printf(".");
+      }
+
    }
    printf("\n");
+}
+
+
+state (*which_rule(int rule))(state start, state mid, state end)
+{
+   switch(rule)
+   {
+      case 1:
+      return &rule110;
+      case 3:
+      return &rule30;
+      default:
+      printf("invalid rule\n");
+      exit(1);
+   }
 }

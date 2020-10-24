@@ -25,11 +25,12 @@ void test(void);
 int main(int argc, char*argv[])
 {
    char *arabic_version;
-   test();
+   /*test();*/
    if(argc==2)
    {
       arabic_version=toSoundex(argv[1]);
       printf("%s",arabic_version);
+
       free(arabic_version);
       printf("\n");
       return 0;
@@ -85,13 +86,11 @@ char* toSoundex(char* name)
    int count,i;
    char previous,current;
    char* target;
-   target=malloc(sizeof(char)*4);
+   target=(char *)malloc(sizeof(char)*5);
    target[0]=toupper(name[0]);
-
    /*need to start i and count on one as already assigned first */
    i=1;
    count=1;
-
    previous=START;
    while(count<4 && name[i]!='\0')
    {
@@ -112,6 +111,7 @@ char* toSoundex(char* name)
    {
       target[count]='0';
    }
+   target[count]='\0';
    assert(count==4);
    return target;
 }
