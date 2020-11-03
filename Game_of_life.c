@@ -4,7 +4,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define ITERS 10
+#define ITERS 100
 #define SELF 1
 #define COLS 150
 #define ROWS 90
