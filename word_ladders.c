@@ -18,7 +18,7 @@ typedef enum bool {false,true} bool;
 
 link make_links(char* filename);
 int edit_distance(const char word_1[], const char word_2[],int wordlen);
-void print_ladder(char word_1[],char word_2[],link head,char word_list[WORDLEN][WORDLEN]);
+void fill_ladder(char word_1[],char word_2[],link head,char word_list[WORDLEN][WORDLEN]);
 void free_links(link head);
 
 bool criteria_check(int word_len,char current[],\
@@ -34,7 +34,7 @@ int main(void)
    i=0;
 
    head=make_links("34words.txt");
-   print_ladder("cold","warm",head,word_list);
+   fill_ladder("cold","warm",head,word_list);
    while(strcmp(word_list[i],"xxx")!=0)
    {
       printf("%s\n",word_list[i]);
@@ -45,15 +45,20 @@ int main(void)
 
 void test(void)
 {
+   int i;
+   char word_list[WORDLEN][WORDLEN];
    int word_count,count;
    link head,current;
+   char target_list[WORDLEN][WORDLEN]={"wold","word","worm","warm"};
    word_count=2891;
    count=0;
+
    assert(edit_distance("dan","man",3)==1);
    assert(edit_distance("dain","niad",4)==4);
    assert(edit_distance("dan","dan",3)==0);
    head=make_links("34words.txt");
    current=head;
+
    while(current!=NULL)
    {
       count++;
@@ -61,7 +66,22 @@ void test(void)
    }
    assert(strcmp(head->data,"work")==0);
    assert(count==word_count);
+   fill_ladder("cold","warm",head,word_list);
+
+   i=0;
+   while(strcmp(word_list[i],"xxx")!=0)
+   {
+      assert(strcmp(word_list[i],target_list[i])==0);
+      i++;
+   }
+
+
    free_links(head);
+
+
+   assert(criteria_check(4,"bean","mean","brow")==true);
+   assert(criteria_check(4,"bran","mean","brow")==false);
+   assert(criteria_check(4,"bean","mean","mrow")==false);
 }
 
 
@@ -113,7 +133,7 @@ link make_links(char* filename)
     return head;
 }
 
-void print_ladder(char word_1[],char word_2[],link head,char word_list[WORDLEN][WORDLEN])
+void fill_ladder(char word_1[],char word_2[],link head,char word_list[WORDLEN][WORDLEN])
 {
    link current;
    char temp[6];

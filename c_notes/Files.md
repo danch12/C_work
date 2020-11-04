@@ -14,3 +14,6 @@ fprintf(stderr,"Cannot do whatever %d",fname);
 exit(EXIT_FAILURE);
 ```
 
+can also do fgets to read into a string- then check the string then process the string using sscanf into digits or whatever.
+
+fgets only gets one line at a time. 

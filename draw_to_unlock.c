@@ -51,13 +51,21 @@ int main(void)
 void test(void)
 {
    int i;
-   /*char test_string[1000]="";
+   int num_patterns_test;
+   char test_string[1000]="";
    char* pattern_test[50];
    char end_string[5]="END";
    char test_screen[SCREENLEN][SCREENLEN]={{'1','2','3'},
                                        {'4','5','6'},
-                                       {'7','8','9'}};*/
-
+                                       {'7','8','9'}};
+   char target_strings[10][10]={"123654789",
+                                 "123698547",
+                                 "123698745",
+                                 "125478963",
+                                 "145236987",
+                                 "147852369",
+                                 "147896325",
+                                 "147896523"};
 
    assert(inbounds(50)==false);
    assert(inbounds(-1)==false);
@@ -66,7 +74,12 @@ void test(void)
    assert(not_been('1',"123")==false);
    assert(not_been('2',"123")==false);
    assert(not_been('9',"1238")==true);
-
+   num_patterns_test=count_moves(test_screen,0,0,test_string,pattern_test,0);
+   for(i=0;i<num_patterns_test;i++)
+   {
+      assert(strcmp(target_strings[i],pattern_test[i])==0);
+      free(pattern_test[i]);
+   }
 
 }
 
@@ -93,7 +106,7 @@ int count_moves(char screen[SCREENLEN][SCREENLEN],int x,int y,char string[],\
 
                   strncat(string,&screen[x+i][y+j],1);
                   count_moves(screen,x+i,y+j,string,arr_to_fill,count);
-                  /*then remove again */
+                  /*then remove again so different path taken*/
                   string[strlen(string)-1]='\0';
                }
 
@@ -107,7 +120,7 @@ int count_moves(char screen[SCREENLEN][SCREENLEN],int x,int y,char string[],\
       arr_to_fill[count]=(char*)malloc(sizeof(char)*strlen(string)+1);
       strcpy(arr_to_fill[count],string);
       count+=1;
-      printf("%d\n",count);
+
 
    }
 
