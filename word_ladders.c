@@ -162,6 +162,7 @@ void fill_ladder(char word_1[],char word_2[],link head,char word_list[WORDLEN][W
    strcpy(word_list[i],"xxx");
 }
 
+
 bool criteria_check(int word_len,char current[],\
                      char existing[],char target_word[])
 {

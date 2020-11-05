@@ -29,7 +29,9 @@ int size_of_ll(link head);
 void group_anagrams(link head);
 bool in_list(char word[],char* used_words[],int size);
 int add_to_list(link head,char* seen_list[],int position);
+void free_list(char** pointer_list,int size);
 link two_word_anagrams(link head,int orig_hist[],char orig_word[]);
+void copy_over_word(int position,char** list,char word[]);
 void test(void);
 
 int main(int argc, char* argv[])
@@ -39,23 +41,23 @@ int main(int argc, char* argv[])
    test();
    if(argc<2)
    {
-      fprintf(stderr,"not valid cell\n");
+      fprintf(stderr,"need words\n");
       return 1;
    }
    else
    {
       make_hist(argv[1],user_hist,ALPHASIZE);
-      head=make_links("34words.txt");
-      /*group_anagrams(head);*/
+      head=make_links("eng_370k_shuffle.txt");
+      group_anagrams(head);
       anagrams=create_anagram_links(head,user_hist,argv[1]);
       printf("%d\n",size_of_ll(anagrams));
-      two_word=two_word_anagrams(head,user_hist,argv[1]);
-      /*head=remove_non_anagrams(head,user_hist,argv[1]);*/
-      print_ll(two_word);
+      /*two_word=two_word_anagrams(head,user_hist,argv[1]);*/
+
+      /*print_ll(two_word);*/
       print_ll(anagrams);
       free_links(head);
       free_links(anagrams);
-      free_links(two_word);
+      /*free_links(two_word);*/
    }
 
    return 0;
@@ -66,21 +68,57 @@ void test(void)
    link head;
    int test_hist_1[26]={0};
    int test_hist_2[26]={0};
+   int i,pos;
+   char* test_seen[10];
    char test_str[27];
    char test_str_ll[10000];
+   link test_point;
+   test_point=malloc(sizeof(element));
+   strcpy(test_point->data,"bye");
+   test_point=NULL;
+
+   test_seen[0]=(char*)malloc(sizeof(char)*10);
+   test_seen[1]=(char*)malloc(sizeof(char)*10);
+
+
+   strcpy(test_seen[0],"hello");
+   strcpy(test_seen[1],"test");
+
+
+   add_to_list(test_point,test_seen,2);
+
    make_hist("abet",test_hist_1,26);
    make_hist("abbbaa",test_hist_2,26);
    stringify_array(test_hist_2,26,test_str);
    assert(strcmp(test_str,"33000000000000000000000000")==0);
    assert(same_hist(test_hist_1,test_hist_2,26)==false);
    assert(same_hist(test_hist_1,test_hist_1,26)==true);
+
+
+   assert(in_list("hello",test_seen,3)==true);
+   assert(in_list("hel",test_seen,3)==false);
+
+
+
    head=make_links("test_word_list.txt");
    stringify_linkedl(head,test_str_ll);
    assert(strcmp(test_str_ll," abetbeatbetaalertalter"));
+   pos=add_to_list(head,test_seen,2);
+   assert(strcmp(test_seen[2],"abet")==0);
+   assert(strcmp(test_seen[4],"beta")==0);
+
+   head=make_links("test_word_list.txt");
+   assert(size_of_ll(head)==5);
    head=remove_non_anagrams(head,test_hist_1,"abet");
+   assert(size_of_ll(head)==2);
+
    stringify_linkedl(head,test_str_ll);
    assert(strcmp(test_str_ll," abetbeatbeta"));
    free_links(head);
+   for(i=0;i<2;i++)
+   {
+      free(test_seen[i]);
+   }
 
 
 }
@@ -312,6 +350,7 @@ bool in_list(char word[],char* used_words[],int size)
    }
    return false;
 }
+
 void group_anagrams(link head)
 {
    /*want to first check that word hasnt apeared yet
@@ -340,36 +379,47 @@ void group_anagrams(link head)
    {
       if(!in_list(head->data,seen_list,position))
       {
-         /*copy over head word*/
-         seen_list[position]=malloc(sizeof(char)*strlen(head->data)+1);
-         if(seen_list[position]==NULL)
-         {
-            fprintf(stderr,"not enough space\n");
-            exit(EXIT_FAILURE);
-         }
-         strcpy(seen_list[position],head->data);
+         copy_over_word(position,seen_list,head->data);
          position++;
+
          make_hist(head->data,head_hist,26);
          /*create linked list of anagrams and print then free*/
          current_anagrams=create_anagram_links(temp,head_hist,head->data);
          printf("%d %s ",size_of_ll(current_anagrams),head->data);
          print_ll(current_anagrams);
-         /*copy over rest of anagrams*/
+         /*copy over rest of anagrams to seen list*/
          position=add_to_list(current_anagrams,seen_list,position);
          printf("\n");
-
+         
          temp=top;
       }
       head=head->next;
    }
-   /*free seen list*/
-   for(i=0;i<position;i++)
-   {
-      free(seen_list[i]);
-   }
-   free(seen_list);
+   free_list(seen_list,position);
 }
 
+
+void copy_over_word(int position,char** list,char word[])
+{
+   list[position]=malloc(sizeof(char)*strlen(word)+1);
+   if(list[position]==NULL)
+   {
+      fprintf(stderr,"not enough space\n");
+      exit(EXIT_FAILURE);
+   }
+   strcpy(list[position],word);
+}
+
+
+void free_list(char** pointer_list,int size)
+{
+   int i;
+   for(i=0;i<size;i++)
+   {
+      free(pointer_list[i]);
+   }
+   free(pointer_list);
+}
 
 int add_to_list(link head,char* seen_list[],int position)
 {

@@ -7,7 +7,7 @@
 #define BEHIND -1
 #define INFRONT 2
 #define SCREENLEN 3
-
+#define LENGTH 9
 
 typedef enum bool {false,true} bool;
 
@@ -58,6 +58,7 @@ void test(void)
    char test_screen[SCREENLEN][SCREENLEN]={{'1','2','3'},
                                        {'4','5','6'},
                                        {'7','8','9'}};
+                                       
    char target_strings[10][10]={"123654789",
                                  "123698547",
                                  "123698745",
@@ -114,7 +115,7 @@ int count_moves(char screen[SCREENLEN][SCREENLEN],int x,int y,char string[],\
          }
       }
    }
-   if(strlen(string)==9)
+   if(strlen(string)==LENGTH)
    {
 
       arr_to_fill[count]=(char*)malloc(sizeof(char)*strlen(string)+1);
