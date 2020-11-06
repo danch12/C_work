@@ -6,8 +6,8 @@
 
 #define BEHIND -1
 #define INFRONT 2
-#define SCREENLEN 3
-#define LENGTH 9
+#define SCREENLEN 5
+#define LENGTH 25
 
 typedef enum bool {false,true} bool;
 
@@ -26,16 +26,18 @@ int main(void)
    char string[1000]="";
    char* patterns[50];
    char end_string[5]="END";
-   char screen[SCREENLEN][SCREENLEN]={{'1','2','3'},
+   /*char screen[SCREENLEN][SCREENLEN]={{'1','2','3'},
                                        {'4','5','6'},
-                                       {'7','8','9'}};
-   /*char screen[SCREENLEN][SCREENLEN]={{'1','2','3','4'},
-                                       {'5','6','7','8'},
-                                       {'9','a','b','c'}};*/
-   test();
+                                       {'7','8','9'}};*/
+   char screen[SCREENLEN][SCREENLEN]={{'1','2','3','4','5'},
+                                       {'6','7','8','9','a'},
+                                       {'b','c','d','e','f'},
+                                       {'g','h','i','j','k'},
+                                       {'l','m','n','o','p'}};
+   /*test();*/
    i=0;
    num_patterns=count_moves(screen,0,0,string,patterns,0);
-   patterns[num_patterns]=(char*)malloc(sizeof(char)*strlen(end_string)+1);
+   /*patterns[num_patterns]=(char*)malloc(sizeof(char)*strlen(end_string)+1);
    strcpy(patterns[num_patterns],end_string);
    while(strcmp(patterns[i],end_string)!=0)
    {
@@ -43,7 +45,7 @@ int main(void)
       printf("%s\n",patterns[i]);
       free(patterns[i]);
       i++;
-   }
+   }*/
    return 0;
 }
 
@@ -53,12 +55,12 @@ void test(void)
    int i;
    int num_patterns_test;
    char test_string[1000]="";
-   char* pattern_test[50];
+   char* pattern_test[100];
    char end_string[5]="END";
    char test_screen[SCREENLEN][SCREENLEN]={{'1','2','3'},
-                                       {'4','5','6'},
-                                       {'7','8','9'}};
-                                       
+                                          {'4','5','6'},
+                                          {'7','8','9'}};
+
    char target_strings[10][10]={"123654789",
                                  "123698547",
                                  "123698745",
@@ -107,19 +109,29 @@ int count_moves(char screen[SCREENLEN][SCREENLEN],int x,int y,char string[],\
 
                   strncat(string,&screen[x+i][y+j],1);
                   count_moves(screen,x+i,y+j,string,arr_to_fill,count);
-                  /*then remove again so different path taken*/
-                  string[strlen(string)-1]='\0';
+                  /*then remove again so different path taken
+                  dont want to remove first char tho*/
+                  if(strlen(string)>1)
+                  {
+                     string[strlen(string)-1]='\0';
+                  }
+
+
+
+
                }
 
+
             }
+
          }
       }
    }
    if(strlen(string)==LENGTH)
    {
-
-      arr_to_fill[count]=(char*)malloc(sizeof(char)*strlen(string)+1);
-      strcpy(arr_to_fill[count],string);
+      printf("%s\n",string);
+      /*arr_to_fill[count]=(char*)malloc(sizeof(char)*strlen(string)+1);
+      strcpy(arr_to_fill[count],string);*/
       count+=1;
 
 

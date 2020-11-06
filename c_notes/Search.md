@@ -79,7 +79,7 @@ int interp(int k, int *a, int lf, int r)
   double md;
   while(lf<=r)
   {
-    md=((double)(k-a[lf])/(double)(a[r]-		       a[lf])* (double)(r-lf))+(double)(lf);
+    md=((double)(k-a[lf])/(double)(a[r]-		       a[lf])* (double)(r-lf))+(double)(r);
     m=0.5+md;
     if(k==a[m])
     {

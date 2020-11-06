@@ -6,6 +6,7 @@
 
 
 #define MAXWORDSIZE 50
+#define MAXWORDS 400000
 #define BUFFERSIZE 1000
 
 typedef enum bool {false,true} bool;
@@ -14,11 +15,34 @@ void move_up_one(int start_pos,char word_list[][MAXWORDSIZE],int size);
 void put_word_in(char word[],char word_list[][MAXWORDSIZE],int size);
 void read_file_in(char word_array[][MAXWORDSIZE],int arr_size, char* filename);
 bool in_list(char word[],char word_array[][MAXWORDSIZE],int arr_size);
+int find_start(const char k_word[], char word_array[][MAXWORDSIZE],int lf,int r);
+int word_score(const char word[]);
+bool interp_search(const char word[],char word_array[][MAXWORDSIZE],int lf, int r);
 void test(void);
 
-int main(void)
+int main(int argc,char* argv[])
 {
+   int i;
+   char word_arr[100000][MAXWORDSIZE]={""};
    test();
+   if(argc<2)
+   {
+      fprintf(stderr,"not enough args\n");
+      exit(EXIT_FAILURE);
+   }
+   else
+   {
+      read_file_in(word_arr,100000,argv[1]);
+      for(i=0;i<10;i++)
+      {
+         printf("%s\n",word_arr[i]);
+      }
+      printf("%d\n",in_list("beat",word_arr,100000));
+
+      printf("%d\n",in_list("alter",word_arr,100000));
+   }
+
+
    return 0;
 }
 
@@ -48,6 +72,14 @@ void test(void)
    assert(in_list("alert",target_test,5)==true);
    assert(in_list("dan",target_test,5)==false);
    assert(in_list("beat",target_test,5)==true);
+   assert(in_list("alter",target_test,5)==true);
+
+   assert(word_score(test_arr[0])==207);
+   assert(word_score("a")==97);
+
+   assert(interp_search("beat",target_test,0,4)==true);
+   assert(interp_search("notin",target_test,0,4)==false);
+
 }
 
 
@@ -119,7 +151,11 @@ bool in_list(char word[],char word_array[][MAXWORDSIZE],int arr_size)
    int lf,rt,mid;
    lf=0;
    rt=arr_size-1;
-
+   /*go past blanks if there are any*/
+   while(strcmp(word_array[rt],"")==0)
+   {
+      rt--;
+   }
    while(lf<=rt)
    {
       mid=(lf+rt)/2;
@@ -141,4 +177,64 @@ bool in_list(char word[],char word_array[][MAXWORDSIZE],int arr_size)
 
    }
    return false;
+}
+
+
+bool interp_search(const char new_word[],char word_array[][MAXWORDSIZE],int lf, int r)
+{
+   int m,k;
+
+   k=word_score(new_word);
+
+   while(lf<=r)
+   {
+      m=find_start(new_word,word_array,lf,r);
+
+
+      if(strcmp(new_word,word_array[m])==0)
+      {
+         return true;
+      }
+      else
+      {
+         if(strcmp(new_word,word_array[m])>0)
+         {
+            lf=m+1;
+         }
+         if(strcmp(new_word,word_array[m])<0)
+         {
+            r=m-1;
+         }
+      }
+   }
+   return false;
+}
+
+
+int word_score(const char word[])
+{
+   if(strlen(word)>1)
+   {
+      return (int) word[0] + (int) word[1];
+   }
+   else
+   {
+      return (int) word[0];
+   }
+
+}
+
+
+int find_start(const char k_word[], char word_array[][MAXWORDSIZE],int lf,int r)
+{
+   double md,l_first,l_last;
+   int m,first_word,last_word,k;
+   k=word_score(k_word);
+   l_first=word_score(word_array[lf]);
+   l_last=word_score(word_array[r]);
+
+   md= (double)(lf)+(((double)k-(double)l_first)/\
+      ((double)l_last-(double)l_first)*((double)r-(double)lf));
+   m=0.5+md;
+   return m;
 }
