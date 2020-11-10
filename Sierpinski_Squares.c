@@ -4,7 +4,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define MAXLEN 100
+#define MAXLEN 128
 
 typedef enum state{off, on} state;
 
@@ -35,7 +35,7 @@ void test(void)
                               {1,1,1,1,1,1,1,1},
                               {1,1,1,1,1,1,1,1},
                               {1,1,1,1,1,1,1,1},};
-   state big_board[100][100];
+   state big_board[MAXLEN][MAXLEN];
    char test_str[10000];
    turn_off(test_board,8,0,0);
    stringify_array_2d(test_board,8,8,test_str);
@@ -43,9 +43,9 @@ void test(void)
    assert(strcmp(test_str,"00111100\n00111100\n00111100\n00111100\n11111111\n11111111\n11111111\n11111111\n")==0);
    turn_on_board(test_board,8,8);
 
-   turn_on_board(big_board,100,100);
-   split_and_turn(big_board,100,100,0,0);
-   print_board(big_board,100,100);
+   turn_on_board(big_board,MAXLEN,MAXLEN);
+   split_and_turn(big_board,MAXLEN,MAXLEN,0,0);
+   print_board(big_board,MAXLEN,MAXLEN);
 }
 
 
@@ -112,8 +112,9 @@ void split_and_turn(state board[][MAXLEN],int orig_len,\
    {
 
       turn_off(board,len,start_row,start_col);
-      print_board(board,orig_len,orig_len);
-      printf("\n");
+      /*print_board(board,orig_len,orig_len);
+      printf("\n");*/
+      printf("%d\n",half_square);
       split_and_turn(board,orig_len,half_square,start_row,start_col+margins);
       split_and_turn(board,orig_len,half_square,start_row+half_square,start_col);
       split_and_turn(board,orig_len,half_square,\
