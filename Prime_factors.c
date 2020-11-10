@@ -8,16 +8,18 @@ typedef enum bool {false,true} bool;
 
 int* sieve_of_e(int n);
 int size_of_prime_arr(int* prime_arr);
-void prime_factors(int n);
-void stringify(int* array,int size);
+char* prime_factors(int n);
+char* stringify(int* array,int size);
 
 void test(void);
 
 int main(void)
 {
-   int* prime_arr;
+
    int i;
+   char* word;
    i=0;
+   test();
    /*prime_arr=sieve_of_e(100);
    while(prime_arr[i]>0)
    {
@@ -25,24 +27,53 @@ int main(void)
       i++;
    }
    free(prime_arr);*/
-   prime_factors(768);
+
+   word=prime_factors(27000);
+   printf("%s\n",word);
+   free(word);
 }
 
 void test(void)
 {
+   int i;
+   int* sieve_under20;
+   int* sieve_under30;
    int primes_under20[8]={2,3, 5, 7, 11, 13, 17, 19};
-   int primes_under30[8]={2,3, 5, 7, 11, 13, 17, 19,23, 29};
-   
+   int primes_under30[10]={2,3, 5, 7, 11, 13, 17, 19,23, 29};
+   int test_list[6]={0,1,2,3,4,-1};
+   int test_stringify[6]={3,4,4,5,5,5};
+   char* test_string;
+   /*int* sieve_of_e(int n)*/
+   sieve_under20=sieve_of_e(20);
+   sieve_under30=sieve_of_e(30);
+   for(i=0;i<8;i++)
+   {
+      assert(sieve_under20[i]==primes_under20[i]);
+   }
+   for(i=0;i<10;i++)
+   {
+      assert(sieve_under30[i]==primes_under30[i]);
+   }
+   free(sieve_under20);
+   free(sieve_under30);
+
+   assert(size_of_prime_arr(test_list)==5);
+   /*int size_of_prime_arr(int* prime_arr)*/
+
+   test_string=stringify(test_stringify,6);
+   printf("%s\n",test_string);
+   free(test_string);
+
 }
 
 
 
-void prime_factors(int n)
+char* prime_factors(int n)
 {
    int* prime_arr;
    int i,pos;
    int size;
-   int num,remainder;
+   int num;
    int final_arr[10000];
    num=n;
    prime_arr=sieve_of_e(n);
@@ -63,23 +94,26 @@ void prime_factors(int n)
    {
       printf("%d\n",final_arr[i]);
    }
-   stringify(final_arr,8);
+
    free(prime_arr);
+   return stringify(final_arr,9);
 }
 
-void stringify(int* array,int size)
+char* stringify(int* array,int size)
 {
    int count;
    char inter_string[100];
-   char final_string[1000]="";
+   char final_string[1000];
+   char* final_string_point;
    int i;
+   strcpy(final_string,"");
    for(i=0;i<size;i++)
    {
       count=1;
       sprintf(inter_string, "%d", array[i]);
       strcat(final_string,inter_string);
 
-      while(array[i]==array[i+1])
+      while(i<size-1&&array[i]==array[i+1])
       {
          count++;
          i++;
@@ -98,7 +132,11 @@ void stringify(int* array,int size)
    {
       final_string[strlen(final_string)-1]='\0';
    }
-   printf("%s\n",final_string);
+
+   final_string_point=malloc(strlen(final_string)+1);
+   strcpy(final_string_point,final_string);
+   final_string_point[strlen(final_string)]='\0';
+   return final_string_point;
 }
 
 
@@ -107,12 +145,12 @@ int size_of_prime_arr(int* prime_arr)
    int count;
    count=0;
    /*added -1 at end of primes list*/
-   while(prime_arr[count]>0)
+   while(prime_arr[count]>=0)
    {
       count++;
    }
    /*dont want to include negative num*/
-   count-=1;
+
    return count;
 }
 

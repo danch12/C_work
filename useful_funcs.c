@@ -47,6 +47,24 @@ void stringify_array(int arr[],int arr_size,char string[])
    string[i]='\0';
 }
 
+
+void stringify_array_2d(int arr[],int num_rows,int num_cols,char string[])
+{
+   int i,j,pos;
+   pos=0;
+   for(i=0;i<num_rows;i++)
+   {
+      for(j=0;j<num_cols;j++)
+      {
+         string[pos]=arr[i][j]+'0';
+         pos++;
+      }
+      string[pos]='\n';
+      pos++;
+   }
+   string[i]='\0';
+}
+
 bool same_array(const int arr_1[],\
     const int arr_2[],int size)
 {
