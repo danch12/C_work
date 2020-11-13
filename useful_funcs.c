@@ -64,6 +64,23 @@ void make_hist(const char word[],int letter_hist[],int hist_size)
    }
 }
 
+int wrap_around(int max_num,int position)
+{
+   if(position>=max_num)
+   {
+      return abs(max_num-position);
+   }
+   else if(position<0)
+   {
+      return max_num+position;
+   }
+   else
+   {
+      return position;
+   }
+}
+
+
 /*stringify single digit array*/
 void stringify_array(int arr[],int arr_size,char string[])
 {

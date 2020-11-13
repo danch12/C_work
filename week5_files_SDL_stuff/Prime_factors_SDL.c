@@ -3,18 +3,35 @@
 #include <time.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
+#include "neillsdl2.h"
 
+#define RADIUSOUTER 5
+#define RADIUS 5
+#define PI 3.14159265
 
 typedef enum bool {false,true} bool;
+
+typedef struct coords{
+   int x;
+   int y;
+}coords;
 
 int* sieve_of_e(int n);
 int size_of_prime_arr(int* prime_arr);
 char* prime_factors(int n);
 char* stringify(int* array,int size);
 void swap(int* a, int* b);
-int* prime_factors_sdl(int n);
+void prime_factors_sdl(int n);
 void simple_sort(int arr[],int size);
-
+bool been_in_area(coords seen_locs[],int arr_size,coords new_loc,int radius);
+void one_num_sdl(int num);
+void make_circle(int num, SDL_Simplewin sw,int start_row, int start_col);
+void make_square(int first_num,int second_num,\
+               SDL_Simplewin sw,int start_col, int start_row);
+void two_num_sdl(int arr[]);
+void three_four_num_sdl(int arr[],int num);
+void run_sdl(int arr[], int size);
 void test(void);
 
 int main(void)
@@ -43,11 +60,12 @@ void test(void)
    int i;
    int* sieve_under20;
    int* sieve_under30;
-   int* sdl_prime;
+
    int primes_under20[8]={2,3, 5, 7, 11, 13, 17, 19};
    int primes_under30[10]={2,3, 5, 7, 11, 13, 17, 19,23, 29};
    int test_list[6]={0,1,2,3,4,-1};
    int test_stringify[6]={3,4,4,5,5,5};
+   int test_sdl[2]={4,10};
    char* test_string;
    /*int* sieve_of_e(int n)*/
    sieve_under20=sieve_of_e(20);
@@ -76,22 +94,129 @@ void test(void)
       printf("%d\n",test_stringify[i]);
    }
 
-   sdl_prime=prime_factors_sdl(117);
-   for(i=0;i<3;i++)
-   {
-      printf("%d\n",sdl_prime[i]);
-   }
-   free(sdl_prime);
+   prime_factors_sdl(18);
+
+
+   /*one_num_sdl(20);*/
 
 }
 
-void one_num_sdl(int arr[])
+void one_num_sdl(int num)
 {
+   SDL_Simplewin sw;
+   Neill_SDL_Init(&sw);
+   make_circle(num,sw,WWIDTH/2, WHEIGHT/2);
+
+   do
+   {
+     Neill_SDL_Events(&sw);
+   }while(!sw.finished);
+
+   SDL_Quit();
+   atexit(SDL_Quit);
+}
+
+void three_four_num_sdl(int arr[],int num)
+{
+   int i,temp;
+   assert(num==3||num==4);
+   temp=arr[1];
+   for(i=2;i<=num;i++)
+   {
+      temp=temp*arr[i];
+   }
+   arr[1]=temp;
+   two_num_sdl(arr);
+}
+
+void two_num_sdl(int arr[])
+{
+   double first, second,i,third,start_col,base_row,base_col;
+   SDL_Simplewin sw;
+   first=arr[0];
+   second=arr[1];
+   base_col=WWIDTH/first;
+   base_row=WHEIGHT/first;
+   if((int)second%2==0)
+   {
+      second=second/2;
+      third=2;
+   }
+   else
+   {
+      third=1;
+   }
+   Neill_SDL_Init(&sw);
+   for(i=0;i<first;i++)
+   {
+      /*start_row=base_row*i +WHEIGHT/first;*/
+      start_col= base_col*i+ ((WWIDTH/(first))/2);
+      make_square(second,third,sw,start_col,base_row);
+   }
+   do
+   {
+     Neill_SDL_Events(&sw);
+   }while(!sw.finished);
+
+   SDL_Quit();
+   atexit(SDL_Quit);
+}
+
+void make_circle(int num, SDL_Simplewin sw,int start_col, int start_row)
+{
+   double i,radius_outer,x,y,intervals;
+
+   radius_outer = RADIUSOUTER*num;
+   intervals= 2*PI/num;
+
+   for(i=0;i<2*PI;i+=intervals)
+   {
+
+      x= radius_outer *cos(i)+start_col;
+      y= radius_outer * sin(i)+start_row;
+
+      Neill_SDL_SetDrawColour(&sw, rand()%255,
+                                   rand()%255,
+                                   rand()%255);
+
+      Neill_SDL_RenderFillCircle(sw.renderer,x,y,RADIUS);
+      Neill_SDL_UpdateScreen(&sw);
+   }
+}
+
+void make_square(int first_num,int second_num,\
+               SDL_Simplewin sw,int start_col, int start_row)
+{
+   int i,j,x,y,prev;
+   int pos_count;
+   pos_count=0;
+   prev=0;
+   for(i=0;i<first_num;i++)
+   {
+      y= start_row + pos_count;
+      for(j=0;j<second_num;j++)
+      {
+
+         Neill_SDL_SetDrawColour(&sw, rand()%255,
+                                      rand()%255,
+                                      rand()%255);
+
+         x= start_col+(j*RADIUS*3);
+
+         Neill_SDL_RenderFillCircle(sw.renderer,x,y,RADIUS);
+         Neill_SDL_UpdateScreen(&sw);
+
+      }
+      pos_count+=RADIUS*2;
+   }
 
 }
 
 
-int* prime_factors_sdl(int n)
+
+
+
+void prime_factors_sdl(int n)
 {
    int* prime_arr;
    int i,pos,count;
@@ -112,7 +237,6 @@ int* prime_factors_sdl(int n)
          num/=prime_arr[i];
       }
    }
-   printf("count =%d\n",count);
    final_arr=(int*)malloc(sizeof(int)*count);
    pos=0;
    num=n;
@@ -128,10 +252,33 @@ int* prime_factors_sdl(int n)
    }
    simple_sort(final_arr,pos);
    free(prime_arr);
-   return final_arr;
+   run_sdl(final_arr,pos);
+
 }
 
+void run_sdl(int arr[], int size)
+{
+   switch(size)
+   {
+      case 1:
+      one_num_sdl(arr[0]);
+      break;
 
+      case 2:
+      two_num_sdl(arr);
+      break;
+
+      case 3:
+      case 4:
+      three_four_num_sdl(arr,size);
+      break;
+      default:
+      fprintf(stderr,"wrong size arr sorry not everything supported\
+                     in this iteration of code\n");
+      exit(EXIT_FAILURE);
+
+   }
+}
 
 void swap(int* a, int* b)
 {
