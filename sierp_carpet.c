@@ -126,7 +126,6 @@ void split_and_turn(state board[][MAXLEN],int orig_len,\
    else
    {
       /*printf("inner_sq_len= %d\n",inner_sq_len);
-
       printf("len =%d\n",len);*/
       square_off(board,inner_sq_len,start_row+inner_sq_len,start_col+inner_sq_len);
       print_board(board,orig_len,orig_len);
@@ -135,7 +134,6 @@ void split_and_turn(state board[][MAXLEN],int orig_len,\
       {
          for(j=start_col;j<len+start_col;j+=inner_sq_len)
          {
-            /*printf("current row= %d current col=%d\n",i,j);*/
             split_and_turn(board,orig_len,inner_sq_len,i,j);
          }
 
