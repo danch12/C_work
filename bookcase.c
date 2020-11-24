@@ -542,13 +542,7 @@ void test(void)
 
 
 
-   /*fp= fopen("rrggccyy-437.bc","r");
-   if(fp==NULL)
-   {
-      fprintf(stderr,"error while opening file in testing\n");
-      exit(EXIT_FAILURE);
-   }
-
+   /*
    num_rows=num_cols=0;
    assert(get_sizes(fp,&num_rows,&num_cols));
    assert(num_rows==4);
@@ -597,6 +591,8 @@ int len_shelf_full(int row,nodeptr bk_container)
    int x;
    int count;
    count=0;
+   assert(row>0);
+   assert(row<bk_container->num_rows);
    for(x=0;(x<bk_container->num_cols) && \
    (bk_container->bookcase[row][x]!=empty) ;x++)
    {

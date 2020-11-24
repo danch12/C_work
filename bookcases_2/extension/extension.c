@@ -1,55 +1,12 @@
-#include <stdlib.h>
-/*#include <stdio.h>*/
-#include <time.h>
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
-#include <math.h>
 #include "common_bk.h"
 
-#define NUMCOLOURS 8
-#define MAXSIZE 9
-#define STARTROW 0
-#define IMPOSS 2
-
-#define MAXSTRLEN (MAXSIZE*(MAXSIZE+1)+1)
-#define MAXBKS 1000000
-
-
-
-typedef struct node
-{
-   colours bookcase[MAXSIZE][MAXSIZE];
-   struct node* parent;
-   int num_children;
-   int num_rows;
-   int num_cols;
-   /*because im sorting need to have
-   way of telling if already seen the node*/
-   bool seen;
-   double impurity;
-   struct node* next;
-}node;
-
-typedef node* nodeptr;
-
-/*since im basically doing insertion sort
-it makes sense to do linked list - no point
-making a faster way of searching if inserting
-is going to take ages*/
-typedef struct bookcase_arr{
-   int size;
-   nodeptr head;
-}bookcase_arr;
-
-/*from an original bookcase create first node*/
-nodeptr create_orig_node(colours bookcase[MAXSIZE][MAXSIZE],\
-                        int num_rows,int num_cols);
 
 /*find gini coeff of one row*/
 double find_gini_row(int colour_hist[NUMCOLOURS]);
+
 /*averaged gini coefficent of whole bookcase*/
 bool calculate_gini_bc(nodeptr bk_container);
+
 bool compare_doubles_equality(double num_1,double num_2,\
                               double epsilon);
 
@@ -64,6 +21,7 @@ bool insert_sorted(bookcase_arr* books_arr,nodeptr to_add);
 bool free_bookcase_arr(bookcase_arr* to_free);
 nodeptr go_through_bookcases(bookcase_arr* bk_arr,\
                         nodeptr orig_bookcase,int max_iters);
+
 bool duplicate(bookcase_arr* bk_arr,nodeptr to_add);
 /*count times a colour appears in a row*/
 void count_colour_apps_row(nodeptr bk_container,\
@@ -71,29 +29,12 @@ void count_colour_apps_row(nodeptr bk_container,\
 /*count how many different colours appear in a row*/
 int count_colour_row(nodeptr bk_container,colours colour,int row);
 
-/*need more tests*/
 nodeptr iterate_one_bookcase(nodeptr parent_bookcase,bookcase_arr* bk_arr);
-
-/*funcs from prev excercise cant put them
-all in common file as nodeptr definition has changed*/
-
-
-bool impossible_start(const nodeptr bk_container);
-int len_shelf_full(int row,const nodeptr bk_container);
-
-char* num_to_letter(colours c);
-void bookcase_to_str(const nodeptr bk_container,char* str);
-bool legal_move(int start_row,int target_row, \
-            const nodeptr bk_container);
-bool is_happy(int start_row,const nodeptr bk_container);
-nodeptr iterate_one_bookcase(nodeptr parent_bookcase,bookcase_arr* bk_arr);
-void print_lineage(nodeptr happy_bookcase,bool verbose);
-int num_of_gens(nodeptr happy_bookcase);
 nodeptr fill_from_file(char* filename);
-bool empties_before_colour(const nodeptr bk_container);
-int count_num_colours(const nodeptr bk_container);
-int count_colour(const nodeptr bk_container,colours colour);
-bool colour_impossibility(const nodeptr bk_container);
+
+
+
+
 
 void test(void);
 
@@ -182,6 +123,7 @@ void test(void)
    colours test_5050[MAXSIZE][MAXSIZE]={{red,red,green,green},
                                        {red,red,green,green}};
    epsilon=0.001;
+
    test_node1=create_orig_node(test_bc_simple_4,5,4);
    /*only differences to the main bookcase file*/
    assert(compare_doubles_equality(test_node1->impurity,IMPOSS,epsilon));
@@ -275,7 +217,7 @@ void test(void)
    /*testing bookcase ll funcs*/
 
    test_bk_arr= init_bookcase_arr();
-
+   assert(test_bk_arr->size==0);
 
    test_node1=create_orig_node(test_not_imposs,2,4);
    calculate_gini_bc(test_node1);
@@ -356,7 +298,6 @@ void test(void)
 
 
 
-   /*nodeptr iterate_one_bookcase(nodeptr parent_bookcase,bookcase_arr* bk_arr);*/
    test_bk_arr= init_bookcase_arr();
    test_node1=create_orig_node(test_bc_simple_4,5,4);
    iterate_one_bookcase(test_node1,test_bk_arr);
@@ -406,25 +347,6 @@ void test(void)
    free_bookcase_arr(test_bk_arr);
 }
 
-nodeptr create_orig_node(colours bookcase[MAXSIZE][MAXSIZE],\
-                        int num_rows,int num_cols)
-{
-   nodeptr origin;
-
-   origin=(nodeptr)safe_calloc(1,sizeof(node));
-   origin->parent=NULL;
-   origin->num_children=0;
-   origin->num_rows=num_rows;
-   origin->num_cols=num_cols;
-
-   memcpy(origin->bookcase,bookcase,\
-         MAXSIZE*MAXSIZE*sizeof(colours));
-   origin->seen=false;
-   /*set to impossible val initially*/
-   origin->impurity=IMPOSS;
-   return origin;
-}
-
 
 void count_colour_apps_row(const nodeptr bk_container,\
                int colour_hist[NUMCOLOURS],int row)
@@ -457,13 +379,6 @@ int count_colour_row(const nodeptr bk_container,colours colour,int row)
    return count;
 }
 
-/*from python to c
-def gini(self, target):
-        vals, counts = np.unique(target, return_counts=True)
-        gini_parts = []
-        for c in counts:
-            gini_parts.append((-(c / np.sum(counts))**2))
-        return sum(gini_parts)*/
 
 double find_gini_row(int colour_hist[NUMCOLOURS])
 {
@@ -536,89 +451,6 @@ bool compare_doubles_equality(double num_1,double num_2,\
 }
 
 
-void bookcase_to_str(nodeptr bk_container,char* str)
-{
-   int y,x;
-
-   str[0]='\0';
-
-   for(y=0;y<bk_container->num_rows;y++)
-   {
-      for(x=0;x<bk_container->num_cols;x++)
-      {
-
-         strcat(str,num_to_letter(bk_container->bookcase[y][x]));
-      }
-      strcat(str,"\n");
-   }
-
-
-}
-
-
-bool legal_move(int start_row,int target_row, \
-            const nodeptr bk_container)
-{
-
-   int book_index;
-   if(bk_container==NULL)
-   {
-      return false;
-   }
-   if(start_row==target_row)
-   {
-      /*this is not a move +will lead to waste*/
-      return false;
-   }
-   /*not sure when this would happen but still check*/
-   if((start_row>=bk_container->num_rows)||\
-      (target_row>=bk_container->num_rows)\
-      ||(start_row<0)||(target_row<0))
-   {
-      return false;
-   }
-   if(len_shelf_full(target_row,bk_container)==\
-      bk_container->num_cols)
-   {
-      return false;
-   }
-   /*len shelf returns size need to minus 1 to get index*/
-   book_index=len_shelf_full(start_row,bk_container)-1;
-   /*empty shelf*/
-   if(book_index<0)
-   {
-      return false;
-   }
-
-   return true;
-}
-
-
-nodeptr init_copy_node(nodeptr parent_bookcase)
-{
-   nodeptr child;
-   if(parent_bookcase)
-   {
-      parent_bookcase->num_children=\
-      parent_bookcase->num_children+1;
-
-      child=(nodeptr)safe_calloc(1,sizeof(node));
-      child->parent=parent_bookcase;
-      child->num_children=0;
-      child->num_rows=parent_bookcase->num_rows;
-      child->num_cols=parent_bookcase->num_cols;
-      child->next=NULL;
-      child->impurity=2;
-      memcpy(child->bookcase,parent_bookcase->bookcase,\
-               MAXSIZE*MAXSIZE*sizeof(colours));
-      return child;
-   }
-
-   return NULL;
-}
-
-
-
 nodeptr make_move(int start_row,int target_row,\
          nodeptr parent_bookcase)
 {
@@ -652,18 +484,6 @@ nodeptr make_move(int start_row,int target_row,\
 }
 
 
-int len_shelf_full(int row,const nodeptr bk_container)
-{
-   int x;
-   int count;
-   count=0;
-   for(x=0;(x<bk_container->num_cols) && \
-   (bk_container->bookcase[row][x]!=empty) ;x++)
-   {
-      count+=1;
-   }
-   return count;
-}
 
 
 
@@ -690,7 +510,8 @@ void add_bookcase(bookcase_arr* books_arr,nodeptr to_add)
    }
 }
 
-/*can assume books_arr not null*/
+/*can assume books_arr not null as this func only
+used in add_bookcase*/
 bool insert_sorted(bookcase_arr* books_arr,nodeptr to_add)
 {
    nodeptr current,previous;
@@ -787,38 +608,6 @@ nodeptr iterate_one_bookcase(nodeptr parent_bookcase,bookcase_arr* bk_arr)
 
 
 
-bool is_happy(int start_row,nodeptr bk_container)
-{
-   int y,x;
-   colours* colour_track;
-   colour_track=(colours*)safe_calloc(bk_container->num_rows\
-                                    ,sizeof(colours));
-   for(y=start_row;y<bk_container->num_rows;y++)
-   {
-       /*something has gone wrong if an empty is before a colour
-       will check for that in seperate func bc of this safe to
-      assign first item to the tracker*/
-      colour_track[y]=bk_container->bookcase[y][0];
-      for(x=0;x<bk_container->num_cols;x++)
-      {
-         if(bk_container->bookcase[y][x]!=colour_track[y]&&\
-            bk_container->bookcase[y][x]!=empty)
-         {
-            free(colour_track);
-            return false;
-         }
-      }
-   }
-   if(duplicate_colour_rows(colour_track,bk_container->num_rows))
-   {
-      free(colour_track);
-      return false;
-   }
-   free(colour_track);
-   return true;
-}
-
-
 
 nodeptr go_through_bookcases(bookcase_arr* bk_arr,\
                         nodeptr orig_bookcase,int max_iters)
@@ -880,47 +669,6 @@ bool duplicate(bookcase_arr* bk_arr,nodeptr to_add)
 }
 
 
-void print_lineage(nodeptr happy_bookcase,bool verbose)
-{
-   int count;
-   char temp_str[MAXSTRLEN];
-   count=num_of_gens(happy_bookcase);
-   if(count==-1)
-   {
-      printf("No Solution?\n");
-      return;
-   }
-   printf("%d\n",count);
-   if(verbose)
-   {
-      while(happy_bookcase!=NULL)
-      {
-         bookcase_to_str(happy_bookcase,temp_str);
-         printf("%s",temp_str);
-         printf("\n");
-
-         happy_bookcase=happy_bookcase->parent;
-      }
-   }
-}
-
-
-int num_of_gens(nodeptr happy_bookcase)
-{
-   int count;
-   count=-1;
-   if(happy_bookcase)
-   {
-      count+=2;
-      while(happy_bookcase->parent!=NULL)
-      {
-         count+=1;
-         happy_bookcase=happy_bookcase->parent;
-      }
-   }
-   return count;
-}
-
 
 nodeptr fill_from_file(char* filename)
 {
@@ -963,113 +711,4 @@ nodeptr fill_from_file(char* filename)
    }
    fclose(fp);
    return NULL;
-}
-
-
-
-
-bool empties_before_colour(const nodeptr bk_container)
-{
-   int y,x;
-   int first_empty_ind;
-   if(bk_container)
-   {
-      for(y=0;y<bk_container->num_rows;y++)
-      {
-         first_empty_ind=len_shelf_full(y,bk_container);
-         for(x=first_empty_ind;x<bk_container->num_cols;x++)
-         {
-            if(bk_container->bookcase[y][x]!=empty)
-            {
-               return true;
-            }
-         }
-      }
-
-   }
-   return false;
-}
-
-
-bool impossible_start(const nodeptr bk_container)
-{
-   int num_colours;
-   int num_empty_spaces;
-   num_colours=count_num_colours(bk_container);
-   if(num_colours>bk_container->num_rows)
-   {
-      return true;
-   }
-   if(colour_impossibility(bk_container))
-   {
-      return true;
-   }
-   num_empty_spaces=count_colour(bk_container,empty);
-   if(num_empty_spaces==0)
-   {
-      if(!is_happy(STARTROW,bk_container))
-      {
-         return true;
-      }
-   }
-   return false;
-}
-
-
-bool colour_impossibility(const nodeptr bk_container)
-{
-   int i;
-   for(i=red;i<=black;i++)
-   {
-      if(count_colour(bk_container,i)>bk_container->num_cols)
-      {
-         return true;
-      }
-   }
-   return false;
-}
-
-
-int count_colour(const nodeptr bk_container,colours colour)
-{
-   int y,x,count;
-   count=0;
-   for(y=0;y<bk_container->num_rows;y++)
-   {
-      for(x=0;x<bk_container->num_cols;x++)
-      {
-         if(bk_container->bookcase[y][x]==colour)
-         {
-            count+=1;
-         }
-      }
-
-   }
-   return count;
-}
-
-/*enumed the colours so can just create a bool hist
- and use the colours as indexes*/
-int count_num_colours(const nodeptr bk_container)
-{
-   int y,x,count;
-   bool colour_hist[NUMCOLOURS]={false};
-
-   for(y=0;y<bk_container->num_rows;y++)
-   {
-      for(x=0;x<bk_container->num_cols;x++)
-      {
-         if(bk_container->bookcase[y][x]!=empty)
-         {
-            /*minus 1 as 0 indexed*/
-            colour_hist[bk_container->bookcase[y][x]-1]=true;
-         }
-      }
-   }
-   count=0;
-   for(y=0;y<NUMCOLOURS;y++)
-   {
-      count+=(int)colour_hist[y];
-   }
-   return count;
 }

@@ -61,7 +61,7 @@ bool legal_move(int start_row,int target_row, \
             const nodeptr bk_container);
 
 /*from an original bookcase create first node*/
-nodeptr create_orig_node(const colours bookcase[MAXSIZE][MAXSIZE],\
+nodeptr create_orig_node(colours bookcase[MAXSIZE][MAXSIZE],\
                         int num_rows,int num_cols);
 
 /*create a copy of a node and increase the num
@@ -143,6 +143,11 @@ int main(int argc,char* argv[])
       fprintf(stderr,"invalid file- empties occur before books\n");
       exit(EXIT_FAILURE);
    }
+   if(impossible_start(origin))
+   {
+      printf("No Solution?\n");
+      return 0;
+   }
    bk_arr=init_bookcase_arr();
    solution=go_through_bookcases(bk_arr,origin,MAXBKS);
 
@@ -155,7 +160,6 @@ int main(int argc,char* argv[])
       verbose=false;
    }
    print_lineage(solution,verbose);
-
    free_bookcase_arr(bk_arr);
    return 0;
 }
@@ -587,6 +591,7 @@ void test(void)
 }
 
 
+
 int len_shelf_full(int row,const nodeptr bk_container)
 {
    int x;
@@ -599,6 +604,7 @@ int len_shelf_full(int row,const nodeptr bk_container)
    }
    return count;
 }
+
 
 
 /*only including start_row
@@ -746,7 +752,7 @@ nodeptr init_copy_node(const nodeptr parent_bookcase)
    return NULL;
 }
 
-nodeptr create_orig_node(const colours bookcase[MAXSIZE][MAXSIZE],\
+nodeptr create_orig_node(colours bookcase[MAXSIZE][MAXSIZE],\
                         int num_rows,int num_cols)
 {
    nodeptr origin;
