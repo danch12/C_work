@@ -4,6 +4,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include "common_bk.h"
 
 #define NUMCOLOURS 8
 #define INITLEN 10
@@ -16,8 +17,8 @@
 #define MAXBKS 1000000
 #define BUFFERSIZE 100
 
-typedef enum colours {empty,red, green,yellow,blue,magenta,cyan,white,black} colours;
-typedef enum bool {false, true} bool;
+/*typedef enum colours {empty,red, green,yellow,blue,magenta,cyan,white,black} colours;
+typedef enum bool {false, true} bool;*/
 
 
 typedef struct node
@@ -41,32 +42,26 @@ typedef struct bookcase_arr{
 
 
 /*win conditions*/
-bool is_happy(int start_row,nodeptr bk_container);
-bool duplicate_colour_rows(colours* array,int array_size);
+bool is_happy(int start_row,const nodeptr bk_container);
+
 /*how full is one bookcase shelf -
 couldnt think of a better name sorry*/
-int len_shelf_full(int row,nodeptr bk_container);
+int len_shelf_full(int row,const nodeptr bk_container);
 
 
-/*
-legallity_checker_init() */
 
 /*mostly for testing what bookcases look like*/
-char* num_to_letter(colours c);
-void bookcase_to_str(nodeptr bk_container,char* str);
-
-/*return void then cast when appropriate*/
-void* safe_calloc(size_t nitems, size_t size);
+void bookcase_to_str(const nodeptr bk_container,char* str);
 
 /*deals with trying to move empties
   moving to full row
   trying to move into same row
   +invalid row positions*/
 bool legal_move(int start_row,int target_row, \
-            nodeptr bk_container);
+            const nodeptr bk_container);
 
 /*from an original bookcase create first node*/
-nodeptr create_orig_node(colours bookcase[MAXSIZE][MAXSIZE],\
+nodeptr create_orig_node(const colours bookcase[MAXSIZE][MAXSIZE],\
                         int num_rows,int num_cols);
 
 /*create a copy of a node and increase the num
@@ -76,7 +71,7 @@ nodeptr init_copy_node(nodeptr parent_bookcase);
 /*if legal creates a new bookcase with book moved
 to target row otherwise returns NULL*/
 nodeptr make_move(int start_row,int target_row,\
-            nodeptr parent_bookcase);
+               nodeptr parent_bookcase);
 
 /*add a bookcase to the bookcase array*/
 void add_bookcase(bookcase_arr* books_arr,nodeptr to_add);
@@ -98,21 +93,24 @@ bool free_bookcase_arr(bookcase_arr* b_arr);
 
 /*enumed the colours so can just create a bool hist
  and use the colours as indexes*/
-int count_num_colours(nodeptr bk_container);
-int count_colour(nodeptr bk_container,colours colour);
+int count_num_colours(const nodeptr bk_container);
+/*count occurences of single colour*/
+int count_colour(const nodeptr bk_container,colours colour);
 
 /*considers basic impossibilities - doesnt cover
 everything */
 bool impossible_start(nodeptr bk_container);
-bool colour_impossibility(nodeptr bk_container);
+
+bool colour_impossibility(const nodeptr bk_container);
 
 
-bool empties_before_colour(nodeptr bk_container);
+bool empties_before_colour(const nodeptr bk_container);
 
 void print_lineage(nodeptr happy_bookcase,bool verbose);
 
 /*returns -1 if NULL*/
 int num_of_gens(nodeptr happy_bookcase);
+
 /*to find impossible bookcases one of the checks will be
 no (simple)oscillating bookcases - eg move to a free shelf
  then move back again *a million - to do this
@@ -120,13 +118,9 @@ no (simple)oscillating bookcases - eg move to a free shelf
   bookcases to see repeated */
 bool oscillating(bookcase_arr* bk_arr,int pos);
 /*counts to 50 single children in a row
-then sets of oscillating checker*/
+then sets off oscillating checker*/
 bool oscilating_counter(bookcase_arr* bk_arr,int pos,int* count);
 
-colours letter_to_num(char c);
-
-/*get num rows and cols*/
-bool get_sizes(FILE *fp,int* num_rows,int* num_cols);
 /*creates a node from a file*/
 nodeptr fill_from_file(char* filename);
 
@@ -161,6 +155,7 @@ int main(int argc,char* argv[])
       verbose=false;
    }
    print_lineage(solution,verbose);
+
    free_bookcase_arr(bk_arr);
    return 0;
 }
@@ -592,7 +587,7 @@ void test(void)
 }
 
 
-int len_shelf_full(int row,nodeptr bk_container)
+int len_shelf_full(int row,const nodeptr bk_container)
 {
    int x;
    int count;
@@ -608,7 +603,8 @@ int len_shelf_full(int row,nodeptr bk_container)
 
 /*only including start_row
  so can do multiple tests on one bookcase*/
-bool is_happy(int start_row,nodeptr bk_container)
+
+bool is_happy(int start_row,const nodeptr bk_container)
 {
    int y,x;
    colours* colour_track;
@@ -639,38 +635,8 @@ bool is_happy(int start_row,nodeptr bk_container)
    return true;
 }
 
-bool duplicate_colour_rows(colours* array,int array_size)
-{
-   int y,x;
-   for(y=0;y<array_size-1;y++)
-   {
-      for(x=y+1;x<array_size;x++)
-      {
-         if((array[y]==array[x])&&\
-            (array[y]!=empty))
-         {
-            return true;
-         }
-      }
-   }
-   return false;
-}
 
-/*return void then cast when appropriate*/
-void* safe_calloc(size_t nitems, size_t size)
-{
-   void* ptr;
-   ptr = calloc(nitems, size);
-   if(ptr==NULL)
-   {
-      fprintf(stderr,"No Solution?\n");
-   	exit(EXIT_FAILURE);
-   }
-   return ptr;
-}
-
-
-void bookcase_to_str(nodeptr bk_container,char* str)
+void bookcase_to_str(const nodeptr bk_container,char* str)
 {
    int y,x;
 
@@ -690,37 +656,10 @@ void bookcase_to_str(nodeptr bk_container,char* str)
 }
 
 
-char* num_to_letter(colours c)
-{
-   switch(c)
-   {
-      case(empty):
-      return ".";
-      case(red):
-      return "R";
-      case(green):
-      return "G";
-      case(yellow):
-      return "Y";
-      case(blue):
-      return "B";
-      case(magenta):
-      return "M";
-      case(cyan):
-      return "C";
-      case(white):
-      return "W";
-      case(black):
-      return "K";
-      default:
-      fprintf(stderr,"invalid colour in bookcase\n");
-   	exit(EXIT_FAILURE);
-   }
-}
 
 
 bool legal_move(int start_row,int target_row, \
-            nodeptr bk_container)
+            const nodeptr bk_container)
 {
 
    int book_index;
@@ -730,10 +669,10 @@ bool legal_move(int start_row,int target_row, \
    }
    if(start_row==target_row)
    {
-
+      /*this is not a move +will lead to waste*/
       return false;
    }
-
+   /*not sure when this would happen but still check*/
    if((start_row>=bk_container->num_rows)||\
       (target_row>=bk_container->num_rows)\
       ||(start_row<0)||(target_row<0))
@@ -745,9 +684,9 @@ bool legal_move(int start_row,int target_row, \
    {
       return false;
    }
-
+   /*len shelf returns size need to minus 1 to get index*/
    book_index=len_shelf_full(start_row,bk_container)-1;
-
+   /*empty shelf*/
    if(book_index<0)
    {
       return false;
@@ -757,7 +696,7 @@ bool legal_move(int start_row,int target_row, \
 }
 
 nodeptr make_move(int start_row,int target_row,\
-         nodeptr parent_bookcase)
+         const nodeptr parent_bookcase)
 {
    nodeptr child;
    int start_row_pos,target_row_pos;
@@ -786,7 +725,7 @@ nodeptr make_move(int start_row,int target_row,\
 /*initialises a copy of parent bookcase as a child
 if no parent then just returns a NULL ->not sure
 when this would happen but just in case*/
-nodeptr init_copy_node(nodeptr parent_bookcase)
+nodeptr init_copy_node(const nodeptr parent_bookcase)
 {
    nodeptr child;
    if(parent_bookcase)
@@ -807,7 +746,7 @@ nodeptr init_copy_node(nodeptr parent_bookcase)
    return NULL;
 }
 
-nodeptr create_orig_node(colours bookcase[MAXSIZE][MAXSIZE],\
+nodeptr create_orig_node(const colours bookcase[MAXSIZE][MAXSIZE],\
                         int num_rows,int num_cols)
 {
    nodeptr origin;
@@ -1025,7 +964,7 @@ bool oscilating_counter(bookcase_arr* bk_arr,int pos,int* count)
    }
 }
 
-bool colour_impossibility(nodeptr bk_container)
+bool colour_impossibility(const nodeptr bk_container)
 {
    int i;
    for(i=red;i<=black;i++)
@@ -1039,7 +978,7 @@ bool colour_impossibility(nodeptr bk_container)
 }
 
 
-int count_colour(nodeptr bk_container,colours colour)
+int count_colour(const nodeptr bk_container,colours colour)
 {
    int y,x,count;
    count=0;
@@ -1058,7 +997,7 @@ int count_colour(nodeptr bk_container,colours colour)
 }
 /*enumed the colours so can just create a bool hist
  and use the colours as indexes*/
-int count_num_colours(nodeptr bk_container)
+int count_num_colours(const nodeptr bk_container)
 {
    int y,x,count;
    bool colour_hist[NUMCOLOURS]={false};
@@ -1123,35 +1062,8 @@ int num_of_gens(nodeptr happy_bookcase)
    return count;
 }
 
-colours letter_to_num(char c)
-{
-   switch(toupper(c))
-   {
-      case('.'):
-      return empty;
-      case('R'):
-      return red;
-      case('G'):
-      return green;
-      case('Y'):
-      return yellow;
-      case('B'):
-      return blue;
-      case('M'):
-      return magenta;
-      case('C'):
-      return cyan;
-      case('W'):
-      return white;
-      case('K'):
-      return black;
-      default:
-      fprintf(stderr,"invalid colour in bookcase\n");
-   	exit(EXIT_FAILURE);
-   }
-}
 
-nodeptr fill_from_file(char* filename)
+/*nodeptr fill_from_file(char* filename)
 {
    FILE *fp;
    int x,n_rows,n_cols,curr_row;
@@ -1173,10 +1085,10 @@ nodeptr fill_from_file(char* filename)
 
    curr_row=0;
    while(fgets(buffer,BUFFERSIZE,fp)!=NULL)
-   {
+   {*/
       /*need to take away the newline*/
-      assert((strlen(buffer)-1)==(size_t)n_cols&& "more/less cols than expected");
-      assert(curr_row<=n_rows && "more rows than expected");
+   /*   assert((strlen(buffer)-1)==(size_t)n_cols&& "more/less cols than expected");
+      assert(curr_row<=n_rows&& "more rows than expected");
       for(x=0;x<n_cols;x++)
       {
          origin_bk[curr_row][x]=letter_to_num(buffer[x]);
@@ -1187,30 +1099,53 @@ nodeptr fill_from_file(char* filename)
    bk_container=create_orig_node(origin_bk,n_rows,n_cols);
    fclose(fp);
    return bk_container;
-}
+}*/
 
-
-bool get_sizes(FILE *fp,int* num_rows,int* num_cols)
+nodeptr fill_from_file(char* filename)
 {
+   FILE *fp;
+   int x,n_rows,n_cols,curr_row;
+   colours origin_bk[MAXSIZE][MAXSIZE];
    char buffer[BUFFERSIZE];
+   nodeptr bk_container;
 
-   if(fgets(buffer,BUFFERSIZE,fp)==NULL)
+   fp= fopen(filename,"r");
+   if(fp==NULL)
    {
-      fprintf(stderr,"file empty\n");
+      fprintf(stderr,"error while opening file\n");
       exit(EXIT_FAILURE);
    }
-   sscanf(buffer, "%d %d",num_rows,num_cols);
-   /*considering a bookcase with 0 rows || 0 cols
-   not to be a bookcase mostly because it isnt*/
-   if(*num_rows>MAXSIZE||*num_rows<1||*num_cols>MAXSIZE||*num_cols<1)
+   if(!get_sizes(fp,&n_rows,&n_cols))
    {
-      fprintf(stderr,"invalid number of rows/cols\n");
+      fprintf(stderr,"error getting number of rows and columns\n");
       exit(EXIT_FAILURE);
    }
-   return true;
+   curr_row=0;
+   while(fgets(buffer,BUFFERSIZE,fp)!=NULL)
+   {
+      /*need to take away the newline*/
+      if((check_equality(strlen(buffer)-1,(size_t)n_cols))&&
+         check_lower_or_equal(curr_row,n_rows))
+      {
+         for(x=0;x<n_cols;x++)
+         {
+            origin_bk[curr_row][x]=letter_to_num(buffer[x]);
+         }
+         curr_row+=1;
+      }
+   }
+   if(check_equality((size_t)curr_row,(size_t)n_rows))
+   {
+      bk_container=create_orig_node(origin_bk,n_rows,n_cols);
+      fclose(fp);
+      return bk_container;
+   }
+   fclose(fp);
+   return NULL;
 }
 
-bool empties_before_colour(nodeptr bk_container)
+
+bool empties_before_colour(const nodeptr bk_container)
 {
    int y,x;
    int first_empty_ind;

@@ -1,25 +1,21 @@
 #include <stdlib.h>
-#include <stdio.h>
+/*#include <stdio.h>*/
 #include <time.h>
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>
-
+#include "common_bk.h"
 
 #define NUMCOLOURS 8
-#define INITLEN 10
-#define SCALEFACTOR 2
 #define MAXSIZE 9
 #define STARTROW 0
 #define IMPOSS 2
 
 #define MAXSTRLEN (MAXSIZE*(MAXSIZE+1)+1)
 #define MAXBKS 1000000
-#define BUFFERSIZE 100
 
-typedef enum colours {empty,red, green,yellow,blue,magenta,cyan,white,black} colours;
-typedef enum bool {false, true} bool;
+
 
 typedef struct node
 {
@@ -74,27 +70,31 @@ void count_colour_apps_row(nodeptr bk_container,\
                int colour_hist[NUMCOLOURS],int row);
 /*count how many different colours appear in a row*/
 int count_colour_row(nodeptr bk_container,colours colour,int row);
-/*need test*/
+
+/*need more tests*/
 nodeptr iterate_one_bookcase(nodeptr parent_bookcase,bookcase_arr* bk_arr);
 
-/*funcs from prev excercise*/
-int len_shelf_full(int row,nodeptr bk_container);
-void* safe_calloc(size_t nitems, size_t size);
+/*funcs from prev excercise cant put them
+all in common file as nodeptr definition has changed*/
+
+bool check_lower_or_equal(const int dimension,const int comparison);
+bool check_equality(const size_t dimension,const size_t comparison);
+
+int len_shelf_full(int row,const nodeptr bk_container);
+
 char* num_to_letter(colours c);
-void bookcase_to_str(nodeptr bk_container,char* str);
+void bookcase_to_str(const nodeptr bk_container,char* str);
 bool legal_move(int start_row,int target_row, \
-            nodeptr bk_container);
-bool is_happy(int start_row,nodeptr bk_container);
-bool duplicate_colour_rows(colours* array,int array_size);
+            const nodeptr bk_container);
+bool is_happy(int start_row,const nodeptr bk_container);
+nodeptr iterate_one_bookcase(nodeptr parent_bookcase,bookcase_arr* bk_arr);
 void print_lineage(nodeptr happy_bookcase,bool verbose);
 int num_of_gens(nodeptr happy_bookcase);
-colours letter_to_num(char c);
-bool get_sizes(FILE *fp,int* num_rows,int* num_cols);
 nodeptr fill_from_file(char* filename);
-bool empties_before_colour(nodeptr bk_container);
-int count_num_colours(nodeptr bk_container);
-int count_colour(nodeptr bk_container,colours colour);
-bool colour_impossibility(nodeptr bk_container);
+bool empties_before_colour(const nodeptr bk_container);
+int count_num_colours(const nodeptr bk_container);
+int count_colour(const nodeptr bk_container,colours colour);
+bool colour_impossibility(const nodeptr bk_container);
 
 void test(void);
 
@@ -104,6 +104,7 @@ int main(int argc,char* argv[])
    nodeptr origin,solution;
    bookcase_arr* bk_arr;
    test();
+
    if(argc<2||argc>3)
    {
       fprintf(stderr,"wrong number of arguments please try again\n");
@@ -119,8 +120,6 @@ int main(int argc,char* argv[])
 
    bk_arr=init_bookcase_arr();
    solution=go_through_bookcases(bk_arr,origin,MAXBKS);
-
-
    if(argc==3)
    {
       verbose=(strcmp(argv[2],"verbose")==0);
@@ -130,11 +129,14 @@ int main(int argc,char* argv[])
       verbose=false;
    }
    print_lineage(solution,verbose);
+
+
    free_bookcase_arr(bk_arr);
    return 0;
 
 }
-
+/*mostly going to test new stuff ive added-
+to see the other tests check out bookcase.c*/
 void test(void)
 {
    int i;
@@ -272,7 +274,6 @@ void test(void)
    test_bk_arr= init_bookcase_arr();
 
 
-
    test_node1=create_orig_node(test_not_imposs,2,4);
    calculate_gini_bc(test_node1);
    assert(insert_sorted(test_bk_arr,test_node1)==true);
@@ -335,7 +336,7 @@ void test(void)
    assert(free_bookcase_arr(test_bk_arr)==true);
 
 
-   /*bool duplicate(bookcase_arr* bk_arr,nodeptr to_add)*/
+
    test_bk_arr= init_bookcase_arr();
    test_node1=create_orig_node(test_not_imposs,1,4);
    test_node2=create_orig_node(test_bc_simple_4,5,4);
@@ -348,6 +349,31 @@ void test(void)
    assert(duplicate(test_bk_arr,test_node2)==false);
    free(test_node2);
    assert(free_bookcase_arr(test_bk_arr)==true);
+
+
+
+
+   /*nodeptr iterate_one_bookcase(nodeptr parent_bookcase,bookcase_arr* bk_arr);*/
+   test_bk_arr= init_bookcase_arr();
+   test_node1=create_orig_node(test_bc_simple_4,5,4);
+   iterate_one_bookcase(test_node1,test_bk_arr);
+   assert(test_bk_arr->size==16);
+   free_bookcase_arr(test_bk_arr);
+
+   test_bk_arr= init_bookcase_arr();
+   test_node1=create_orig_node(test_bc_simple_3,5,4);
+   iterate_one_bookcase(test_node1,test_bk_arr);
+   /*no legal moves*/
+   assert(test_bk_arr->size==0);
+   free_bookcase_arr(test_bk_arr);
+
+   test_bk_arr= init_bookcase_arr();
+   test_node1=create_orig_node(test_bc_simple_3,5,4);
+   iterate_one_bookcase(test_node1,test_bk_arr);
+   /*no legal moves*/
+   assert(test_bk_arr->size==0);
+   assert(test_node1->seen==true);
+   free_bookcase_arr(test_bk_arr);
 
 
    test_bk_arr= init_bookcase_arr();
@@ -394,7 +420,7 @@ nodeptr create_orig_node(colours bookcase[MAXSIZE][MAXSIZE],\
 }
 
 
-void count_colour_apps_row(nodeptr bk_container,\
+void count_colour_apps_row(const nodeptr bk_container,\
                int colour_hist[NUMCOLOURS],int row)
 {
    int y;
@@ -410,7 +436,7 @@ void count_colour_apps_row(nodeptr bk_container,\
 
 
 
-int count_colour_row(nodeptr bk_container,colours colour,int row)
+int count_colour_row(const nodeptr bk_container,colours colour,int row)
 {
    int x,count;
    count=0;
@@ -488,18 +514,6 @@ bool calculate_gini_bc(nodeptr bk_container)
 
 
 
-/*return void then cast when appropriate*/
-void* safe_calloc(size_t nitems, size_t size)
-{
-  void* ptr;
-  ptr = calloc(nitems, size);
-  if(ptr==NULL)
-  {
-     fprintf(stderr,"No Solution?");
-  	  exit(EXIT_FAILURE);
-  }
-  return ptr;
-}
 
 
 bool compare_doubles_equality(double num_1,double num_2,\
@@ -531,49 +545,26 @@ void bookcase_to_str(nodeptr bk_container,char* str)
       }
       strcat(str,"\n");
    }
-}
 
 
-char* num_to_letter(colours c)
-{
-   switch(c)
-   {
-      case(empty):
-      return ".";
-      case(red):
-      return "R";
-      case(green):
-      return "G";
-      case(yellow):
-      return "Y";
-      case(blue):
-      return "B";
-      case(magenta):
-      return "M";
-      case(cyan):
-      return "C";
-      case(white):
-      return "W";
-      case(black):
-      return "K";
-      default:
-      fprintf(stderr,"invalid colour in bookcase\n");
-   	exit(EXIT_FAILURE);
-   }
 }
 
 
 bool legal_move(int start_row,int target_row, \
-            nodeptr bk_container)
+            const nodeptr bk_container)
 {
 
    int book_index;
-   if(start_row==target_row)
+   if(bk_container==NULL)
    {
-
       return false;
    }
-
+   if(start_row==target_row)
+   {
+      /*this is not a move +will lead to waste*/
+      return false;
+   }
+   /*not sure when this would happen but still check*/
    if((start_row>=bk_container->num_rows)||\
       (target_row>=bk_container->num_rows)\
       ||(start_row<0)||(target_row<0))
@@ -585,9 +576,9 @@ bool legal_move(int start_row,int target_row, \
    {
       return false;
    }
-
+   /*len shelf returns size need to minus 1 to get index*/
    book_index=len_shelf_full(start_row,bk_container)-1;
-
+   /*empty shelf*/
    if(book_index<0)
    {
       return false;
@@ -655,7 +646,7 @@ nodeptr make_move(int start_row,int target_row,\
 }
 
 
-int len_shelf_full(int row,nodeptr bk_container)
+int len_shelf_full(int row,const nodeptr bk_container)
 {
    int x;
    int count;
@@ -822,23 +813,6 @@ bool is_happy(int start_row,nodeptr bk_container)
 }
 
 
-bool duplicate_colour_rows(colours* array,int array_size)
-{
-   int y,x;
-   for(y=0;y<array_size-1;y++)
-   {
-      for(x=y+1;x<array_size;x++)
-      {
-         if((array[y]==array[x])&&\
-            (array[y]!=empty))
-         {
-            return true;
-         }
-      }
-   }
-   return false;
-}
-
 
 nodeptr go_through_bookcases(bookcase_arr* bk_arr,\
                         nodeptr orig_bookcase,int max_iters)
@@ -942,35 +916,6 @@ int num_of_gens(nodeptr happy_bookcase)
 }
 
 
-colours letter_to_num(char c)
-{
-   switch(toupper(c))
-   {
-      case('.'):
-      return empty;
-      case('R'):
-      return red;
-      case('G'):
-      return green;
-      case('Y'):
-      return yellow;
-      case('B'):
-      return blue;
-      case('M'):
-      return magenta;
-      case('C'):
-      return cyan;
-      case('W'):
-      return white;
-      case('K'):
-      return black;
-      default:
-      fprintf(stderr,"invalid colour in bookcase\n");
-   	exit(EXIT_FAILURE);
-   }
-}
-
-
 nodeptr fill_from_file(char* filename)
 {
    FILE *fp;
@@ -994,44 +939,30 @@ nodeptr fill_from_file(char* filename)
    while(fgets(buffer,BUFFERSIZE,fp)!=NULL)
    {
       /*need to take away the newline*/
-      assert((strlen(buffer)-1)==(size_t)n_cols&& "more/less cols than expected");
-      assert(curr_row<=n_rows&& "more rows than expected");
-      for(x=0;x<n_cols;x++)
+      if((check_equality(strlen(buffer)-1,(size_t)n_cols))&&
+         check_lower_or_equal(curr_row,n_rows))
       {
-         origin_bk[curr_row][x]=letter_to_num(buffer[x]);
+         for(x=0;x<n_cols;x++)
+         {
+            origin_bk[curr_row][x]=letter_to_num(buffer[x]);
+         }
+         curr_row+=1;
       }
-      curr_row+=1;
    }
-   assert(curr_row==n_rows && "rows not as advertised");
-   bk_container=create_orig_node(origin_bk,n_rows,n_cols);
+   if(check_equality((size_t)curr_row,(size_t)n_rows))
+   {
+      bk_container=create_orig_node(origin_bk,n_rows,n_cols);
+      fclose(fp);
+      return bk_container;
+   }
    fclose(fp);
-   return bk_container;
+   return NULL;
 }
 
 
-bool get_sizes(FILE *fp,int* num_rows,int* num_cols)
-{
-   char buffer[BUFFERSIZE];
-
-   if(fgets(buffer,BUFFERSIZE,fp)==NULL)
-   {
-      fprintf(stderr,"file empty\n");
-      exit(EXIT_FAILURE);
-   }
-   sscanf(buffer, "%d %d",num_rows,num_cols);
-   /*considering a bookcase with 0 rows || 0 cols
-   not to be a bookcase mostly because it isnt*/
-   if(*num_rows>MAXSIZE||*num_rows<1||\
-      *num_cols>MAXSIZE||*num_cols<1)
-   {
-      fprintf(stderr,"invalid number of rows/cols\n");
-      exit(EXIT_FAILURE);
-   }
-   return true;
-}
 
 
-bool empties_before_colour(nodeptr bk_container)
+bool empties_before_colour(const nodeptr bk_container)
 {
    int y,x;
    int first_empty_ind;
@@ -1054,7 +985,7 @@ bool empties_before_colour(nodeptr bk_container)
 }
 
 
-bool impossible_start(nodeptr bk_container)
+bool impossible_start(const nodeptr bk_container)
 {
    int num_colours;
    int num_empty_spaces;
@@ -1079,7 +1010,7 @@ bool impossible_start(nodeptr bk_container)
 }
 
 
-bool colour_impossibility(nodeptr bk_container)
+bool colour_impossibility(const nodeptr bk_container)
 {
    int i;
    for(i=red;i<=black;i++)
@@ -1093,7 +1024,7 @@ bool colour_impossibility(nodeptr bk_container)
 }
 
 
-int count_colour(nodeptr bk_container,colours colour)
+int count_colour(const nodeptr bk_container,colours colour)
 {
    int y,x,count;
    count=0;
@@ -1113,7 +1044,7 @@ int count_colour(nodeptr bk_container,colours colour)
 
 /*enumed the colours so can just create a bool hist
  and use the colours as indexes*/
-int count_num_colours(nodeptr bk_container)
+int count_num_colours(const nodeptr bk_container)
 {
    int y,x,count;
    bool colour_hist[NUMCOLOURS]={false};
