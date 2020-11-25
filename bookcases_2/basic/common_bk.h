@@ -15,7 +15,7 @@
 #define MAXSTRLEN (MAXSIZE*(MAXSIZE+1)+1)
 #define MAXBKS 1000000
 #define BUFFERSIZE 100
-
+#define EMPTY -1
 
 typedef enum colours {empty,red, green,yellow,blue,magenta,cyan,white,black} colours;
 typedef enum bool {false, true} bool;

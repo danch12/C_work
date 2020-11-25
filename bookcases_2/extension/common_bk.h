@@ -16,6 +16,7 @@
 #define MAXBKS 1000000
 #define BUFFERSIZE 100
 #define IMPOSS 2
+#define EMPTY -1
 
 
 

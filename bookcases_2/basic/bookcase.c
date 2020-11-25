@@ -340,7 +340,7 @@ void add_bookcase(bookcase_arr* books_arr,nodeptr to_add)
 
          if(books_arr->array==NULL)
          {
-            fprintf(stderr,"Ran out of space");
+            fprintf(stderr,"Ran out of space\n");
       	 	exit(EXIT_FAILURE);
          }
          books_arr->capacity=books_arr->capacity*SCALEFACTOR;
@@ -472,6 +472,8 @@ bool oscillating(bookcase_arr* bk_arr,int pos)
    return true;
 }
 
+/*putting this counter on go_through_bookcases really
+bloated the function so seperated it out here */
 bool oscilating_counter(bookcase_arr* bk_arr,int pos,int* count)
 {
    /*checking out of bounds*/

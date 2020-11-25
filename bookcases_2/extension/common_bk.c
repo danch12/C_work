@@ -16,7 +16,9 @@ nodeptr create_orig_node(colours bookcase[MAXSIZE][MAXSIZE],\
          MAXSIZE*MAXSIZE*sizeof(colours));
 
    origin->seen=false;
-   /*set to impossible val initially*/
+   /*set to impossible val initially
+   to recognise we havent calculated
+   impurity yet*/
    origin->impurity=IMPOSS;
    return origin;
 }
@@ -306,8 +308,8 @@ bool legal_move(int start_row,int target_row, \
   }
   /*len shelf returns size need to minus 1 to get index*/
   book_index=len_shelf_full(start_row,bk_container)-1;
-  /*empty shelf*/
-  if(book_index<0)
+
+  if(book_index==EMPTY)
   {
      return false;
   }
