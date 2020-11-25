@@ -10,13 +10,12 @@
 #include <math.h>
 
 #define NUMCOLOURS 8
-
-
 #define STARTROW 0
+#define MAXSIZE 9
 #define MAXSTRLEN (MAXSIZE*(MAXSIZE+1)+1)
 #define MAXBKS 1000000
 #define BUFFERSIZE 100
-#define MAXSIZE 9
+
 
 typedef enum colours {empty,red, green,yellow,blue,magenta,cyan,white,black} colours;
 typedef enum bool {false, true} bool;

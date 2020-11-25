@@ -251,5 +251,17 @@ int main(void)
    assert(duplicate_colour_rows(test_dupes,1)==false);
    assert(duplicate_colour_rows(test_dupes,4)==false);
    assert(duplicate_colour_rows(test_dupes,7)==true);
+
+   assert(check_lower_or_equal((size_t) 1 , (size_t) 1)==true);
+   assert(check_lower_or_equal((size_t) 1 , (size_t) 2)==true);
+   assert(check_equality((size_t) 1,(size_t)1)==true);
+   /*these stop the file*/
+   /*check_lower_or_equal((size_t) 3 , (size_t) 2);
+
+   size t has only positives so was wondering if it
+   would reject this - it does
+   check_equality((size_t) -1,(size_t)1);
+   */
+
    return 0;
 }

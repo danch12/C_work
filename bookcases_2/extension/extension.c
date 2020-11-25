@@ -1,6 +1,5 @@
 #include "common_bk.h"
 
-
 /*find gini coeff of one row*/
 double find_gini_row(int colour_hist[NUMCOLOURS]);
 
@@ -11,7 +10,7 @@ bool compare_doubles_equality(double num_1,double num_2,\
                               double epsilon);
 
 nodeptr make_move(int start_row,int target_row,\
-         nodeptr parent_bookcase);
+         const nodeptr parent_bookcase);
 
 bookcase_arr* init_bookcase_arr(void);
 bool free_bookcase_arr(bookcase_arr* b_arr);
@@ -24,10 +23,10 @@ nodeptr go_through_bookcases(bookcase_arr* bk_arr,\
 
 bool duplicate(bookcase_arr* bk_arr,nodeptr to_add);
 /*count times a colour appears in a row*/
-void count_colour_apps_row(nodeptr bk_container,\
+void count_colour_apps_row(const nodeptr bk_container,\
                int colour_hist[NUMCOLOURS],int row);
 /*count how many different colours appear in a row*/
-int count_colour_row(nodeptr bk_container,colours colour,int row);
+int count_colour_row(const nodeptr bk_container,colours colour,int row);
 
 nodeptr iterate_one_bookcase(nodeptr parent_bookcase,bookcase_arr* bk_arr);
 nodeptr fill_from_file(char* filename);
@@ -73,14 +72,13 @@ int main(int argc,char* argv[])
       verbose=false;
    }
    print_lineage(solution,verbose);
-
-
    free_bookcase_arr(bk_arr);
    return 0;
 
 }
+
 /*mostly going to test new stuff ive added-
-to see the other tests check out bookcase.c*/
+to see the other tests check out common_tests.c*/
 void test(void)
 {
    int i;
@@ -197,8 +195,7 @@ void test(void)
 
 
 
-   /*mostly going to test new stuff ive added-
-   to see the other tests check out bookcase.c*/
+
    test_node1=create_orig_node(test_not_imposs,2,4);
    test_node2=make_move(1,0,test_node1);
    assert(compare_doubles_equality(test_node2->impurity,0,epsilon));
@@ -249,9 +246,11 @@ void test(void)
 
    test_node1=create_orig_node(test_5050,2,4);
    assert(calculate_gini_bc(test_node1)==true);
-   insert_sorted(test_bk_arr,test_node1);
+   assert(insert_sorted(test_bk_arr,test_node1));
    bookcase_to_str(test_bk_arr->head->next->next->next,test_string);
    assert(strcmp(test_string,"RRGG\nRRGG\n")==0);
+
+   assert(insert_sorted(test_bk_arr,NULL)==false);
 
    test_node1=test_bk_arr->head;
    test_node2=test_bk_arr->head->next;
@@ -310,14 +309,15 @@ void test(void)
    iterate_one_bookcase(test_node1,test_bk_arr);
    /*no legal moves*/
    assert(test_bk_arr->size==0);
+   assert(test_node1->seen==true);
    free(test_node1);
    free_bookcase_arr(test_bk_arr);
 
    test_bk_arr= init_bookcase_arr();
-   test_node1=create_orig_node(test_bc_simple_3,5,4);
+   test_node1=create_orig_node(test_oscillations,2,4);
    iterate_one_bookcase(test_node1,test_bk_arr);
    /*no legal moves*/
-   assert(test_bk_arr->size==0);
+   assert(test_bk_arr->size==1);
    assert(test_node1->seen==true);
    free(test_node1);
    free_bookcase_arr(test_bk_arr);
@@ -357,7 +357,7 @@ void count_colour_apps_row(const nodeptr bk_container,\
 
    for(y=red;y<=black;y++)
    {
-      /*red is 0 as ignoring empties*/
+      /*red is 0 as ignoring empties in this func*/
       colour_hist[y-1]= count_colour_row(bk_container,y,row);
    }
 }
@@ -452,7 +452,7 @@ bool compare_doubles_equality(double num_1,double num_2,\
 
 
 nodeptr make_move(int start_row,int target_row,\
-         nodeptr parent_bookcase)
+         const nodeptr parent_bookcase)
 {
    nodeptr child;
    int start_row_pos,target_row_pos;
@@ -482,9 +482,6 @@ nodeptr make_move(int start_row,int target_row,\
    return NULL;
 
 }
-
-
-
 
 
 bookcase_arr* init_bookcase_arr(void)
@@ -523,7 +520,7 @@ bool insert_sorted(bookcase_arr* books_arr,nodeptr to_add)
          books_arr->head=to_add;
          return true;
       }
-      /*putting thins at head of list*/
+      /*putting things at head of list*/
       if(books_arr->head->impurity >= to_add->impurity)
       {
          to_add->next=books_arr->head;
@@ -599,7 +596,6 @@ nodeptr iterate_one_bookcase(nodeptr parent_bookcase,bookcase_arr* bk_arr)
             {
                free(child);
             }
-
          }
       }
    }

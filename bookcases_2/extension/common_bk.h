@@ -11,10 +11,10 @@
 
 #define NUMCOLOURS 8
 #define STARTROW 0
+#define MAXSIZE 9
 #define MAXSTRLEN (MAXSIZE*(MAXSIZE+1)+1)
 #define MAXBKS 1000000
 #define BUFFERSIZE 100
-#define MAXSIZE 9
 #define IMPOSS 2
 
 

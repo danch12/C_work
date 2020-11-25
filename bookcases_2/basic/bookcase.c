@@ -80,14 +80,14 @@ int main(int argc,char* argv[])
    return 0;
 }
 
+
+/*for tests common to both the main and extension parts
+of assignment check out common_tests.c*/
 void test(void)
 {
-   /*have commented out vars used for testing files
-   and those asserts as well just in case you dont have
-   the files*/
-   int i;/*,num_rows,num_cols;*/
+   int i,num_rows,num_cols;
    nodeptr test_node1, test_node2,clean_test,temp;
-   /*FILE *fp;*/
+   FILE *fp;
    bookcase_arr* test_book_arr;
 
    colours test_bc[MAXSIZE][MAXSIZE]={{red,empty,empty,empty},
@@ -268,7 +268,7 @@ void test(void)
 
 
 
-   /*fp= fopen("rrggccyy-437.bc","r");
+   fp= fopen("rrggccyy-437.bc","r");
    if(fp==NULL)
    {
       fprintf(stderr,"error while opening file in testing\n");
@@ -278,24 +278,21 @@ void test(void)
    num_rows=num_cols=0;
    assert(get_sizes(fp,&num_rows,&num_cols));
    assert(num_rows==4);
-   assert(num_cols==3);*/
+   assert(num_cols==3);
+   fclose(fp);
 
    /*reading in files test*/
-   /*test_node1=fill_from_file("rrggccyy-437.bc");
+   test_node1=fill_from_file("rrggccyy-437.bc");
    assert(test_node1->num_rows==4);
    assert(test_node1->num_cols==3);
 
    bookcase_to_str(test_node1,test_str);
    assert(strcmp(test_str,"RG.\nGR.\nCY.\nYC.\n")==0);
-   free(test_node1);*/
+   free(test_node1);
 
-   /*tested for invalid chars in file and
-   it throws an invalid colour error*/
+   /*tested for wrong dimensions*/
    /*fill_from_file("eng_370k_shuffle.txt");*/
 
-   /*tested for invalid num rows in file and
-   it throws an invalid number of rows error*/
-   /*fill_from_file("norows.txt");*/
 }
 
 
@@ -379,7 +376,7 @@ bool free_bookcase_arr(bookcase_arr* b_arr)
    return true;
 }
 
-
+/*creates bookcases for all legal moves given initial board*/
 nodeptr iterate_one_bookcase(nodeptr parent_bookcase,bookcase_arr* bk_arr)
 {
    int start_row,target_row;
@@ -410,6 +407,9 @@ nodeptr iterate_one_bookcase(nodeptr parent_bookcase,bookcase_arr* bk_arr)
    return NULL;
 }
 
+/*iterates through the array of bookcases
+and creates all possible children for
+each board*/
 nodeptr go_through_bookcases(bookcase_arr* bk_arr,\
                         nodeptr orig_bookcase,int max_iters)
 {
@@ -506,7 +506,9 @@ bool oscilating_counter(bookcase_arr* bk_arr,int pos,int* count)
 }
 
 
-
+/*create node from file
+didnt really need check equality and check lower
+but having all the fprintfs in same func was getting messy*/
 nodeptr fill_from_file(char* filename)
 {
    FILE *fp;

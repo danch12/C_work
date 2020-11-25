@@ -8,6 +8,7 @@ INCEXT = -Iextension
 
 all: basic_fast basic_san extension_fast extension_san
 
+#these tests are for functions shared between the two files
 
 test_basic_fast: basic/common_bk.h common_tests.c basic/common_bk.c
 	$(CC) common_tests.c basic/common_bk.c -o basic_common_test_fast $(CFLAGSFAST) $(INCBASIC) $(LIDLIBS)
@@ -21,6 +22,7 @@ test_ext_fast: extension/common_bk.h common_tests.c extension/common_bk.c
 test_ext_san: extension/common_bk.h common_tests.c extension/common_bk.c
 	$(CC) common_tests.c extension/common_bk.c -o ext_common_test_san $(CFLAGSSAN) $(INCEXT) $(LIDLIBS)
 
+
 basic_fast: basic/bookcase.c basic/common_bk.c basic/common_bk.h
 	$(CC) basic/bookcase.c basic/common_bk.c  -o basic_fast $(CFLAGSFAST) $(LIDLIBS)
 
@@ -33,7 +35,7 @@ extension_fast: extension/extension.c extension/common_bk.c extension/common_bk.
 extension_san: extension/extension.c extension/common_bk.c extension/common_bk.h
 	$(CC) extension/extension.c extension/common_bk.c -o extension_san $(CFLAGSSAN) $(LIDLIBS)
 
-rm:
+clean:
 	rm -f  basic_fast basic_san extension_fast extension_san basic_common_test_fast basic_common_test_san ext_common_test_san ext_common_test_fast
 
 run_common_test:test_basic_fast test_basic_san test_ext_fast test_ext_san
@@ -41,6 +43,8 @@ run_common_test:test_basic_fast test_basic_san test_ext_fast test_ext_san
 	./basic_common_test_san
 	./ext_common_test_fast
 	./ext_common_test_san
+
+#to use args you do something like ./basic_san ARGS="whatever.file"
 
 run_all: run_common_test all
 	./basic_san $(ARGS) 

@@ -14,6 +14,7 @@ nodeptr create_orig_node(colours bookcase[MAXSIZE][MAXSIZE],\
 
    memcpy(origin->bookcase,bookcase,\
          MAXSIZE*MAXSIZE*sizeof(colours));
+
    origin->seen=false;
    /*set to impossible val initially*/
    origin->impurity=IMPOSS;
@@ -321,6 +322,8 @@ void print_lineage(nodeptr happy_bookcase,bool verbose)
    int count;
    char temp_str[MAXSTRLEN];
    count=num_of_gens(happy_bookcase);
+   /*num of gens returns -1 if NULL
+   which happens when theres no solution*/
    if(count==-1)
    {
       printf("No Solution?\n");
@@ -380,8 +383,8 @@ bool empties_before_colour(const nodeptr bk_container)
    return false;
 }
 
-/*counts number of different colours*/
-/*enumed the colours so can just create a bool hist
+/*counts number of different colours
+enumed the colours so can just create a bool hist
  and use the colours as indexes*/
 int count_num_colours(const nodeptr bk_container)
 {

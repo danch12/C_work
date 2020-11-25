@@ -315,6 +315,8 @@ void print_lineage(nodeptr happy_bookcase,bool verbose)
    count=num_of_gens(happy_bookcase);
    if(count==-1)
    {
+      /*num of gens returns -1 if NULL
+      which happens when theres no solution*/
       printf("No Solution?\n");
       return;
    }
