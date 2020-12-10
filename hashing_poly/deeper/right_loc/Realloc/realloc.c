@@ -44,15 +44,23 @@ typedef struct test_struct
 }test_struct;
 
 assoc* assoc_init(int keysize);
+void assoc_insert(assoc** a, void* key, void* data);
+void assoc_free(assoc* a);
+unsigned int assoc_count(assoc* a);
+void* assoc_lookup(assoc* a, void* key);
 /*seemed stupid to use init then recalloc*/
 assoc* assoc_resized(int keysize,int n_cap,int old_cap);
 int _wrap_around(int max_num,int position);
 int _first_hash(void* key,assoc* a);
 /*http://www.cse.yorku.ca/~oz/hash.html#djb2 sdbm*/
 int _first_str_hash(void* key,assoc* a);
-bool _insertion_helper(assoc* a,void* key, void* data,int insertion_point);
-bool _double_hash(int step_size,int start_point,\
-                  assoc* a,void* key, void* data);
+
+
+
+assoc* _resize(assoc* a);
+bool _insertion(assoc* a,k_v_pair* kv);
+bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point);
+bool _double_hash(int step_size,int start_point, assoc* a,k_v_pair* kv);
 /*going to count on only initial 16 to be a non prime arr_size
 as will set anything else to a prime number*/
 int _first_num_hash(void* key, assoc* a);
@@ -66,8 +74,8 @@ assoc* _bigger_array(assoc* a);
 bool _same_key(void* key1,void* key2,int bytesize);
 int _sieve_of_e_helper(int new_cap_target);
 /* Free up all allocated space from 'a' */
-void assoc_free(assoc* a);
 
+void _partial_free(assoc* a);
 void test(void);
 
 int main(void)
@@ -86,6 +94,7 @@ void test(void)
    float test_float;
    FILE *fp;
    test_struct test_s;
+   k_v_pair* test_kv;
    int test_hashes[10000]={0};
 
    int histogram_hashes[15053]={0};
@@ -194,6 +203,9 @@ void test(void)
    assert(_float_check(void_ptr,test_assoc)==false);
    assoc_free(test_assoc);
 
+
+
+
    test_assoc=assoc_init(sizeof(float));
    test_float=10.82;
    void_ptr=&test_float;
@@ -284,6 +296,7 @@ void test(void)
 
 
    memset(histogram_hashes,0,sizeof(int)*15053);
+
    test_assoc=assoc_init(sizeof(int));
    test_assoc->capacity=15053;
    for(i=0;i<10000;i++)
@@ -398,6 +411,8 @@ void test(void)
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
+
+
    assert(_wrap_around(10,11)==1);
    assert(_wrap_around(10,10)==0);
 
@@ -438,13 +453,15 @@ void test(void)
    test_assoc2=_bigger_array(test_assoc);
    assert(test_assoc2->capacity==37);
    assert(test_assoc2->lower_prime==INITSIZE);
-   test_assoc->capacity=15053;
    assoc_free(test_assoc2);
+
+   test_assoc->capacity=15053;
    test_assoc2=_bigger_array(test_assoc);
    assert(test_assoc2->capacity==36109);
    assert(test_assoc2->lower_prime==15053);
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
+   assoc_free(test_assoc2);
    assert(!_bigger_array(NULL));
 
 
@@ -456,20 +473,24 @@ void test(void)
    }
    assert(test_assoc->size==0);
    i_long=10;
-   void_ptr=&i_long;
    i_long2=12;
-   void_ptr2=&i_long2;
+
+   test_kv=init_kv_pair(&i_long,&i_long2);
    /*adding to empty space*/
-   assert(_insertion_helper(test_assoc,void_ptr,void_ptr2,0));
+   assert(_insertion_helper(test_assoc,test_kv,0));
    assert(*(long*)test_assoc->arr[0]->key==10);
    assert(*(long*)test_assoc->arr[0]->value==12);
-   void_ptr2=&i_long;
+
+
+   test_kv=init_kv_pair(&i_long,&i_long);
    /*updating value with same key*/
-   assert(_insertion_helper(test_assoc,void_ptr,void_ptr2,0));
+   assert(_insertion_helper(test_assoc,test_kv,0));
    assert(*(long*)test_assoc->arr[0]->value==10);
-   void_ptr=&i_long2;
+
+   test_kv=init_kv_pair(&i_long2,&i_long);
    /*trying to insert with different key*/
-   assert(!_insertion_helper(test_assoc,void_ptr,void_ptr2,0));
+   assert(!_insertion_helper(test_assoc,test_kv,0));
+   free(test_kv);
    /*size should only increase when adding new kv pairs
    not when updating existing ones*/
    assert(test_assoc->size==1);
@@ -478,33 +499,92 @@ void test(void)
    /*testing words and mixed types*/
    test_assoc=assoc_init(0);
    strcpy(word,"938Neill\n");
-   void_ptr=word;
    i=1;
-   void_ptr2=&i;
-   assert(_insertion_helper(test_assoc,void_ptr,void_ptr2,0));
+   test_kv=init_kv_pair(&word,&i);
+   assert(_insertion_helper(test_assoc,test_kv,0));
    assert(strcmp(test_assoc->arr[0]->key,word)==0);
    assert(*(int*)test_assoc->arr[0]->value==1);
 
    test_s.test_2 =10;
-   assert(_insertion_helper(test_assoc,void_ptr,&test_s,0));
+   test_kv=init_kv_pair(&word,&test_s);
+   assert(_insertion_helper(test_assoc,test_kv,0));
    /*we can also put structs as values but not as keys */
    assert((*(test_struct*)test_assoc->arr[0]->value).test_2==10);
 
    strcpy(word2,"938Neilliscool\n");
-   assert(!_insertion_helper(test_assoc,word2,void_ptr2,0));
-   assert(!_insertion_helper(test_assoc,NULL,void_ptr2,0));
-   assert(!_insertion_helper(test_assoc,word,NULL,0));
+   test_kv=init_kv_pair(&word2,&test_s);
+   assert(!_insertion_helper(test_assoc,test_kv,0));
+   free(test_kv);
+   assert(!_insertion_helper(test_assoc,NULL,0));
+   assert(!_insertion_helper(test_assoc,NULL,0));
    assoc_free(test_assoc);
 
 
    test_assoc=assoc_init(sizeof(int));
 
    i=50;
-   assert(_insertion_helper(test_assoc,&i,word2,0));
+   test_kv=init_kv_pair(&i,&word2);
+   assert(_insertion_helper(test_assoc,test_kv,0));
    assert(strcmp(word2,(char*)test_assoc->arr[0]->value)==0);
    test_int =49;
-   assert(_double_hash(1,0,test_assoc,&test_int,&i));
-   assert(*(int*)test_assoc->arr[1]->value==50);
+
+   test_kv=init_kv_pair(&test_int,&i);
+   assert(_double_hash(7,0,test_assoc,test_kv));
+   assert(*(int*)test_assoc->arr[7]->value==50);
+
+   test_float=50.1;
+   test_kv=init_kv_pair(&test_float,&test_int);
+   assert(_double_hash(7,0,test_assoc,test_kv));
+   assert(*(int*)test_assoc->arr[14]->value==49);
+   assoc_free(test_assoc);
+
+
+
+   test_assoc=assoc_init(sizeof(int));
+   for(i=0;i<15;i++)
+   {
+      test_kv=init_kv_pair(&test_hashes[i],&i);
+      assert(_insertion(test_assoc,test_kv));
+   }
+   assert(test_assoc->size==15);
+   assoc_free(test_assoc);
+
+
+   test_assoc=assoc_init(sizeof(int));
+   for(i=0;i<15;i++)
+   {
+      test_kv=init_kv_pair(&test_hashes[i],&i);
+      assert(_insertion(test_assoc,test_kv));
+   }
+
+   test_assoc=_resize(test_assoc);
+   assert(test_assoc->size==15);
+   assert(test_assoc->capacity==37);
+   for(i=0;i<15;i++)
+   {
+      test_hash1=_first_num_hash(&test_hashes[i],test_assoc);
+      assert(*(int*)test_assoc->arr[test_hash1]->value==i);
+   }
+
+   assoc_free(test_assoc);
+
+   srand(time(NULL));
+   test_assoc=assoc_init(sizeof(int));
+   for(i=0;i<10000;i++)
+   {
+      test_hashes[i]=rand()%10000;
+      assoc_insert(&test_assoc, &test_hashes[i],&i);
+   }
+   assert(test_assoc->size<10000);
+   assoc_free(test_assoc);
+   test_assoc=assoc_init(sizeof(int));
+   for(i=0;i<10000;i++)
+   {
+      test_hashes[i]=i;
+      assoc_insert(&test_assoc, &test_hashes[i],&i);
+   }
+   assert(test_assoc->size==10000);
+   assoc_free(test_assoc);
 }
 
 /*return void then cast when appropriate*/
@@ -534,6 +614,7 @@ assoc* assoc_init(int keysize)
    n_assoc->capacity=INITSIZE;
    n_assoc->bytesize=keysize;
    n_assoc->arr=(k_v_pair**)_safe_calloc(INITSIZE,sizeof(k_v_pair*));
+   /*set to 0 because insertion function updates this*/
    n_assoc->size=0;
    n_assoc->lower_prime=INITLOWPRIME;
    return n_assoc;
@@ -573,6 +654,14 @@ void assoc_free(assoc* a)
    free(a);
 }
 
+/*when resizing dont want to free all the values*/
+void _partial_free(assoc* a)
+{
+   free(a->arr);
+   free(a);
+}
+
+
 int _wrap_around(int max_num,int position)
 {
 
@@ -580,8 +669,7 @@ int _wrap_around(int max_num,int position)
 }
 
 
-/*void assoc_insert(assoc** a, void* key, void* data);*/
-/*check size of key we are using*/
+
 
 
 int _first_hash(void* key,assoc* a)
@@ -795,7 +883,6 @@ int _sieve_of_e_helper(int new_cap_target)
          }
       }
    }
-   /*1 isnt a prime*/
    for(i=new_cap_target-1;i>1;i--)
    {
       if(bool_arr[i])
@@ -811,26 +898,26 @@ int _sieve_of_e_helper(int new_cap_target)
 
 
 
-bool _insertion(assoc* a,  void* key, void* data)
+
+bool _insertion(assoc* a,k_v_pair* kv)
 {
    int hash_1;
    int hash_2;
-   if(key)
+   if(kv)
    {
-      hash_1=_first_hash(key,a);
-      if(_insertion_helper(a,key,data,hash_1))
+      hash_1=_first_hash(kv->key,a);
+      if(_insertion_helper(a,kv,hash_1))
       {
          return true;
       }
       else
       {
          hash_2=sec_hash(hash_1,a);
-         if(_double_hash(hash_2,hash_1,a,key,data))
+         if(_double_hash(hash_2,hash_1,a,kv))
          {
             return true;
          }
       }
-
    }
    return false;
 }
@@ -840,17 +927,19 @@ that a free space is found eventually if there is one
 and we check that the array is not full before _insertion
 it is ok to have a seemingly infinite loop
 however we will also put a count that acts as safeguard*/
-bool _double_hash(int step_size,int start_point, assoc* a,void* key, void* data)
+bool _double_hash(int step_size,int start_point, assoc* a,k_v_pair* kv)
 {
-   int i;
+   int i,ind;
    int count;
    count=0;
    i=start_point;
    while(count<(int)(a->capacity*100))
    {
       count++;
-      i = _wrap_around(a->capacity,i-step_size);
-      if(_insertion_helper(a,key,data,i))
+
+      i = i-step_size;
+      ind=_wrap_around(a->capacity,i);
+      if(_insertion_helper(a,kv,ind))
       {
          return true;
       }
@@ -860,23 +949,24 @@ bool _double_hash(int step_size,int start_point, assoc* a,void* key, void* data)
 }
 
 
-bool _insertion_helper(assoc* a,void* key, void* data,int insertion_point)
+bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point)
 {
-   k_v_pair* to_insert;
-   if(key&&data)
+
+   if(kv)
    {
       if(a->arr[insertion_point]==NULL)
       {
-         to_insert=init_kv_pair(key,data);
-         a->arr[insertion_point]=to_insert;
+
+         a->arr[insertion_point]=kv;
          a->size++;
          return true;
       }
       else
       {
-         if(_same_key(a->arr[insertion_point]->key,key,a->bytesize))
+         if(_same_key(a->arr[insertion_point]->key,kv->key,a->bytesize))
          {
-            a->arr[insertion_point]->value=data;
+            free(a->arr[insertion_point]);
+            a->arr[insertion_point]=kv;
             return true;
          }
          else
@@ -920,4 +1010,87 @@ k_v_pair* init_kv_pair(void* key, void* data)
    n_kv->key = key;
    n_kv->value= data;
    return n_kv;
+}
+
+
+
+
+assoc* _resize(assoc* a)
+{
+   unsigned int i;
+   assoc* n_ass;
+
+   n_ass=_bigger_array(a);
+   /*basically checks for nulls as bigger array
+   returns NULL if a is NULL*/
+   if(n_ass)
+   {
+      for(i=0;i<a->capacity;i++)
+      {
+         /*if data present*/
+         if(a->arr[i])
+         {
+            if(!_insertion(n_ass,a->arr[i]))
+            {
+               fprintf(stderr, "error in reinserting values to hash table\n");
+               exit(EXIT_FAILURE);
+            }
+         }
+      }
+      _partial_free(a);
+      return n_ass;
+   }
+   return NULL;
+}
+
+
+void assoc_insert(assoc** a, void* key, void* data)
+{
+   assoc* a_ref;
+   k_v_pair* kv;
+   a_ref = *a;
+
+   if(a_ref!=NULL)
+   {
+      /*if the array gets 60% full */
+
+      if(a_ref->size > ((float)a_ref->capacity*0.6))
+      {
+         a_ref=_resize(a_ref);
+      }
+      kv=init_kv_pair(key,data);
+      if(!_insertion(a_ref,kv))
+      {
+         if(kv)
+         {
+            free(kv);
+         }
+      }
+
+   }
+   /*setting again in case array grew*/
+   *a = a_ref;
+
+}
+
+
+
+unsigned int assoc_count(assoc* a)
+{
+   if(a)
+   {
+      return a->size;
+   }
+   return 0;
+}
+
+
+
+/*theoretically the value could be in
+any cell of the array if the hash function
+was awful so will still need to check every
+cell*/
+void* assoc_lookup(assoc* a, void* key)
+{
+
 }
