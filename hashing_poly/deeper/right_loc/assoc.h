@@ -29,7 +29,7 @@ assoc* assoc_init(int keysize);
 void assoc_insert(assoc** a, void* key, void* data);
 
 /*
-   Returns the number of key/data pairs 
+   Returns the number of key/data pairs
    currently stored in the table
 */
 unsigned int assoc_count(assoc* a);
@@ -40,7 +40,7 @@ unsigned int assoc_count(assoc* a);
 */
 void* assoc_lookup(assoc* a, void* key);
 
-void assoc_todot(assoc* a);
+
 
 /* Free up all allocated space from 'a' */
 void assoc_free(assoc* a);
