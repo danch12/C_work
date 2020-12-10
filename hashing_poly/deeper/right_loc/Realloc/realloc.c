@@ -27,7 +27,7 @@ typedef struct k_v_pair
 
 typedef struct assoc
 {
-   k_v_pair* arr;
+   k_v_pair** arr;
    int bytesize;
    unsigned int capacity;
    unsigned int size;
@@ -35,12 +35,24 @@ typedef struct assoc
    int lower_prime;
 }assoc;
 
+/*not going to accept structs as keys but can be values
+*/
+typedef struct test_struct
+{
+   int test;
+   int test_2;
+}test_struct;
+
 assoc* assoc_init(int keysize);
+/*seemed stupid to use init then recalloc*/
+assoc* assoc_resized(int keysize,int n_cap,int old_cap);
 int _wrap_around(int max_num,int position);
 int _first_hash(void* key,assoc* a);
 /*http://www.cse.yorku.ca/~oz/hash.html#djb2 sdbm*/
 int _first_str_hash(void* key,assoc* a);
-
+bool _insertion_helper(assoc* a,void* key, void* data,int insertion_point);
+bool _double_hash(int step_size,int start_point,\
+                  assoc* a,void* key, void* data);
 /*going to count on only initial 16 to be a non prime arr_size
 as will set anything else to a prime number*/
 int _first_num_hash(void* key, assoc* a);
@@ -49,8 +61,9 @@ bool _float_check(void* num,assoc* a);
 
 int sec_hash(int f_hash,assoc* a);
 void* _safe_calloc(size_t nitems, size_t size);
-
-bool _bigger_array(assoc* a);
+k_v_pair* init_kv_pair(void* key, void* data);
+assoc* _bigger_array(assoc* a);
+bool _same_key(void* key1,void* key2,int bytesize);
 int _sieve_of_e_helper(int new_cap_target);
 /* Free up all allocated space from 'a' */
 void assoc_free(assoc* a);
@@ -66,17 +79,19 @@ int main(void)
 
 void test(void)
 {
-   int i,test_hash1,test_hash2;
+   int i,test_hash1,test_hash2,test_int;
    void* void_ptr,*void_ptr2;
-   long i_long;
+   long i_long,i_long2;
    double t_double;
    float test_float;
    FILE *fp;
+   test_struct test_s;
    int test_hashes[10000]={0};
 
    int histogram_hashes[15053]={0};
    char word[50];
-   assoc* test_assoc;
+   char word2[50];
+   assoc* test_assoc,*test_assoc2;
 
    /*testing hashing function*/
 
@@ -110,6 +125,7 @@ void test(void)
       assert(histogram_hashes[i]<15);
    }
    fclose(fp);
+   test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
    test_assoc=assoc_init(sizeof(int));
@@ -130,6 +146,7 @@ void test(void)
       assert(histogram_hashes[i]<5);
    }
    memset(histogram_hashes,0,sizeof(int)*15053);
+   test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
 
@@ -151,6 +168,7 @@ void test(void)
    {
       assert(histogram_hashes[i]<5);
    }
+   test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
 
@@ -260,6 +278,7 @@ void test(void)
       assert(histogram_hashes[i]<15);
    }
    fclose(fp);
+   test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
 
@@ -282,6 +301,7 @@ void test(void)
       assert(histogram_hashes[i]<5);
    }
    memset(histogram_hashes,0,sizeof(int)*15053);
+   test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
 
@@ -305,6 +325,7 @@ void test(void)
       assert(histogram_hashes[i]<5);
    }
    memset(histogram_hashes,0,sizeof(int)*15053);
+   test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
 
@@ -327,6 +348,7 @@ void test(void)
    {
       assert(histogram_hashes[i]<5);
    }
+   test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
 
@@ -361,6 +383,7 @@ void test(void)
       test_hash2=sec_hash(test_hash1,test_assoc);
       assert((test_hash2<15053)&&(test_hash2>=0));
    }
+   test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
    test_assoc=assoc_init(sizeof(char));
@@ -372,11 +395,39 @@ void test(void)
       test_hash2=sec_hash(test_hash1,test_assoc);
       assert((test_hash2<15053)&&(test_hash2>=0));
    }
+   test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
+
+   assert(_wrap_around(10,11)==1);
+   assert(_wrap_around(10,10)==0);
+
+   /*should just cycle from 0 to 9 over and over*/
+   test_int=0;
+   for(i=20;i>0;i--)
+   {
+      assert(_wrap_around(10,i)==test_int);
+      test_int--;
+      if(test_int<0)
+      {
+         test_int=9;
+      }
+   }
+   test_int=0;
+   for(i=0;i<-20;i++)
+   {
+      assert(_wrap_around(10,i)==test_int);
+      test_int++;
+      if(test_int>9)
+      {
+         test_int=0;
+      }
+   }
+
 
 
    /*bigger primes */
 
+   /*gets closest lower prime */
    assert(_sieve_of_e_helper(1049)==1039);
    assert(_sieve_of_e_helper(2677)==2671);
    assert(_sieve_of_e_helper(0)==NOPRIME);
@@ -384,14 +435,76 @@ void test(void)
 
    test_assoc=assoc_init(sizeof(long));
 
-   _bigger_array(test_assoc);
-   assert(test_assoc->capacity==37);
-   assert(test_assoc->lower_prime==INITSIZE);
+   test_assoc2=_bigger_array(test_assoc);
+   assert(test_assoc2->capacity==37);
+   assert(test_assoc2->lower_prime==INITSIZE);
    test_assoc->capacity=15053;
-   _bigger_array(test_assoc);
-   assert(test_assoc->capacity==36109);
-   assert(test_assoc->lower_prime==15053);
+   assoc_free(test_assoc2);
+   test_assoc2=_bigger_array(test_assoc);
+   assert(test_assoc2->capacity==36109);
+   assert(test_assoc2->lower_prime==15053);
+   test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
+   assert(!_bigger_array(NULL));
+
+
+   /*inserting a kv_pair*/
+   test_assoc=assoc_init(sizeof(long));
+   for(i=0;i<(int)test_assoc->capacity;i++)
+   {
+      assert(test_assoc->arr[i]==NULL);
+   }
+   assert(test_assoc->size==0);
+   i_long=10;
+   void_ptr=&i_long;
+   i_long2=12;
+   void_ptr2=&i_long2;
+   /*adding to empty space*/
+   assert(_insertion_helper(test_assoc,void_ptr,void_ptr2,0));
+   assert(*(long*)test_assoc->arr[0]->key==10);
+   assert(*(long*)test_assoc->arr[0]->value==12);
+   void_ptr2=&i_long;
+   /*updating value with same key*/
+   assert(_insertion_helper(test_assoc,void_ptr,void_ptr2,0));
+   assert(*(long*)test_assoc->arr[0]->value==10);
+   void_ptr=&i_long2;
+   /*trying to insert with different key*/
+   assert(!_insertion_helper(test_assoc,void_ptr,void_ptr2,0));
+   /*size should only increase when adding new kv pairs
+   not when updating existing ones*/
+   assert(test_assoc->size==1);
+   assoc_free(test_assoc);
+
+   /*testing words and mixed types*/
+   test_assoc=assoc_init(0);
+   strcpy(word,"938Neill\n");
+   void_ptr=word;
+   i=1;
+   void_ptr2=&i;
+   assert(_insertion_helper(test_assoc,void_ptr,void_ptr2,0));
+   assert(strcmp(test_assoc->arr[0]->key,word)==0);
+   assert(*(int*)test_assoc->arr[0]->value==1);
+
+   test_s.test_2 =10;
+   assert(_insertion_helper(test_assoc,void_ptr,&test_s,0));
+   /*we can also put structs as values but not as keys */
+   assert((*(test_struct*)test_assoc->arr[0]->value).test_2==10);
+
+   strcpy(word2,"938Neilliscool\n");
+   assert(!_insertion_helper(test_assoc,word2,void_ptr2,0));
+   assert(!_insertion_helper(test_assoc,NULL,void_ptr2,0));
+   assert(!_insertion_helper(test_assoc,word,NULL,0));
+   assoc_free(test_assoc);
+
+
+   test_assoc=assoc_init(sizeof(int));
+
+   i=50;
+   assert(_insertion_helper(test_assoc,&i,word2,0));
+   assert(strcmp(word2,(char*)test_assoc->arr[0]->value)==0);
+   test_int =49;
+   assert(_double_hash(1,0,test_assoc,&test_int,&i));
+   assert(*(int*)test_assoc->arr[1]->value==50);
 }
 
 /*return void then cast when appropriate*/
@@ -411,37 +524,59 @@ void* _safe_calloc(size_t nitems, size_t size)
 assoc* assoc_init(int keysize)
 {
    assoc* n_assoc;
+   if(keysize>8)
+   {
+      fprintf(stderr,"not an accepted key format\n");
+      exit(EXIT_FAILURE);
+   }
    assert(keysize>=0);
    n_assoc=_safe_calloc(1,sizeof(assoc));
    n_assoc->capacity=INITSIZE;
    n_assoc->bytesize=keysize;
-   n_assoc->arr=(k_v_pair*)_safe_calloc(INITSIZE,sizeof(k_v_pair*));
+   n_assoc->arr=(k_v_pair**)_safe_calloc(INITSIZE,sizeof(k_v_pair*));
    n_assoc->size=0;
    n_assoc->lower_prime=INITLOWPRIME;
+   return n_assoc;
+}
+
+/*seemed stupid to use init then recalloc*/
+assoc* assoc_resized(int keysize,int n_cap,int old_cap)
+{
+   assoc* n_assoc;
+   if(keysize>8)
+   {
+      fprintf(stderr,"not an accepted key format\n");
+      exit(EXIT_FAILURE);
+   }
+   assert(keysize>=0);
+   n_assoc=_safe_calloc(1,sizeof(assoc));
+   n_assoc->capacity=n_cap;
+   n_assoc->bytesize=keysize;
+   n_assoc->arr=(k_v_pair**)_safe_calloc(n_cap,sizeof(k_v_pair*));
+   n_assoc->size=0;
+   n_assoc->lower_prime=old_cap;
    return n_assoc;
 }
 
 /* Free up all allocated space from 'a' */
 void assoc_free(assoc* a)
 {
+   int i;
+   for(i=0;i<(int)a->capacity;i++)
+   {
+      if(a->arr[i])
+      {
+         free(a->arr[i]);
+      }
+   }
    free(a->arr);
    free(a);
 }
 
 int _wrap_around(int max_num,int position)
 {
-   if(position>=max_num)
-   {
-      return abs(max_num-position);
-   }
-   else if(position<0)
-   {
-      return max_num+position;
-   }
-   else
-   {
-      return position;
-   }
+
+   return abs(position % max_num);
 }
 
 
@@ -529,7 +664,7 @@ void* _float_convert(void* key,assoc* a)
    char* ptr;
    void* n_key;
    int i,count;
-   if(key!=NULL)
+   if(key)
    {
       if(_float_check(key,a))
       {
@@ -617,10 +752,11 @@ int sec_hash(int f_hash,assoc* a)
 
 /*assigns a prime number to table size and a lower
 https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes*/
-bool _bigger_array(assoc* a)
+assoc* _bigger_array(assoc* a)
 {
    int bigger_table;
    int new_cap_target,prime_limit;
+   assoc* a_n;
    if(a)
    {
       bigger_table=a->capacity;
@@ -633,11 +769,10 @@ bool _bigger_array(assoc* a)
          bigger_table=_sieve_of_e_helper(prime_limit);
          prime_limit=(float)prime_limit*PRIMESCALE;
       }
-      a->lower_prime=a->capacity;
-      a->capacity=bigger_table;
-      return true;
+      a_n=assoc_resized(a->bytesize,bigger_table,a->capacity);
+      return a_n;
    }
-   return false;
+   return NULL;
 }
 
 int _sieve_of_e_helper(int new_cap_target)
@@ -678,37 +813,81 @@ int _sieve_of_e_helper(int new_cap_target)
 
 bool _insertion(assoc* a,  void* key, void* data)
 {
-   k_v_pair to_insert;
    int hash_1;
    int hash_2;
    if(key)
    {
       hash_1=_first_hash(key,a);
-      if(a->arr[hash_1]==NULL)
+      if(_insertion_helper(a,key,data,hash_1))
+      {
+         return true;
+      }
+      else
+      {
+         hash_2=sec_hash(hash_1,a);
+         if(_double_hash(hash_2,hash_1,a,key,data))
+         {
+            return true;
+         }
+      }
+
+   }
+   return false;
+}
+
+/*because in theory the second hash step size will mean
+that a free space is found eventually if there is one
+and we check that the array is not full before _insertion
+it is ok to have a seemingly infinite loop
+however we will also put a count that acts as safeguard*/
+bool _double_hash(int step_size,int start_point, assoc* a,void* key, void* data)
+{
+   int i;
+   int count;
+   count=0;
+   i=start_point;
+   while(count<(int)(a->capacity*100))
+   {
+      count++;
+      i = _wrap_around(a->capacity,i-step_size);
+      if(_insertion_helper(a,key,data,i))
+      {
+         return true;
+      }
+
+   }
+   return false;
+}
+
+
+bool _insertion_helper(assoc* a,void* key, void* data,int insertion_point)
+{
+   k_v_pair* to_insert;
+   if(key&&data)
+   {
+      if(a->arr[insertion_point]==NULL)
       {
          to_insert=init_kv_pair(key,data);
-         a->arr[hash_1]=to_insert;
+         a->arr[insertion_point]=to_insert;
          a->size++;
          return true;
       }
       else
       {
-         if(_same_key(a->arr[hash_1]->key,key,a->bytesize))
+         if(_same_key(a->arr[insertion_point]->key,key,a->bytesize))
          {
-            a->arr[hash_1]->value=data;
+            a->arr[insertion_point]->value=data;
             return true;
          }
          else
          {
-            hash2=sec_hash(hash_1,a);
-            _double_hash()
+            return false;
          }
       }
    }
    return false;
 }
 
-bool _double_hash()
 
 
 bool _same_key(void* key1,void* key2,int bytesize)
@@ -731,11 +910,13 @@ bool _same_key(void* key1,void* key2,int bytesize)
    }
 }
 
-
+/*pretty sure convention is to just point
+to original data and not copy but could be wrong*/
 k_v_pair* init_kv_pair(void* key, void* data)
 {
-   k_v_pair n_kv;
-   n_kv=safe_calloc(1,sizeof(k_v_pair));
+
+   k_v_pair* n_kv;
+   n_kv=_safe_calloc(1,sizeof(k_v_pair));
    n_kv->key = key;
    n_kv->value= data;
    return n_kv;
