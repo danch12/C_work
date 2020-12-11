@@ -22,6 +22,7 @@ int main(void)
    a = assoc_init(0);
    fp = nfopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
    for(j=0; j<WORDS; j++){
+
       assert(assoc_count(a)==j);
       i[j] = j;
       if(fscanf(fp, "%s", strs[j])!=1){
@@ -31,7 +32,7 @@ int main(void)
    }
    fclose(fp);
 
-   /* 
+   /*
       What's the longest word that is still spelled
       correctly when reversed, but is not a palindrome ?
    */
@@ -64,7 +65,7 @@ int main(void)
       assoc_insert(&a, &i[j], NULL);
    }
    printf("%d unique numbers out of %d\n", assoc_count(a), j);
-      
+
    assoc_free(a);
 
    return 0;
