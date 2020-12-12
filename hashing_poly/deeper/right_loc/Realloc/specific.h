@@ -9,7 +9,7 @@
 #define EPSILON 0.000001
 #define NOKEY -1
 #define NOPRIME -1
-
+#define FAILSAFE 1
 typedef enum bool {false, true} bool;
 
 typedef struct k_v_pair

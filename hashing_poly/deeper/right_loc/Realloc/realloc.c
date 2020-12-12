@@ -24,8 +24,11 @@ assoc* _assoc_resized(int keysize,int n_cap,int old_cap);
 int _wrap_around(int max_num,int position);
 /*http://www.cse.yorku.ca/~oz/hash.html#djb2 sdbm*/
 unsigned int _first_hash(void* key,assoc* a);
-unsigned int _sec_hash(unsigned int f_hash,assoc* a);
-
+unsigned int _sec_hash(void* key,assoc* a);
+/*the lower prime is always going to be a unsigned int
+so taking its modulus will mean that all numbers land within
+the unsigned int range*/
+unsigned long _byte_convert(void* key,assoc* a);
 
 assoc* _resize(assoc* a);
 bool _insertion(assoc* a,k_v_pair* kv);
@@ -44,13 +47,15 @@ void* _assoc_lookup_helper(int step_size,int start_point,\
                            assoc* a,void* key);
 void _partial_free(assoc* a);
 void test(void);
-/*
-int main(void)
+
+
+/*int main(void)
 {
-   test();
+   assoc_init(0);
+   assoc_init(sizeof(int));
    return 0;
-}
-*/
+}*/
+
 
 void test(void)
 {
@@ -58,7 +63,7 @@ void test(void)
    void* void_ptr;
    long i_long,i_long2;
    double t_double;
-   float test_float;
+   float test_float,test_float2;
    FILE *fp;
    test_struct test_s,test_y;
 
@@ -104,7 +109,7 @@ void test(void)
    test_assoc=assoc_init(0);
    test_assoc->capacity=15053;
 
-   fp = fopen("eng_370k_shuffle.txt", "rt");
+   fp = fopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
    if(fp==NULL)
    {
       fprintf(stderr,"file not there?\n");
@@ -262,14 +267,58 @@ void test(void)
 
    /*second hashing func*/
 
+
+
+
+
+
+   test_assoc=assoc_init(sizeof(int));
+
+   i=0;
+   assert(_byte_convert(&i,test_assoc)==0);
+   i=100;
+   assert(_byte_convert(&i,test_assoc)==100);
+
+   assoc_free(test_assoc);
+   /*not sure on testing byte convert with floats
+   as the bytes are a bit funky*/
+   test_assoc=assoc_init(sizeof(float));
+   test_float=0.0;
+   assert(_byte_convert(&test_float,test_assoc)==0);
+   test_float=10.679;
+   assert(_byte_convert(&test_float,test_assoc)==_byte_convert(&test_float,test_assoc));
+   test_float2=10.678;
+   assert(_byte_convert(&test_float,test_assoc)!=_byte_convert(&test_float2,test_assoc));
+   /*floats are accurate to 6 dps*/
+   test_float=10.555556;
+   test_float2=10.555555;
+   assert(_byte_convert(&test_float,test_assoc)==_byte_convert(&test_float,test_assoc));
+   assert(_byte_convert(&test_float,test_assoc)!=_byte_convert(&test_float2,test_assoc));
+
+   assoc_free(test_assoc);
+   assert(_byte_convert(&test_float,NULL)==0);
+   assert(_byte_convert(NULL,NULL)==0);
+
+   test_assoc=assoc_init(0);
+   assert(_byte_convert(NULL,test_assoc)==0);
+   strcpy(word,"hello");
+
+   assert(_byte_convert(word,test_assoc)==532);
+   strcpy(word,"");
+   /*things like this are why i put the safeguard in
+   my double hash func*/
+   assert(_byte_convert(word,test_assoc)==0);
+   strcpy(word," ");
+   assert(_byte_convert(word,test_assoc)==32);
+   assoc_free(test_assoc);
+
    test_assoc=assoc_init(sizeof(int));
    test_assoc->capacity=15053;
-
    for(i=0;i<10000;i++)
    {
-      test_hash1=_first_hash(&i,test_assoc);
-      test_hash2=_sec_hash(test_hash1,test_assoc);
-      assert((test_hash2<15053)&&(test_hash2>=0));
+
+      test_hash2=_sec_hash(&i,test_assoc);
+      assert((test_hash2<15053)&&(test_hash2>0));
    }
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
@@ -279,14 +328,15 @@ void test(void)
 
    for(i='a';i<'z';i++)
    {
-      test_hash1=_first_hash(&i,test_assoc);
-      test_hash2=_sec_hash(test_hash1,test_assoc);
-      assert((test_hash2<15053)&&(test_hash2>=0));
+
+      test_hash2=_sec_hash(&i,test_assoc);
+      assert((test_hash2<15053)&&(test_hash2>0));
    }
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
-
+   /*test for same results- not entirely necessary but would be nice
+   to have different results for each hash function on the same key*/
 
    assert(_wrap_around(10,11)==1);
    assert(_wrap_around(10,10)==0);
@@ -492,7 +542,7 @@ void test(void)
 
    test_assoc=assoc_init(0);
 
-   fp = fopen("eng_370k_shuffle.txt", "rt");
+   fp = fopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
    if(fp==NULL)
    {
       fprintf(stderr,"file not there?\n");
@@ -545,7 +595,12 @@ void* _safe_calloc(size_t nitems, size_t size)
 assoc* assoc_init(int keysize)
 {
    assoc* n_assoc;
-
+   static bool tested=false;
+   if(!tested)
+   {
+      tested=true;
+      test();
+   }
    assert(keysize>=0);
    n_assoc=_safe_calloc(1,sizeof(assoc));
    n_assoc->capacity=INITSIZE;
@@ -564,8 +619,13 @@ assoc* _assoc_resized(int keysize,int n_cap,int old_cap)
    assert(keysize>=0);
    n_assoc=_safe_calloc(1,sizeof(assoc));
    n_assoc->capacity=n_cap;
+   if(n_assoc->capacity>UINT_MAX/2)
+   {
+      fprintf(stderr,"warning -potential overflow in next resize\n");
+   }
    n_assoc->bytesize=keysize;
    n_assoc->arr=(k_v_pair**)_safe_calloc(n_cap,sizeof(k_v_pair*));
+   /*set to 0 because insertion function updates this*/
    n_assoc->size=0;
    n_assoc->lower_prime=old_cap;
    return n_assoc;
@@ -641,11 +701,55 @@ unsigned int _first_hash(void* key,assoc* a)
 
 
 /*https://www.geeksforgeeks.org/double-hashing/ idea for second
-hashing function */
-unsigned int _sec_hash(unsigned int f_hash,assoc* a)
+hashing function
+need to change this should use key not first hash
+ */
+unsigned int _sec_hash(void* key,assoc* a)
 {
-   return (a->lower_prime - (f_hash% a->lower_prime));
+   unsigned long hash;
+   hash=_byte_convert(key,a);
+   hash=a->lower_prime - (hash % a->lower_prime);
+   if(hash==0)
+   {
+      /*fail safe as if we return 0 then we will
+      probe same index of our array over and over*/
+      return FAILSAFE;
+   }
+   else
+   {
+      return hash;
+   }
 }
+
+unsigned long _byte_convert(void* key,assoc* a)
+{
+   unsigned int i;
+   unsigned long s;
+   char* str;
+   str= (char*) key;
+   s=0;
+   if(key&&a)
+   {
+      if(a->bytesize>0)
+      {
+         for(i=0;i< a->bytesize;i++,str++)
+         {
+            s+= *str;
+         }
+      }
+      else
+      {
+         i=0;
+         while(str[i])
+         {
+            s+= str[i];
+            i++;
+         }
+      }
+   }
+   return s;
+}
+
 
 
 /*assigns a prime number to table size and a lower*/
@@ -723,7 +827,7 @@ bool _insertion(assoc* a,k_v_pair* kv)
       }
       else
       {
-         hash_2=_sec_hash(hash_1,a);
+         hash_2=_sec_hash(kv->key,a);
          if(_double_hash(hash_2,hash_1,a,kv))
          {
             return true;
@@ -920,7 +1024,7 @@ void* assoc_lookup(assoc* a, void* key)
       {
          return a->arr[hash_1]->value;
       }
-      hash_2=_sec_hash(hash_1,a);
+      hash_2=_sec_hash(key,a);
       return _assoc_lookup_helper(hash_2,hash_1,a,key);
       /*count=1;
       hash_2=_sec_hash(hash_1,a);
