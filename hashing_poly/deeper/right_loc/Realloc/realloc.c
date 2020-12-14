@@ -8,7 +8,10 @@
 
 #include "specific.h"
 #include "../assoc.h"
+#define TESTCAP 15053
 
+/*((1-(1/100000))^100000)*100000 = probability that
+number does not appear at least once*/
 
 
 typedef struct test_struct
@@ -17,34 +20,39 @@ typedef struct test_struct
    int test_2;
 }test_struct;
 
+/*test for this just in case*/
+typedef struct test_struct_str
+{
+   char word[10];
+   int number;
+}test_struct_str;
 
 
-/*seemed stupid to use init then recalloc*/
 assoc* _assoc_resized(int keysize,int n_cap,int old_cap);
 int _wrap_around(int max_num,int position);
 /*http://www.cse.yorku.ca/~oz/hash.html#djb2 sdbm*/
-unsigned int _first_hash(void* key,assoc* a);
-unsigned int _sec_hash(void* key,assoc* a);
-/*the lower prime is always going to be a unsigned int
+unsigned int _first_hash(void* key,const assoc* a);
+unsigned int _sec_hash(void* key,const assoc* a);
+/*the capacity/lower prime is always going to be a unsigned int
 so taking its modulus will mean that all numbers land within
 the unsigned int range*/
-unsigned long _byte_convert(void* key,assoc* a);
-
+unsigned long _byte_convert(void* key,const assoc* a);
 assoc* _resize(assoc* a);
-bool _insertion(assoc* a,k_v_pair* kv);
+bool _insertion(assoc* a, k_v_pair* kv);
 bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point);
-bool _double_hash(int step_size,int start_point, assoc* a,k_v_pair* kv);
+bool _double_hash(int step_size,int start_point, assoc* a, k_v_pair* kv);
 
 
 void* _safe_calloc(size_t nitems, size_t size);
-k_v_pair* init_kv_pair(void* key, void* data);
+k_v_pair* _init_kv_pair(void* key, void* data);
 assoc* _bigger_array(assoc* a);
-bool _same_key(void* key1,void* key2,int bytesize);
+bool _same_key(const void* key1,const void* key2,int bytesize);
 int _sieve_of_e_helper(int new_cap_target);
-/* Free up all allocated space from 'a' */
+
 /*pretty much the reverse of _double_hash()*/
 void* _assoc_lookup_helper(int step_size,int start_point,\
-                           assoc* a,void* key);
+                           const assoc* a,const void* key);
+/*frees structs but not kv pairs*/
 void _partial_free(assoc* a);
 void test(void);
 
@@ -59,25 +67,24 @@ void test(void);
 
 void test(void)
 {
-   int i,test_hash1,test_hash2,test_int;
+   int i,test_hash1,test_hash2,test_int,count,j;
    void* void_ptr;
    long i_long,i_long2;
    double t_double;
    float test_float,test_float2;
    FILE *fp;
    test_struct test_s,test_y;
-
+   test_struct_str ss_test;
    k_v_pair* test_kv;
    int test_hashes[10000]={0};
-
-   int histogram_hashes[15053]={0};
+   int test_hashes2[10000]={0};
+   int test_arr[10000]={0};
+   int histogram_hashes[TESTCAP]={0};
    char word[50];
    char word2[50];
    assoc* test_assoc,*test_assoc2;
 
    test_s.test=10;
-
-
 
 
 
@@ -102,12 +109,16 @@ void test(void)
 
    assoc_free(test_assoc);
    assoc_free(test_assoc2);
-
+   strcpy(ss_test.word,"test");
+   ss_test.number=1;
+   test_assoc=assoc_init(sizeof(test_struct_str));
+   assert(_first_hash(&ss_test,test_assoc));
+   assoc_free(test_assoc);
 
    /*testing hashing function*/
 
    test_assoc=assoc_init(0);
-   test_assoc->capacity=15053;
+   test_assoc->capacity=TESTCAP;
 
    fp = fopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
    if(fp==NULL)
@@ -128,11 +139,11 @@ void test(void)
    }
    for(i=0;i<10000;i++)
    {
-      assert((test_hashes[i]<15053)&&(test_hashes[i]>=0));
+      assert((test_hashes[i]<TESTCAP)&&(test_hashes[i]>=0));
    }
-   /*testing spread of hash distribution - should use
+   /*testing spread of hash distribution roughly - should use
    a chi squared test or something similar but this will do*/
-   for(i=0;i<15053;i++)
+   for(i=0;i<TESTCAP;i++)
    {
       assert(histogram_hashes[i]<50);
    }
@@ -144,9 +155,9 @@ void test(void)
 
 
    test_assoc=assoc_init(sizeof(int));
-   test_assoc->capacity=15053;
-   memset(histogram_hashes,0,sizeof(int)*15053);
-   /*15053 is prime*/
+   test_assoc->capacity=TESTCAP;
+   memset(histogram_hashes,0,sizeof(int)*TESTCAP);
+   /*TESTCAP is prime*/
    for(i=0;i<10000;i++)
    {
       test_hashes[i]=_first_hash(&i,test_assoc);
@@ -154,7 +165,7 @@ void test(void)
    }
    for(i=0;i<10000;i++)
    {
-      assert((test_hashes[i]<15053)&&(test_hashes[i]>=0));
+      assert((test_hashes[i]<TESTCAP)&&(test_hashes[i]>=0));
    }
 
    for(i=0;(unsigned int)i<test_assoc->capacity;i++)
@@ -162,14 +173,14 @@ void test(void)
 
       assert(histogram_hashes[i]<50);
    }
-   memset(histogram_hashes,0,sizeof(int)*15053);
+   memset(histogram_hashes,0,sizeof(int)*TESTCAP);
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
 
 
    test_assoc=assoc_init(sizeof(long));
-   test_assoc->capacity=15053;
+   test_assoc->capacity=TESTCAP;
    i=0;
    for(i_long=INT_MAX;i_long<(INT_MAX+(long)1000);i_long++)
    {
@@ -179,13 +190,13 @@ void test(void)
    }
    for(i=0;i<INITSIZE;i++)
    {
-      assert((test_hashes[i]<15053)&&(test_hashes[i]>=0));
+      assert((test_hashes[i]<TESTCAP)&&(test_hashes[i]>=0));
 
    }
    for(i=0;(unsigned int)i<test_assoc->capacity;i++)
    {
 
-      assert(histogram_hashes[i]<20);
+      assert(histogram_hashes[i]<50);
    }
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
@@ -195,10 +206,10 @@ void test(void)
 
 
 
-   memset(histogram_hashes,0,sizeof(int)*15053);
+   memset(histogram_hashes,0,sizeof(int)*TESTCAP);
 
    test_assoc=assoc_init(sizeof(int));
-   test_assoc->capacity=15053;
+   test_assoc->capacity=TESTCAP;
    for(i=0;i<10000;i++)
    {
       test_hashes[i]=_first_hash(&i,test_assoc);
@@ -206,15 +217,15 @@ void test(void)
    }
    for(i=0;i<10000;i++)
    {
-      assert((test_hashes[i]<15053)&&(test_hashes[i]>=0));
+      assert((test_hashes[i]<TESTCAP)&&(test_hashes[i]>=0));
 
    }
    for(i=0;(unsigned int)i<test_assoc->capacity;i++)
    {
 
-      assert(histogram_hashes[i]<50);
+      assert(histogram_hashes[i]<5);
    }
-   memset(histogram_hashes,0,sizeof(int)*15053);
+   memset(histogram_hashes,0,sizeof(int)*TESTCAP);
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
@@ -225,7 +236,7 @@ void test(void)
 
 
    test_assoc=assoc_init(sizeof(double));
-   test_assoc->capacity=15053;
+   test_assoc->capacity=TESTCAP;
    i=0;
    for(t_double=10;t_double<11;t_double+=0.001)
    {
@@ -236,11 +247,11 @@ void test(void)
    }
    for(i=0;i<1000;i++)
    {
-      assert((test_hashes[i]<15053)&&(test_hashes[i]>=0));
+      assert((test_hashes[i]<TESTCAP)&&(test_hashes[i]>=0));
    }
    for(i=0;(unsigned int)i<test_assoc->capacity;i++)
    {
-      assert(histogram_hashes[i]<5);
+      assert(histogram_hashes[i]<20);
    }
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
@@ -266,11 +277,6 @@ void test(void)
    assoc_free(test_assoc);
 
    /*second hashing func*/
-
-
-
-
-
 
    test_assoc=assoc_init(sizeof(int));
 
@@ -305,38 +311,106 @@ void test(void)
 
    assert(_byte_convert(word,test_assoc)==532);
    strcpy(word,"");
+
    /*things like this are why i put the safeguard in
    my double hash func*/
    assert(_byte_convert(word,test_assoc)==0);
+   assert(_sec_hash(word,test_assoc)!=0);
    strcpy(word," ");
    assert(_byte_convert(word,test_assoc)==32);
    assoc_free(test_assoc);
 
+
+
    test_assoc=assoc_init(sizeof(int));
-   test_assoc->capacity=15053;
+   test_assoc->capacity=TESTCAP;
    for(i=0;i<10000;i++)
    {
 
       test_hash2=_sec_hash(&i,test_assoc);
-      assert((test_hash2<15053)&&(test_hash2>0));
+      assert((test_hash2<TESTCAP)&&(test_hash2>0));
    }
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
    test_assoc=assoc_init(sizeof(char));
-   test_assoc->capacity=15053;
+   test_assoc->capacity=TESTCAP;
 
    for(i='a';i<'z';i++)
    {
 
       test_hash2=_sec_hash(&i,test_assoc);
-      assert((test_hash2<15053)&&(test_hash2>0));
+      assert((test_hash2<TESTCAP)&&(test_hash2>0));
    }
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
 
+
+   test_assoc=assoc_init(0);
+   strcpy(word,"");
+   assert(_sec_hash(word,test_assoc)!=0);
+   strcpy(word,"jdjndjvjvbj");
+   assert(_sec_hash(word,test_assoc)!=0);
+   assoc_free(test_assoc);
    /*test for same results- not entirely necessary but would be nice
    to have different results for each hash function on the same key*/
+   test_assoc=assoc_init(sizeof(int));
+   test_assoc->capacity=TESTCAP;
+   for(i=0;i<10000;i++)
+   {
+      test_arr[i]=i;
+      test_hashes[i]=_first_hash(&test_arr[i],test_assoc);
+      test_hashes2[i]=_sec_hash(&test_arr[i],test_assoc);
+      assert(test_hashes[i]<TESTCAP&&test_hashes[i]>=0);
+      assert(test_hashes2[i]<TESTCAP&&test_hashes2[i]>0);
+      /*dont think you want the hash function
+      to be getting the same number frequently*/
+   }
+   count=0;
+   for(i=0;i<10000;i++)
+   {
+      for(j=i+1;j<10000;j++)
+      {
+         if(test_hashes[i]==test_hashes[j])
+         {
+            if(test_hashes2[i]==test_hashes2[j])
+            {
+               count+=1;
+            }
+         }
+      }
+   }
+   assert(count<5);
+
+   /*just checking it works for negative nums as well*/
+   count=0;
+   for(i=0;i> -10000;i--)
+   {
+      test_arr[count]=i;
+      test_hashes[count]=_first_hash(&test_arr[count],test_assoc);
+      test_hashes2[count]=_sec_hash(&test_arr[count],test_assoc);
+      assert(test_hashes[count]<TESTCAP&&test_hashes[count]>=0);
+      assert(test_hashes2[count]<TESTCAP&&test_hashes2[count]>0);
+      count++;
+   }
+
+   count=0;
+   for(i=0;i<10000;i++)
+   {
+      for(j=i+1;j<10000;j++)
+      {
+         if(test_hashes[i]==test_hashes[j])
+         {
+            if(test_hashes2[i]==test_hashes2[j])
+            {
+               count+=1;
+            }
+         }
+      }
+   }
+   test_assoc->capacity=INITSIZE;
+   assoc_free(test_assoc);
+   assert(count<5);
 
    assert(_wrap_around(10,11)==1);
    assert(_wrap_around(10,10)==0);
@@ -380,16 +454,26 @@ void test(void)
    assert(test_assoc2->lower_prime==INITSIZE);
    assoc_free(test_assoc2);
 
-   test_assoc->capacity=15053;
+   test_assoc->capacity=TESTCAP;
    test_assoc2=_bigger_array(test_assoc);
    assert(test_assoc2->capacity==36109);
-   assert(test_assoc2->lower_prime==15053);
+   assert(test_assoc2->lower_prime==TESTCAP);
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
    assoc_free(test_assoc2);
    assert(!_bigger_array(NULL));
 
 
+   assert(_same_key(NULL,NULL,sizeof(int))==false);
+   assert(_same_key(NULL,&i,sizeof(int))==false);
+   j=7;
+   i=6;
+   assert(_same_key(&j,&i,sizeof(int))==false);
+   assert(_same_key(&i,&i,sizeof(int))==true);
+   strcpy(word,"dan");
+   strcpy(word2,"dna");
+   assert(_same_key(word,word2,0)==false);
+   assert(_same_key(word,word,0)==true);
    /*inserting a kv_pair*/
    test_assoc=assoc_init(sizeof(long));
    for(i=0;i<(int)test_assoc->capacity;i++)
@@ -400,19 +484,20 @@ void test(void)
    i_long=10;
    i_long2=12;
 
-   test_kv=init_kv_pair(&i_long,&i_long2);
+   assert(_init_kv_pair(NULL,&i_long2)==NULL);
+   test_kv=_init_kv_pair(&i_long,&i_long2);
    /*adding to empty space*/
    assert(_insertion_helper(test_assoc,test_kv,0));
    assert(*(long*)test_assoc->arr[0]->key==10);
    assert(*(long*)test_assoc->arr[0]->value==12);
 
 
-   test_kv=init_kv_pair(&i_long,&i_long);
+   test_kv=_init_kv_pair(&i_long,&i_long);
    /*updating value with same key*/
    assert(_insertion_helper(test_assoc,test_kv,0));
    assert(*(long*)test_assoc->arr[0]->value==10);
 
-   test_kv=init_kv_pair(&i_long2,&i_long);
+   test_kv=_init_kv_pair(&i_long2,&i_long);
    /*trying to insert with different key*/
    assert(!_insertion_helper(test_assoc,test_kv,0));
    free(test_kv);
@@ -425,19 +510,19 @@ void test(void)
    test_assoc=assoc_init(0);
    strcpy(word,"938Neill\n");
    i=1;
-   test_kv=init_kv_pair(&word,&i);
+   test_kv=_init_kv_pair(&word,&i);
    assert(_insertion_helper(test_assoc,test_kv,0));
    assert(strcmp(test_assoc->arr[0]->key,word)==0);
    assert(*(int*)test_assoc->arr[0]->value==1);
 
    test_s.test_2 =10;
-   test_kv=init_kv_pair(&word,&test_s);
+   test_kv=_init_kv_pair(&word,&test_s);
    assert(_insertion_helper(test_assoc,test_kv,0));
    /*we can also put structs as values but not as keys */
    assert((*(test_struct*)test_assoc->arr[0]->value).test_2==10);
 
    strcpy(word2,"938Neilliscool\n");
-   test_kv=init_kv_pair(&word2,&test_s);
+   test_kv=_init_kv_pair(&word2,&test_s);
    assert(!_insertion_helper(test_assoc,test_kv,0));
    free(test_kv);
    assert(!_insertion_helper(test_assoc,NULL,0));
@@ -448,17 +533,17 @@ void test(void)
    test_assoc=assoc_init(sizeof(int));
 
    i=50;
-   test_kv=init_kv_pair(&i,&word2);
+   test_kv=_init_kv_pair(&i,&word2);
    assert(_insertion_helper(test_assoc,test_kv,0));
    assert(strcmp(word2,(char*)test_assoc->arr[0]->value)==0);
    test_int =49;
 
-   test_kv=init_kv_pair(&test_int,&i);
+   test_kv=_init_kv_pair(&test_int,&i);
    assert(_double_hash(7,0,test_assoc,test_kv));
    assert(*(int*)test_assoc->arr[7]->value==50);
 
    test_float=50.1;
-   test_kv=init_kv_pair(&test_float,&test_int);
+   test_kv=_init_kv_pair(&test_float,&test_int);
    assert(_double_hash(7,0,test_assoc,test_kv));
    assert(*(int*)test_assoc->arr[14]->value==49);
    assoc_free(test_assoc);
@@ -468,7 +553,7 @@ void test(void)
    test_assoc=assoc_init(sizeof(int));
    for(i=0;i<15;i++)
    {
-      test_kv=init_kv_pair(&test_hashes[i],&i);
+      test_kv=_init_kv_pair(&test_hashes[i],&i);
       assert(_insertion(test_assoc,test_kv));
    }
    assert(test_assoc->size==15);
@@ -478,13 +563,15 @@ void test(void)
    test_assoc=assoc_init(sizeof(int));
    for(i=0;i<15;i++)
    {
-      test_kv=init_kv_pair(&test_hashes[i],&i);
+      test_kv=_init_kv_pair(&test_hashes[i],&i);
       assert(_insertion(test_assoc,test_kv));
    }
 
    test_assoc=_resize(test_assoc);
    assert(test_assoc->size==15);
    assert(test_assoc->capacity==37);
+   /*check that after resizing everything still there*/
+
    for(i=0;i<15;i++)
    {
       test_hash1=_first_hash(&test_hashes[i],test_assoc);
@@ -493,6 +580,7 @@ void test(void)
 
    assoc_free(test_assoc);
    srand(time(NULL));
+
    test_assoc=assoc_init(sizeof(int));
 
 
@@ -555,6 +643,8 @@ void test(void)
          fprintf(stderr,"failed scan of word\n");
          exit(EXIT_FAILURE);
       }
+
+
       assoc_insert(&test_assoc, word,&i);
       assert(assoc_lookup(test_assoc,word)==&i);
    }
@@ -566,15 +656,17 @@ void test(void)
    test_s.test=10;
    for(i=0;i<10000;i++)
    {
+      assert(assoc_count(test_assoc)==(unsigned int)i);
       test_hashes[i]=i;
       assoc_insert(&test_assoc,&test_hashes[i],&test_s);
+
    }
    for(i=0;i<10000;i++)
    {
-
       assert(assoc_lookup(test_assoc,&test_hashes[i])==&test_s);
    }
    assoc_free(test_assoc);
+   assert(assoc_count(NULL)==0);
 /*need to add something to cast long doubles to longs instead of exiting*/
 }
 
@@ -612,7 +704,7 @@ assoc* assoc_init(int keysize)
    return n_assoc;
 }
 
-/*seemed stupid to use init then recalloc*/
+
 assoc* _assoc_resized(int keysize,int n_cap,int old_cap)
 {
    assoc* n_assoc;
@@ -634,16 +726,19 @@ assoc* _assoc_resized(int keysize,int n_cap,int old_cap)
 /* Free up all allocated space from 'a' */
 void assoc_free(assoc* a)
 {
-   int i;
-   for(i=0;i<(int)a->capacity;i++)
+   unsigned int i;
+   if(a)
    {
-      if(a->arr[i])
+      for(i=0;i<a->capacity;i++)
       {
-         free(a->arr[i]);
+         if(a->arr[i])
+         {
+            free(a->arr[i]);
+         }
       }
+      free(a->arr);
+      free(a);
    }
-   free(a->arr);
-   free(a);
 }
 
 /*when resizing dont want to free all the values*/
@@ -653,10 +748,9 @@ void _partial_free(assoc* a)
    free(a);
 }
 
-
+/*https://stackoverflow.com/questions/11720656/modulo-operation-with-negative-numbers*/
 int _wrap_around(int max_num,int position)
 {
-
    return abs(position % max_num);
 }
 
@@ -664,7 +758,7 @@ int _wrap_around(int max_num,int position)
 
 
 /*http://www.cse.yorku.ca/~oz/hash.html#djb2 sdbm*/
-unsigned int _first_hash(void* key,assoc* a)
+unsigned int _first_hash(void* key,const assoc* a)
 {
    unsigned int i;
    unsigned long hash;
@@ -672,28 +766,29 @@ unsigned int _first_hash(void* key,assoc* a)
    str= (char*) key;
    hash=0;
 
-   if(key)
+
+   if(a->bytesize>0)
    {
-      if(a->bytesize>0)
+      for(i=0;i< a->bytesize;i++,str++)
       {
-         for(i=0;i< a->bytesize;i++,str++)
-         {
-            hash+= (*str)+(hash<<6) +(hash<<16)-hash;
-         }
-         return hash% a->capacity;
+         /*these magic numbers dont really have much
+         of an explaination so seems odd to define them
+         something like MAGIC_NUM probably gives less
+         info than just the number */
+         hash+= (*str)+(hash<<6) +(hash<<16)-hash;
       }
-      else
-      {
-         i=0;
-         while(str[i])
-         {
-            hash+= str[i]+(hash<<6) +(hash<<16)-hash;
-            i++;
-         }
-         return hash% a->capacity;
-      }
+      return hash% a->capacity;
    }
-   return NOKEY;
+   else
+   {
+      i=0;
+      while(str[i])
+      {
+         hash+= str[i]+(hash<<6) +(hash<<16)-hash;
+         i++;
+      }
+      return hash% a->capacity;
+   }
 
 }
 
@@ -702,9 +797,8 @@ unsigned int _first_hash(void* key,assoc* a)
 
 /*https://www.geeksforgeeks.org/double-hashing/ idea for second
 hashing function
-need to change this should use key not first hash
  */
-unsigned int _sec_hash(void* key,assoc* a)
+unsigned int _sec_hash(void* key,const assoc* a)
 {
    unsigned long hash;
    hash=_byte_convert(key,a);
@@ -721,7 +815,7 @@ unsigned int _sec_hash(void* key,assoc* a)
    }
 }
 
-unsigned long _byte_convert(void* key,assoc* a)
+unsigned long _byte_convert(void* key,const assoc* a)
 {
    unsigned int i;
    unsigned long s;
@@ -768,7 +862,7 @@ assoc* _bigger_array(assoc* a)
       while(bigger_table<new_cap_target)
       {
          bigger_table=_sieve_of_e_helper(prime_limit);
-         prime_limit=(float)prime_limit*PRIMESCALE;
+         prime_limit=(double)prime_limit*PRIMESCALE;
       }
       a_n=_assoc_resized(a->bytesize,bigger_table,a->capacity);
       return a_n;
@@ -842,13 +936,13 @@ that a free space is found eventually if there is one
 and we check that the array is not full before _insertion
 it is ok to have a seemingly infinite loop
 however we will also put a count that acts as safeguard*/
-bool _double_hash(int step_size,int start_point, assoc* a,k_v_pair* kv)
+bool _double_hash(int step_size,int start_point, assoc* a, k_v_pair* kv)
 {
    int i,ind;
-   int count;
+   unsigned int count;
    count=0;
    i=start_point;
-   while(count<(int)(a->capacity*100))
+   while(count<(a->capacity*100))
    {
       count++;
 
@@ -894,7 +988,7 @@ bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point)
 they would be the same but for this im going to
 say they arent because i want functions to exit
 if both are NULL anyway*/
-bool _same_key(void* key1,void* key2,int bytesize)
+bool _same_key(const void* key1,const void* key2,int bytesize)
 {
    if(key1 && key2)
    {
@@ -918,16 +1012,18 @@ bool _same_key(void* key1,void* key2,int bytesize)
    return false;
 }
 
-/*pretty sure convention is to just point
-to original data and not copy but could be wrong*/
-k_v_pair* init_kv_pair(void* key, void* data)
+k_v_pair* _init_kv_pair(void* key, void* data)
 {
 
    k_v_pair* n_kv;
-   n_kv=_safe_calloc(1,sizeof(k_v_pair));
-   n_kv->key = key;
-   n_kv->value= data;
-   return n_kv;
+   if(key)
+   {
+      n_kv=_safe_calloc(1,sizeof(k_v_pair));
+      n_kv->key = key;
+      n_kv->value= data;
+      return n_kv;
+   }
+   return NULL;
 }
 
 
@@ -978,7 +1074,7 @@ void assoc_insert(assoc** a, void* key, void* data)
             a_ref=_resize(a_ref);
             *a = a_ref;
          }
-         kv=init_kv_pair(key,data);
+         kv=_init_kv_pair(key,data);
          if(!_insertion(a_ref,kv))
          {
             if(kv)
@@ -1010,7 +1106,7 @@ cell
 but if we find an empty cell then not in*/
 void* assoc_lookup(assoc* a, void* key)
 {
-   int hash_1, hash_2;
+   unsigned int hash_1, hash_2;
 
    /*check if either are null*/
    if(a && key)
@@ -1026,31 +1122,14 @@ void* assoc_lookup(assoc* a, void* key)
       }
       hash_2=_sec_hash(key,a);
       return _assoc_lookup_helper(hash_2,hash_1,a,key);
-      /*count=1;
-      hash_2=_sec_hash(hash_1,a);
-      i=hash_1-hash_2;
-      while(count<a->capacity)
-      {
-         ind=_wrap_around(a->capacity,i);*/
-         /*if empty then not there*/
-      /*   if(!a->arr[ind])
-         {
-            return NULL;
-         }
-         if(_same_key(a->arr[ind]->key,key,a->bytesize))
-         {
-            return a->arr[ind]->value;
-         }
-         i=i-hash_2;
-         count++;
-      }*/
+
    }
 
    return NULL;
 }
 
 /*pretty much the reverse of _double_hash()*/
-void* _assoc_lookup_helper(int step_size,int start_point, assoc* a,void* key)
+void* _assoc_lookup_helper(int step_size,int start_point,const assoc* a,const void* key)
 {
    int i,ind;
    unsigned int count;

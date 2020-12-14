@@ -5,8 +5,6 @@
 #define INITLOWPRIME 13
 #define SCALEFACTOR 2
 #define PRIMESCALE 1.2
-#define MAXDIGITS 50
-#define EPSILON 0.000001
 #define NOKEY -1
 #define NOPRIME -1
 #define FAILSAFE 1
@@ -27,6 +25,8 @@ typedef struct assoc
    unsigned int size;
    /*needed for double hashing*/
    int lower_prime;
+
+
 }assoc;
 
 #endif
