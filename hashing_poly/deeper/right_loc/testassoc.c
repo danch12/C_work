@@ -31,7 +31,7 @@ int main(void)
       assoc_insert(&a, strs[j], &i[j]);
    }
    fclose(fp);
-
+   
    /*
       What's the longest word that is still spelled
       correctly when reversed, but is not a palindrome ?

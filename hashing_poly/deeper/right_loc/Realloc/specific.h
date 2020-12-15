@@ -1,5 +1,12 @@
 #ifndef SPECIFIC_H
 #define SPECIFIC_H
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include <string.h>
+#include <assert.h>
+#include <ctype.h>
+#include <limits.h>
 
 #define INITSIZE 17
 #define INITLOWPRIME 13

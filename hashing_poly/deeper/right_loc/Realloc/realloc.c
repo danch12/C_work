@@ -1,11 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <assert.h>
-#include <ctype.h>
-#include <limits.h>
-
 #include "specific.h"
 #include "../assoc.h"
 #define TESTCAP 15053
@@ -56,13 +48,6 @@ void* _assoc_lookup_helper(int step_size,int start_point,\
 void _partial_free(assoc* a);
 void test(void);
 
-
-/*int main(void)
-{
-   assoc_init(0);
-   assoc_init(sizeof(int));
-   return 0;
-}*/
 
 
 void test(void)
@@ -1077,6 +1062,7 @@ void assoc_insert(assoc** a, void* key, void* data)
          kv=_init_kv_pair(key,data);
          if(!_insertion(a_ref,kv))
          {
+            /*failsafe*/
             if(kv)
             {
                free(kv);
