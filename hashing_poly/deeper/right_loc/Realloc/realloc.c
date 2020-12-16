@@ -22,7 +22,7 @@ typedef struct test_struct_str
 
 /*just going to have a go for fun
 using your queues one as sort of a template
-/*void to_dot(assoc* n_assoc);*/
+void to_dot(assoc* n_assoc);*/
 
 
 assoc* _assoc_resized(int keysize,int n_cap,int old_cap);
