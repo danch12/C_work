@@ -15,8 +15,8 @@ testrealloc_s : assoc.h Realloc/specific.h Realloc/realloc.c testassoc.c ../../A
 testrealloc_v : assoc.h Realloc/specific.h Realloc/realloc.c testassoc.c ../../ADTs/General/general.h ../../ADTs/General/general.c
 	$(CC) testassoc.c Realloc/realloc.c ../../ADTs/General/general.c -o testrealloc_v -I./Realloc $(VALGRIND) $(LDLIBS)
 
-testcuckoo_s : assoc.h Cuckoo/specific.h Cuckoo/cuckoo.c testassoc.c ../../ADTs/General/general.h ../../ADTs/General/general.c
-	$(CC) testassoc.c Cuckoo/cuckoo.c ../../ADTs/General/general.c -o testcuckoo_s -I./Cuckoo $(SANITIZE) $(LDLIBS)
+testcuckoo_s : assoc.h Cuckoo2/specific.h Cuckoo2/cuckoo.c testassoc.c ../../ADTs/General/general.h ../../ADTs/General/general.c
+	$(CC) testassoc.c Cuckoo2/cuckoo.c ../../ADTs/General/general.c -o testcuckoo_s -I./Cuckoo $(SANITIZE) $(LDLIBS)
 
 testcuckoo_v : assoc.h Cuckoo/specific.h Cuckoo/cuckoo.c testassoc.c ../../ADTs/General/general.h ../../ADTs/General/general.c
 	$(CC) testassoc.c Cuckoo/cuckoo.c ../../ADTs/General/general.c -o testcuckoo_v -I./Cuckoo $(VALGRIND) $(LDLIBS)

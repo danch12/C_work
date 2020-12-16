@@ -9,7 +9,11 @@ typedef struct test_struct_str
    int number;
 }test_struct_str;
 
-
+/*unsigned int assoc_count(assoc* a);
+void* assoc_lookup(assoc* a, void* key);
+void assoc_insert(assoc** a, void* key, void* data);
+void* _table_lookup(void* key,table* to_look);
+void assoc_free(assoc* a);*/
 table* _table_init(assoc* a,\
                   unsigned int (*hash_f)(void*,const table* ));
 /*return void then cast when appropriate*/
@@ -37,7 +41,12 @@ void* _table_lookup(void* key,table* to_look);
 int _sieve_of_e_helper(int new_cap_target);
 int _log_2(int num);
 void test(void);
-
+/*
+int main(void)
+{
+   test();
+   return 0;
+}*/
 
 void test(void)
 {
@@ -57,17 +66,17 @@ void test(void)
 
 
    test_assoc=assoc_init(sizeof(int));
-   test_assoc->table_1->capacity=TESTCAP;
-   test_assoc->table_2->capacity=TESTCAP;
-   assert(test_assoc->table_1->hash_func!=test_assoc->table_2->hash_func);
+   test_assoc->table_arr[0]->capacity=TESTCAP;
+   test_assoc->table_arr[1]->capacity=TESTCAP;
+   assert(test_assoc->table_arr[0]->hash_func!=test_assoc->table_arr[1]->hash_func);
    assert(test_assoc->bytesize==sizeof(int));
 
 
    for(i=0;i<10000;i++)
    {
       test_arr[i]=i;
-      test_hashes[i]=test_assoc->table_1->hash_func(&test_arr[i],test_assoc->table_1);
-      test_hashes2[i]=test_assoc->table_2->hash_func(&test_arr[i],test_assoc->table_2);
+      test_hashes[i]=test_assoc->table_arr[0]->hash_func(&test_arr[i],test_assoc->table_arr[0]);
+      test_hashes2[i]=test_assoc->table_arr[1]->hash_func(&test_arr[i],test_assoc->table_arr[1]);
       assert(test_hashes[i]<TESTCAP&&test_hashes[i]>=0);
       assert(test_hashes2[i]<TESTCAP&&test_hashes2[i]>=0);
 
@@ -89,15 +98,15 @@ void test(void)
       }
    }
    assert(count<10);
-   test_assoc->table_1->capacity=INITSIZE;
-   test_assoc->table_2->capacity=INITSIZE;
+   test_assoc->table_arr[0]->capacity=INITSIZE;
+   test_assoc->table_arr[1]->capacity=INITSIZE;
    assoc_free(test_assoc);
 
 
 
    test_assoc=assoc_init(0);
-   test_assoc->table_1->capacity=TESTCAP;
-   test_assoc->table_2->capacity=TESTCAP;
+   test_assoc->table_arr[0]->capacity=TESTCAP;
+   test_assoc->table_arr[1]->capacity=TESTCAP;
    fp = fopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
    if(fp==NULL)
    {
@@ -111,8 +120,8 @@ void test(void)
          fprintf(stderr,"failed scan of word\n");
          exit(EXIT_FAILURE);
       }
-      test_hashes[i]=test_assoc->table_1->hash_func(word,test_assoc->table_1);
-      test_hashes2[i]=test_assoc->table_2->hash_func(word,test_assoc->table_2);
+      test_hashes[i]=test_assoc->table_arr[0]->hash_func(word,test_assoc->table_arr[0]);
+      test_hashes2[i]=test_assoc->table_arr[1]->hash_func(word,test_assoc->table_arr[1]);
       assert(test_hashes[i]<TESTCAP&&test_hashes[i]>=0);
       assert(test_hashes2[i]<TESTCAP&&test_hashes2[i]>=0);
    }
@@ -133,18 +142,18 @@ void test(void)
    assert(count<10);
 
    fclose(fp);
-   test_assoc->table_1->capacity=INITSIZE;
-   test_assoc->table_2->capacity=INITSIZE;
+   test_assoc->table_arr[0]->capacity=INITSIZE;
+   test_assoc->table_arr[1]->capacity=INITSIZE;
    assoc_free(test_assoc);
 
    test_assoc=assoc_init(sizeof(double));
-   test_assoc->table_1->capacity=TESTCAP;
-   test_assoc->table_2->capacity=TESTCAP;
+   test_assoc->table_arr[0]->capacity=TESTCAP;
+   test_assoc->table_arr[1]->capacity=TESTCAP;
 
    for(i=0,d_i=0.0;d_i<10;d_i+=0.01,i++)
    {
-      test_hashes[i]=test_assoc->table_1->hash_func(&d_i,test_assoc->table_1);
-      test_hashes2[i]=test_assoc->table_2->hash_func(&d_i,test_assoc->table_2);
+      test_hashes[i]=test_assoc->table_arr[0]->hash_func(&d_i,test_assoc->table_arr[0]);
+      test_hashes2[i]=test_assoc->table_arr[1]->hash_func(&d_i,test_assoc->table_arr[1]);
       assert(test_hashes[i]<TESTCAP&&test_hashes[i]>=0);
       assert(test_hashes2[i]<TESTCAP&&test_hashes2[i]>=0);
    }
@@ -164,8 +173,8 @@ void test(void)
       }
    }
    assert(count<10);
-   test_assoc->table_1->capacity=INITSIZE;
-   test_assoc->table_2->capacity=INITSIZE;
+   test_assoc->table_arr[0]->capacity=INITSIZE;
+   test_assoc->table_arr[1]->capacity=INITSIZE;
    assoc_free(test_assoc);
 
 
@@ -176,14 +185,14 @@ void test(void)
    test_kv= _init_kv_pair(&i,&j);
    assert(_table_insertion(NULL,test_kv)==NULL);
    assert(_table_insertion(NULL,NULL)==NULL);
-   assert(_table_insertion(test_assoc->table_1,NULL)==NULL);
+   assert(_table_insertion(test_assoc->table_arr[0],NULL)==NULL);
    /*this doesnt increase the size of the whole assoc yet*/
-   assert(_table_insertion(test_assoc->table_1,test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_1->arr[_first_hash(&i,test_assoc->table_1)]->key)==0);
+   assert(_table_insertion(test_assoc->table_arr[0],test_kv)==NULL);
+   assert(*(int*)(test_assoc->table_arr[0]->arr[_first_hash(&i,test_assoc->table_arr[0])]->key)==0);
    j=2;
    test_kv= _init_kv_pair(&i,&j);
-   assert(_table_insertion(test_assoc->table_1,test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_1->arr[_first_hash(&i,test_assoc->table_1)]->value)==2);
+   assert(_table_insertion(test_assoc->table_arr[0],test_kv)==NULL);
+   assert(*(int*)(test_assoc->table_arr[0]->arr[_first_hash(&i,test_assoc->table_arr[0])]->value)==2);
    assoc_free(test_assoc);
 
 
@@ -191,13 +200,13 @@ void test(void)
    i=1;
    j=18;
    test_kv= _init_kv_pair(&i,&j);
-   assert(_table_insertion(test_assoc->table_1,test_kv)==NULL);
+   assert(_table_insertion(test_assoc->table_arr[0],test_kv)==NULL);
    test_kv= _init_kv_pair(&j,&i);
 
-   test_kv=_table_insertion(test_assoc->table_1,test_kv);
+   test_kv=_table_insertion(test_assoc->table_arr[0],test_kv);
    assert(*(int*)test_kv->key==1);
 
-   assert(*(int*)(test_assoc->table_1->arr[_first_hash(&j,test_assoc->table_1)]->value)==1);
+   assert(*(int*)(test_assoc->table_arr[0]->arr[_first_hash(&j,test_assoc->table_arr[0])]->value)==1);
    free(test_kv);
    assoc_free(test_assoc);
 
@@ -205,10 +214,10 @@ void test(void)
 
    strcpy(word,"hello");
    test_kv= _init_kv_pair(word,&j);
-   assert(_table_insertion(test_assoc->table_1,test_kv)==NULL);
+   assert(_table_insertion(test_assoc->table_arr[0],test_kv)==NULL);
    test_kv= _init_kv_pair(word,&i);
-   assert(_table_insertion(test_assoc->table_1,test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_1->arr[_first_hash(word,test_assoc->table_1)]->value)==1);
+   assert(_table_insertion(test_assoc->table_arr[0],test_kv)==NULL);
+   assert(*(int*)(test_assoc->table_arr[0]->arr[_first_hash(word,test_assoc->table_arr[0])]->value)==1);
 
 
    assoc_free(test_assoc);
@@ -220,14 +229,14 @@ void test(void)
    test_kv= _init_kv_pair(&i,&j);
    assert(_table_insertion(NULL,test_kv)==NULL);
    assert(_table_insertion(NULL,NULL)==NULL);
-   assert(_table_insertion(test_assoc->table_2,NULL)==NULL);
+   assert(_table_insertion(test_assoc->table_arr[1],NULL)==NULL);
    /*this doesnt increase the size of the whole assoc yet*/
-   assert(_table_insertion(test_assoc->table_2,test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_2->arr[_sec_hash(&i,test_assoc->table_2)]->key)==0);
+   assert(_table_insertion(test_assoc->table_arr[1],test_kv)==NULL);
+   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(&i,test_assoc->table_arr[1])]->key)==0);
    j=2;
    test_kv= _init_kv_pair(&i,&j);
-   assert(_table_insertion(test_assoc->table_2,test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_2->arr[_sec_hash(&i,test_assoc->table_2)]->value)==2);
+   assert(_table_insertion(test_assoc->table_arr[1],test_kv)==NULL);
+   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(&i,test_assoc->table_arr[1])]->value)==2);
    assoc_free(test_assoc);
 
 
@@ -235,14 +244,14 @@ void test(void)
    i=1;
    j=9;
    test_kv= _init_kv_pair(&i,&j);
-   assert(_table_insertion(test_assoc->table_2,test_kv)==NULL);
+   assert(_table_insertion(test_assoc->table_arr[1],test_kv)==NULL);
    test_kv= _init_kv_pair(&j,&i);
 
 
-   test_kv=_table_insertion(test_assoc->table_2,test_kv);
+   test_kv=_table_insertion(test_assoc->table_arr[1],test_kv);
    assert(*(int*)test_kv->key==1);
    assert(*(int*)test_kv->value==9);
-   assert(*(int*)(test_assoc->table_2->arr[_sec_hash(&j,test_assoc->table_2)]->value)==1);
+   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(&j,test_assoc->table_arr[1])]->value)==1);
    free(test_kv);
    assoc_free(test_assoc);
 
@@ -250,10 +259,10 @@ void test(void)
 
    strcpy(word,"hello");
    test_kv= _init_kv_pair(word,&j);
-   assert(_table_insertion(test_assoc->table_2,test_kv)==NULL);
+   assert(_table_insertion(test_assoc->table_arr[1],test_kv)==NULL);
    test_kv= _init_kv_pair(word,&i);
-   assert(_table_insertion(test_assoc->table_2,test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_2->arr[_sec_hash(word,test_assoc->table_2)]->value)==1);
+   assert(_table_insertion(test_assoc->table_arr[1],test_kv)==NULL);
+   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(word,test_assoc->table_arr[1])]->value)==1);
    assoc_free(test_assoc);
 
 
@@ -266,34 +275,37 @@ void test(void)
    i=0;
    j=17;
    x=34;
+
    test_assoc=assoc_init(sizeof(int));
+
    test_kv=_init_kv_pair(&i,&i);
    assert(_outer_insert(test_kv,test_assoc)==NULL);
    test_kv=_init_kv_pair(&j,&j);
    assert(_outer_insert(test_kv,test_assoc)==NULL);
    test_kv=_init_kv_pair(&x,&x);
    test_kv=_outer_insert(test_kv,test_assoc);
-   assert(*(int*)test_kv->key==i);
+
+   assert(*(int*)test_kv->key==j);
    free(test_kv);
 
    /*x bounces out j which bounces out i which bounces out x and so on*/
-   assert(*(int*)test_assoc->table_1->arr[_first_hash(&x,test_assoc->table_1)]->value==j);
-   assert(*(int*)test_assoc->table_2->arr[_sec_hash(&x,test_assoc->table_2)]->value==x);
+   assert(*(int*)test_assoc->table_arr[0]->arr[_first_hash(&x,test_assoc->table_arr[0])]->value==i);
+   assert(*(int*)test_assoc->table_arr[1]->arr[_sec_hash(&x,test_assoc->table_arr[1])]->value==x);
    assoc_free(test_assoc);
 
    test_assoc2=assoc_init(sizeof(int));
    test_assoc=_assoc_resized(test_assoc2,501);
-   assert(test_assoc->table_1->capacity==501);
-   assert(test_assoc->table_2->capacity==501);
+   assert(test_assoc->table_arr[0]->capacity==501);
+   assert(test_assoc->table_arr[1]->capacity==501);
    for(i=0;i<30;i++)
    {
       test_kv=_init_kv_pair(&test_arr[i],&i);
-      assert(!_table_insertion(test_assoc->table_1,test_kv));
+      assert(!_table_insertion(test_assoc->table_arr[0],test_kv));
    }
 
    /*trying to fit too many into a small table*/
-   assert(_table_reinsert(test_assoc2,test_assoc->table_1)==false);
-   assert(_table_reinsert(NULL,test_assoc->table_1)==false);
+   assert(_table_reinsert(test_assoc2,test_assoc->table_arr[0])==false);
+   assert(_table_reinsert(NULL,test_assoc->table_arr[0])==false);
    assert(_table_reinsert(test_assoc,NULL)==false);
 
    /*doesnt matter if theres kv pairs in the table thats too
@@ -306,10 +318,10 @@ void test(void)
    for(i=0;i<4;i++)
    {
       test_kv=_init_kv_pair(&test_arr[i],&i);
-      assert(!_table_insertion(test_assoc2->table_1,test_kv));
+      assert(!_table_insertion(test_assoc2->table_arr[0],test_kv));
    }
 
-   assert(_table_reinsert(test_assoc,test_assoc2->table_1)==true);
+   assert(_table_reinsert(test_assoc,test_assoc2->table_arr[0])==true);
 
    assoc_free(test_assoc);
    _partial_free(test_assoc2);
@@ -320,23 +332,24 @@ void test(void)
    {
 
       test_kv=_init_kv_pair(&test_arr[i],&i);
-      assert(!_table_insertion(test_assoc->table_1,test_kv));
+      assert(!_table_insertion(test_assoc->table_arr[0],test_kv));
    }
    i++;
    test_kv=_init_kv_pair(&test_arr[i],&i);
    test_assoc=_resize(test_assoc,test_kv,INITSIZE*SCALEFACTOR);
-
+   assert(assoc_count(test_assoc)==5);
    /*things still can be found after resizing*/
    for(i=0;i<4;i++)
    {
-       assert(assoc_lookup(test_assoc, &test_arr[i]));
+
+      assert(assoc_lookup(test_assoc, &test_arr[i]));
    }
 
    for(i=0;i<(int)test_assoc->capacity;i++)
    {
-      if(test_assoc->table_1->arr[i])
+      if(test_assoc->table_arr[0]->arr[i])
       {
-         assert(_table_lookup(test_assoc->table_1->arr[i]->key,test_assoc->table_1));
+         assert(_table_lookup(test_assoc->table_arr[0]->arr[i]->key,test_assoc->table_arr[0]));
       }
    }
    for(i=6;i<100;i++)
@@ -359,11 +372,11 @@ void test(void)
    count=0;
    for(i=0;i<(int)test_assoc->capacity;i++)
    {
-      if(test_assoc->table_1->arr[i])
+      if(test_assoc->table_arr[0]->arr[i])
       {
          count++;
       }
-      if(test_assoc->table_2->arr[i])
+      if(test_assoc->table_arr[1]->arr[i])
       {
          count++;
       }
@@ -394,8 +407,9 @@ void test(void)
    }
    for(i=0;i<100;i++)
    {
+
       test_kv=assoc_lookup(test_assoc,&tss_arr[i]);
-      assert(*(int*)test_kv->value==i);
+      assert(*(int*)test_kv==i);
    }
    assoc_free(test_assoc);
 
@@ -412,7 +426,7 @@ void test(void)
    {
 
       test_kv=assoc_lookup(test_assoc,&test_floats[i]);
-      assert(*(float*)test_kv->value-test_float<0.0001);
+      assert(*(float*)test_kv-test_float<0.0001);
    }
    assoc_insert(&test_assoc,NULL,NULL);
    assert(assoc_count(test_assoc)==(unsigned int)i);
@@ -436,6 +450,7 @@ void* _safe_calloc(size_t nitems, size_t size)
 assoc* assoc_init(int keysize)
 {
    assoc* n_assoc;
+   int i;
    static bool tested=false;
    if(!tested)
    {
@@ -446,9 +461,17 @@ assoc* assoc_init(int keysize)
    n_assoc=_safe_calloc(1,sizeof(assoc));
    n_assoc->capacity=INITSIZE;
    n_assoc->bytesize=keysize;
-   n_assoc->table_1=_table_init(n_assoc,&_first_hash);
-   n_assoc->table_2=_table_init(n_assoc,&_sec_hash);
-
+   for(i=0;i<NUMTABLES;i++)
+   {
+      if(i%NUMTABLES==0)
+      {
+         n_assoc->table_arr[i]=_table_init(n_assoc,&_first_hash);
+      }
+      else
+      {
+         n_assoc->table_arr[i]=_table_init(n_assoc,&_sec_hash);
+      }
+   }
    return n_assoc;
 }
 
@@ -467,32 +490,32 @@ table* _table_init(assoc* a,\
 
 void assoc_free(assoc* a)
 {
-   unsigned int i;
-   for(i=0;i<a->capacity;i++)
+   unsigned int i,j;
+   for(j=0;j<NUMTABLES;j++)
    {
-      if(a->table_1->arr[i])
+      for(i=0;i<a->capacity;i++)
       {
-         free(a->table_1->arr[i]);
+         if(a->table_arr[j]->arr[i])
+         {
+            free(a->table_arr[j]->arr[i]);
+         }
+
       }
-      if(a->table_2->arr[i])
-      {
-         free(a->table_2->arr[i]);
-      }
+      free(a->table_arr[j]->arr);
+      free(a->table_arr[j]);
    }
-   free(a->table_1->arr);
-   free(a->table_2->arr);
-   free(a->table_1);
-   free(a->table_2);
    free(a);
 }
 
 /*when resizing dont want to free all the values*/
 void _partial_free(assoc* a)
 {
-   free(a->table_1->arr);
-   free(a->table_2->arr);
-   free(a->table_1);
-   free(a->table_2);
+   int i;
+   for(i=0;i<NUMTABLES;i++)
+   {
+      free(a->table_arr[i]->arr);
+      free(a->table_arr[i]);
+   }
    free(a);
 }
 
@@ -626,6 +649,7 @@ k_v_pair* _table_insertion(table* a, k_v_pair* kv)
 
       if(a->arr[insertion_point]==NULL)
       {
+
          /*only increasing size when your putting a kv pair into a empty space*/
          a->size++;
          a->arr[insertion_point]=kv;
@@ -635,6 +659,7 @@ k_v_pair* _table_insertion(table* a, k_v_pair* kv)
       {
          if(_same_key(a->arr[insertion_point]->key,kv->key,a->bytesize))
          {
+            /*if it isnt the same kv pair*/
             if(a->arr[insertion_point]!=kv)
             {
                free(a->arr[insertion_point]);
@@ -663,36 +688,29 @@ k_v_pair* _outer_insert(k_v_pair* kv,assoc* a)
    k_v_pair* to_place;
    int count;
    int max_bounce;
-
+   to_place=kv;
    if(kv && a)
    {
       max_bounce = _log_2(a->capacity);
-      to_place=_table_insertion(a->table_1,kv);
-      /*if val was bumped out*/
-      if(to_place)
+      count=0;
+
+      while(count<max_bounce)
       {
-         count=1;
-         while(count<max_bounce)
+         /*count%NUMTABLES will be within bounds*/
+         to_place=_table_insertion(a->table_arr[count%NUMTABLES],to_place);
+         /*if val was bumped out*/
+         if(!to_place)
          {
-            /*keep bumping things out*/
-            to_place=_table_insertion(a->table_2,to_place);
-            count++;
-            if(!to_place)
-            {
-               return NULL;
-            }
-            to_place=_table_insertion(a->table_1,to_place);
-            count++;
-            if(!to_place)
-            {
-               return NULL;
-            }
+            return NULL;
          }
-         /*if we need to resize to fit everything*/
-         return to_place;
+         count++;
       }
+      /*if we need to resize to fit everything*/
+      return to_place;
+
    }
    return NULL;
+
 }
 
 
@@ -700,33 +718,42 @@ k_v_pair* _outer_insert(k_v_pair* kv,assoc* a)
 assoc* _assoc_resized(assoc* old_assoc,int n_cap)
 {
    assoc* n_assoc;
+   int i;
    n_assoc=_safe_calloc(1,sizeof(assoc));
    n_assoc->capacity=n_cap;
    n_assoc->bytesize=old_assoc->bytesize;
-   n_assoc->table_1=_table_init(n_assoc,&_first_hash);
-   n_assoc->table_2=_table_init(n_assoc,&_sec_hash);
-
+   for(i=0;i<NUMTABLES;i++)
+   {
+      if(i%NUMTABLES==0)
+      {
+         n_assoc->table_arr[i]=_table_init(n_assoc,&_first_hash);
+      }
+      else
+      {
+         n_assoc->table_arr[i]=_table_init(n_assoc,&_sec_hash);
+      }
+   }
    return n_assoc;
 }
 
 assoc* _resize(assoc* a, k_v_pair* leftover,int n_size)
 {
    assoc* n_ass;
+   int i;
    if(a)
    {
       n_ass=_bigger_array(a,n_size);
-      /*add in the old table 1*/
-      if(!_table_reinsert(n_ass, a->table_1))
+      /*loop through the tables until everything inserted*/
+      for(i=0;i<NUMTABLES;i++)
       {
-         _partial_free(n_ass);
-         return _resize(a,leftover,n_size*SCALEFACTOR);
+
+         if(!_table_reinsert(n_ass,a->table_arr[i]))
+         {
+            _partial_free(n_ass);
+            return _resize(a,leftover,n_size*SCALEFACTOR);
+         }
       }
-      /*add in the old table 2*/
-      if(!_table_reinsert(n_ass, a->table_2))
-      {
-         _partial_free(n_ass);
-         return _resize(a,leftover,n_size*SCALEFACTOR);
-      }
+      /*add in the leftover*/
       if(_outer_insert(leftover,n_ass))
       {
 
@@ -751,6 +778,7 @@ bool _table_reinsert(assoc* n_assoc, table* old_table)
          /*if data present*/
          if(old_table->arr[i])
          {
+
             if(_outer_insert(old_table->arr[i],n_assoc))
             {
                /*not enough space in new hash tables*/
@@ -763,7 +791,7 @@ bool _table_reinsert(assoc* n_assoc, table* old_table)
    return false;
 }
 
-/*need to test*/
+
 void assoc_insert(assoc** a, void* key, void* data)
 {
    assoc* a_ref;
@@ -791,24 +819,19 @@ void* assoc_lookup(assoc* a, void* key)
 {
 
    k_v_pair* answer;
+   int i;
    /*check if either are null*/
    if(a && key)
    {
-      answer=_table_lookup(key,a->table_1);
-      if(answer)
+      for(i=0;i<NUMTABLES;i++)
       {
-         if(_same_key(answer->key,key,a->bytesize))
+         answer=_table_lookup(key,a->table_arr[i]);
+         if(answer)
          {
-            return answer;
-         }
-      }
-
-      answer=_table_lookup(key,a->table_2);
-      if(answer)
-      {
-         if(_same_key(answer->key,key,a->bytesize))
-         {
-            return answer;
+            if(_same_key(answer->key,key,a->bytesize))
+            {
+               return answer->value;
+            }
          }
       }
    }
@@ -826,17 +849,25 @@ void* _table_lookup(void* key,table* to_look)
 
 int _log_2(int num)
 {
+   /*to get log 2 of a number you do log 10 / log 10 of 2
+   https://www.purplemath.com/modules/logrules5.htm*/
    return log10(num)/log10(2);
 }
 
 
 unsigned int assoc_count(assoc* a)
 {
+   int i;
+   unsigned int size;
+   size=0;
    if(a)
    {
-      return a->table_1->size+a->table_2->size;
+      for(i=0;i<NUMTABLES;i++)
+      {
+         size+=a->table_arr[i]->size;
+      }
    }
-   return 0;
+   return size;
 }
 
 

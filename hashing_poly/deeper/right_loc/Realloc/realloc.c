@@ -32,7 +32,7 @@ unsigned long _byte_convert(void* key,const assoc* a);
 assoc* _resize(assoc* a);
 bool _insertion(assoc* a, k_v_pair* kv);
 bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point);
-bool _double_hash(int step_size,int start_point, assoc* a, k_v_pair* kv);
+bool _double_hash(unsigned int step_size,unsigned int start_point, assoc* a, k_v_pair* kv);
 
 
 void* _safe_calloc(size_t nitems, size_t size);
@@ -895,8 +895,7 @@ int _sieve_of_e_helper(int new_cap_target)
 
 bool _insertion(assoc* a,k_v_pair* kv)
 {
-   int hash_1;
-   int hash_2;
+   unsigned int hash_1,hash_2;
    if(kv)
    {
       hash_1=_first_hash(kv->key,a);
@@ -921,10 +920,10 @@ that a free space is found eventually if there is one
 and we check that the array is not full before _insertion
 it is ok to have a seemingly infinite loop
 however we will also put a count that acts as safeguard*/
-bool _double_hash(int step_size,int start_point, assoc* a, k_v_pair* kv)
+bool _double_hash(unsigned int step_size,unsigned int start_point, assoc* a, k_v_pair* kv)
 {
-   int i,ind;
-   unsigned int count;
+   int i;
+   unsigned int count,ind;
    count=0;
    i=start_point;
    while(count<(a->capacity*100))
@@ -1062,7 +1061,7 @@ void assoc_insert(assoc** a, void* key, void* data)
          kv=_init_kv_pair(key,data);
          if(!_insertion(a_ref,kv))
          {
-            /*failsafe*/
+            /*failsafe if insertion fails for memory leaks*/
             if(kv)
             {
                free(kv);
