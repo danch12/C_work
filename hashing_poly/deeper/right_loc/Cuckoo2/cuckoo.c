@@ -9,11 +9,7 @@ typedef struct test_struct_str
    int number;
 }test_struct_str;
 
-/*unsigned int assoc_count(assoc* a);
-void* assoc_lookup(assoc* a, void* key);
-void assoc_insert(assoc** a, void* key, void* data);
-void* _table_lookup(void* key,table* to_look);
-void assoc_free(assoc* a);*/
+
 table* _table_init(assoc* a,\
                   unsigned int (*hash_f)(void*,const table* ));
 /*return void then cast when appropriate*/
@@ -23,13 +19,23 @@ int _wrap_around(int max_num,int position);
 unsigned int _first_hash(void* key,const table* a);
 /*your version of Bernstein pretty much*/
 unsigned int _sec_hash(void* key,const table* a);
-assoc* assoc_init(int keysize);
+
+
 k_v_pair* _init_kv_pair(void* key, void* data);
+/*returns true if keys are same*/
 bool _same_key(const void* key1,const void* key2,int bytesize);
+
+/*returns null if successful otherwise returns kv pair it kicked out
+this basically tells us we need to resize*/
 k_v_pair* _table_insertion(table* a, k_v_pair* kv);
+/*different to table_insertion - tries to put in whole table
+and returns true if successful*/
 bool _table_reinsert(assoc* n_assoc, table* old_table);
+
 assoc* _bigger_array(assoc* a,int n_size);
 assoc* _assoc_resized(assoc* old_assoc,int n_cap);
+/*this func keeps resizing until everything can fit- only resizes to
+prime numbers */
 assoc* _resize(assoc* a, k_v_pair* leftover,int n_size);
 bool _table_reinsert(assoc* n_assoc, table* old_table);
 /*returns NULL if we dont need to resize
@@ -37,7 +43,9 @@ otherwise returns the pair that was bumped out last*/
 k_v_pair* _outer_insert(k_v_pair* kv,assoc* a);
 /*when resizing dont want to free all the values*/
 void _partial_free(assoc* a);
+
 void* _table_lookup(void* key,table* to_look);
+
 int _sieve_of_e_helper(int new_cap_target);
 int _log_2(int num);
 void test(void);
@@ -412,6 +420,7 @@ void test(void)
       assert(*(int*)test_kv==i);
    }
    assoc_free(test_assoc);
+   fclose(fp);
 
    test_assoc=assoc_init(sizeof(float));
    for(i=0,test_float=0;test_float<10;test_float+=0.5,i++)
@@ -533,7 +542,7 @@ unsigned int _first_hash(void* key,const table* a)
       for(i=0;i< a->bytesize;i++,str++)
       {
 
-         hash+= (*str)+(hash<<6) +(hash<<16)-hash;
+         hash+= (*str)+(hash<<SDBM_ROLL_1) +(hash<<SDBM_ROLL_2)-hash;
       }
       return hash% a->capacity;
    }
@@ -543,7 +552,7 @@ unsigned int _first_hash(void* key,const table* a)
       while(str[i])
       {
 
-         hash+= str[i]+(hash<<6) +(hash<<16)-hash;
+         hash+= str[i]+(hash<<SDBM_ROLL_1) +(hash<<SDBM_ROLL_2)-hash;
          i++;
       }
 
@@ -560,12 +569,12 @@ unsigned int _sec_hash(void* key,const table* a)
    unsigned int i;
    char* str;
    str= (char*) key;
-   hash=5381;
+   hash=BERSTEIN_START;
    if(a->bytesize!=0)
    {
       for(i=0;i< a->bytesize;i++,str++)
       {
-         hash+= 33*hash ^ (*str);
+         hash+= BERN_MULT*hash ^ (*str);
       }
       return hash% a->capacity;
    }
@@ -574,7 +583,7 @@ unsigned int _sec_hash(void* key,const table* a)
       i=0;
       while(str[i])
       {
-         hash+= 33*hash ^ str[i];
+         hash+= BERN_MULT*hash ^ str[i];
          i++;
       }
       return hash % a->capacity;
@@ -634,9 +643,6 @@ bool _same_key(const void* key1,const void* key2,int bytesize)
 /*gunna have a table insert func that returns NULL if it
 places into an empty space otherwise will return the
 thing it kicked out
-will expect a new kv pair each time - cant insert an existing
-kv pair thats already in - as in that specific entity -not another kv pair
-with the same key and value
 */
 k_v_pair* _table_insertion(table* a, k_v_pair* kv)
 {
@@ -764,7 +770,6 @@ assoc* _resize(assoc* a, k_v_pair* leftover,int n_size)
       return n_ass;
 
    }
-
    return NULL;
 }
 
@@ -883,7 +888,7 @@ int _sieve_of_e_helper(int new_cap_target)
       bool_arr[i]=true;
    }
    /*if val is true go through and turn all of its powers false*/
-   for(p=2;p*p<new_cap_target;p++)
+   for(p=START;p*p<new_cap_target;p++)
    {
       if(bool_arr[p]==true)
       {

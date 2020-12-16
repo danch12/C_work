@@ -16,6 +16,11 @@
 #define PRIMESCALE 1.2
 #define NOPRIME -1
 #define NUMTABLES 2
+#define START 2
+#define SDBM_ROLL_1 6
+#define SDBM_ROLL_2 16
+#define BERSTEIN_START 5381
+#define BERN_MULT 33
 typedef enum bool {false, true} bool;
 
 typedef struct k_v_pair

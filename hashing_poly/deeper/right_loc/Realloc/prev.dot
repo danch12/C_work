@@ -1,0 +1,4 @@
+digraph g {graph [ rankdir="LR"];
+Subgraph cluster{
+node1[label="{<n0>position=0 key=0next step= 13|<n1>position=1 key=1491next step= 10|<n2>position=2 key=1750next step= 5|<n3>position=3 key=11958next step= 9|<n4>position=4 key=2268next step= 8|<n5>position=5 emptynext step= none|<n6>position=6 key=11699next step= 3|<n7>position=7 key=7113next step= 5|<n8>position=8 key=12476next step= 4|<n9>position=9 key=2009next step= 6|<n10>position=10 emptynext step= none|<n11>position=11 key=6595next step= 4|<n12>position=12 key=12217next step= 4|<n13>position=13 key=6854next step= 10|<n14>position=14 key=11440next step= 7|<n15>position=15 key=6336next step= 4|<n16>position=16 key=7372next step= 8|}" shape = "record"];
+n0->n13;n1->n10;n2->n5;n3->n9;n4->n8;n6->n3;n7->n5;n8->n4;n9->n6;n11->n4;n12->n4;n13->n10;n14->n7;n15->n4;n16->n8;}}

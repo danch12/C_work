@@ -15,6 +15,9 @@
 #define NOKEY -1
 #define NOPRIME -1
 #define FAILSAFE 1
+#define START 2
+#define SDBM_ROLL_1 6
+#define SDBM_ROLL_2 16
 typedef enum bool {false, true} bool;
 
 typedef struct k_v_pair

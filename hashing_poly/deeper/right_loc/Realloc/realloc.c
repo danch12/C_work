@@ -1,6 +1,7 @@
 #include "specific.h"
 #include "../assoc.h"
 #define TESTCAP 15053
+/*#define DOTFILE 10000*/
 
 /*((1-(1/100000))^100000)*100000 = probability that
 number does not appear at least once*/
@@ -18,6 +19,10 @@ typedef struct test_struct_str
    char word[10];
    int number;
 }test_struct_str;
+
+/*just going to have a go for fun
+using your queues one as sort of a template
+/*void to_dot(assoc* n_assoc);*/
 
 
 assoc* _assoc_resized(int keysize,int n_cap,int old_cap);
@@ -47,7 +52,12 @@ void* _assoc_lookup_helper(int step_size,int start_point,\
 /*frees structs but not kv pairs*/
 void _partial_free(assoc* a);
 void test(void);
+/*int main(void)
+{
 
+   test();
+   return 0;
+}*/
 
 
 void test(void)
@@ -105,7 +115,7 @@ void test(void)
    test_assoc=assoc_init(0);
    test_assoc->capacity=TESTCAP;
 
-   fp = fopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
+   fp = fopen("../../../Data/Words/eng_370k_shuffle.txt", "rt");
    if(fp==NULL)
    {
       fprintf(stderr,"file not there?\n");
@@ -213,9 +223,6 @@ void test(void)
    memset(histogram_hashes,0,sizeof(int)*TESTCAP);
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
-
-
-
 
 
 
@@ -503,7 +510,7 @@ void test(void)
    test_s.test_2 =10;
    test_kv=_init_kv_pair(&word,&test_s);
    assert(_insertion_helper(test_assoc,test_kv,0));
-   /*we can also put structs as values but not as keys */
+
    assert((*(test_struct*)test_assoc->arr[0]->value).test_2==10);
 
    strcpy(word2,"938Neilliscool\n");
@@ -541,6 +548,7 @@ void test(void)
       test_kv=_init_kv_pair(&test_hashes[i],&i);
       assert(_insertion(test_assoc,test_kv));
    }
+
    assert(test_assoc->size==15);
    assoc_free(test_assoc);
 
@@ -615,7 +623,7 @@ void test(void)
 
    test_assoc=assoc_init(0);
 
-   fp = fopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
+   fp = fopen("../../../Data/Words/eng_370k_shuffle.txt", "rt");
    if(fp==NULL)
    {
       fprintf(stderr,"file not there?\n");
@@ -756,11 +764,7 @@ unsigned int _first_hash(void* key,const assoc* a)
    {
       for(i=0;i< a->bytesize;i++,str++)
       {
-         /*these magic numbers dont really have much
-         of an explaination so seems odd to define them
-         something like MAGIC_NUM probably gives less
-         info than just the number */
-         hash+= (*str)+(hash<<6) +(hash<<16)-hash;
+         hash+= (*str)+(hash<<SDBM_ROLL_1) +(hash<<SDBM_ROLL_2)-hash;
       }
       return hash% a->capacity;
    }
@@ -769,7 +773,7 @@ unsigned int _first_hash(void* key,const assoc* a)
       i=0;
       while(str[i])
       {
-         hash+= str[i]+(hash<<6) +(hash<<16)-hash;
+         hash+= str[i]+(hash<<SDBM_ROLL_1) +(hash<<SDBM_ROLL_2)-hash;
          i++;
       }
       return hash% a->capacity;
@@ -866,7 +870,7 @@ int _sieve_of_e_helper(int new_cap_target)
       bool_arr[i]=true;
    }
    /*if val is true go through and turn all of its powers false*/
-   for(p=2;p*p<new_cap_target;p++)
+   for(p=START;p*p<new_cap_target;p++)
    {
       if(bool_arr[p]==true)
       {
@@ -1114,7 +1118,8 @@ void* assoc_lookup(assoc* a, void* key)
 }
 
 /*pretty much the reverse of _double_hash()*/
-void* _assoc_lookup_helper(int step_size,int start_point,const assoc* a,const void* key)
+void* _assoc_lookup_helper(int step_size,int start_point,\
+                           const assoc* a,const void* key)
 {
    int i,ind;
    unsigned int count;
@@ -1137,3 +1142,59 @@ void* _assoc_lookup_helper(int step_size,int start_point,const assoc* a,const vo
    }
    return NULL;
 }
+
+
+
+
+
+
+
+
+
+
+
+/*this is for ints, only use for small tables, works but quite messy*/
+/*void to_dot(assoc* n_assoc)
+{
+   char str[DOTFILE];
+   char tmp[DOTFILE];
+   unsigned int i;
+   int next_step;
+   FILE* fp;
+
+   sprintf(str, "digraph g {graph [ rankdir=\"LR\"];Subgraph cluster{");
+
+   for(i=0;i<n_assoc->capacity;i++)
+   {
+      if(n_assoc->arr[i])
+      {
+         sprintf(tmp, "n%d [label=\"{position=%d key=%d ",i,i, *(int*)n_assoc->arr[i]->key);
+         strcat(str, tmp);
+         next_step= _wrap_around(n_assoc->capacity,i-_sec_hash(n_assoc->arr[i]->key,n_assoc));
+         sprintf(tmp, "next step= %d }\" shape = \"record\"];\n",next_step);
+         strcat(str, tmp);
+      }
+      else
+      {
+          sprintf(tmp, "n%d [label=\"position=%d empty",i,i);
+          strcat(str, tmp);
+          sprintf(tmp, "|next step= none }\" shape = \"record\"];\n");
+          strcat(str, tmp);
+      }
+
+   }
+   for(i=0;i<n_assoc->capacity;i++)
+   {
+      if(n_assoc->arr[i])
+      {
+         next_step= _wrap_around(n_assoc->capacity,i-_sec_hash(n_assoc->arr[i]->key,n_assoc));
+         sprintf(tmp, "n%d->n%d;",i,next_step );
+         strcat(str, tmp);
+      }
+   }
+   strcat(str,"}}");
+   fp = fopen("test.dot", "wt");
+   fprintf(fp, "%s\n", str);
+   fclose(fp);
+}
+*/
