@@ -115,7 +115,7 @@ void test(void)
    test_assoc=assoc_init(0);
    test_assoc->capacity=TESTCAP;
 
-   fp = fopen("../../../Data/Words/eng_370k_shuffle.txt", "rt");
+   fp = fopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
    if(fp==NULL)
    {
       fprintf(stderr,"file not there?\n");
@@ -623,7 +623,7 @@ void test(void)
 
    test_assoc=assoc_init(0);
 
-   fp = fopen("../../../Data/Words/eng_370k_shuffle.txt", "rt");
+   fp = fopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
    if(fp==NULL)
    {
       fprintf(stderr,"file not there?\n");
