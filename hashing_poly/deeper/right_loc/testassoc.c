@@ -1,75 +1,64 @@
 #include "specific.h"
 #include "assoc.h"
 
-#define ARRSIZE 15
-#define WORDS 370119
-#define NUMRANGE 100000
+#define WORDS 500000
+#define WORDLEN 50
 
 char* strduprev(char* str);
+
+#define FNAMELEN 100
+
+#define STRINGKEY 0
+
+int add_dictionary(assoc** b, char* fname, char words[WORDS][WORDLEN]);
 
 int main(void)
 {
 
-   static char strs[WORDS][50]={{0}};
-   FILE *fp;
-   char* tstr;
-   void *p;
-   unsigned int lngst;
-   unsigned int j;
+   static char strs[WORDS][WORDLEN]={{0}};
+   int i;
    assoc* a;
-   static int i[WORDS];
+   FILE* fp;
+   char fname1[FNAMELEN];
+   char fname2[FNAMELEN];
 
-   a = assoc_init(0);
-   fp = nfopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
-   for(j=0; j<WORDS; j++){
-
-      assert(assoc_count(a)==j);
-      i[j] = j;
-      if(fscanf(fp, "%s", strs[j])!=1){
-         on_error("Failed to scan in a word?");
+   strcpy(fname1, "../../Data/Words/eng_370k_shuffle.txt");
+   a = assoc_init(STRINGKEY);
+   i = add_dictionary(&a, fname1, strs);
+   /* Read words in 'Pride & Prejudice' */
+   strcpy(fname2, "../../Data/Words/p-and-p-words.txt");
+   fp = nfopen(fname2, "rt");
+   while(fscanf(fp, "%s", strs[i])==1){
+      if(assoc_lookup(a, strs[i])==NULL){
+         assoc_insert(&a, strs[i], fname2);
+         i++;
       }
-      assoc_insert(&a, strs[j], &i[j]);
    }
    fclose(fp);
-   
-   /*
-      What's the longest word that is still spelled
-      correctly when reversed, but is not a palindrome ?
-   */
-   lngst = 0;
-   for(j=0; j<WORDS; j++){
-      /* Longest */
-      if(strlen(strs[j]) > lngst){
-         tstr = strduprev(strs[j]);
-         /* Not a palindrome */
-         if(strcmp(tstr, strs[j])){
-            /* Spelled correctly */
-            if((p = assoc_lookup(a, tstr))!=NULL){
-               lngst = strlen(tstr);
-               printf("%s <-> %s = %d (%d in the file)\n", tstr, strs[j], lngst, *(int*)p);
-            }
-         }
-         free(tstr);
-      }
-   }
+
+   printf("tulip added from %s\n", (char*)assoc_lookup(a, "tulip"));
+   printf("goulding added from %s\n", (char*)assoc_lookup(a, "goulding"));
    assoc_free(a);
-
-   /*
-      Lets choose NUMRANGE numbers at random between 0 - (NUMRANGE-1)
-      and hash them.  Then assoc_count() tells us how many are unique
-   */
-   srand(time(NULL));
-   a = assoc_init(sizeof(int));
-   for(j=0; j<NUMRANGE; j++){
-      i[j] = rand()%NUMRANGE;
-      assoc_insert(&a, &i[j], NULL);
-   }
-   printf("%d unique numbers out of %d\n", assoc_count(a), j);
-
-   assoc_free(a);
-
    return 0;
 }
+
+int add_dictionary(assoc** b, char* fname, char words[WORDS][WORDLEN])
+{
+   FILE* fp;
+   int i = 0;
+   assoc* a = *b;
+
+   /* Dictionary */
+   fp = nfopen(fname, "rt");
+   while(fscanf(fp, "%s", words[i])==1){
+      assoc_insert(&a, words[i], fname);
+      i++;
+   }
+   fclose(fp);
+   *b = a;
+   return i;
+}
+
 
 /* Make a copy, reversed */
 char* strduprev(char* str)

@@ -1,7 +1,7 @@
 #include "specific.h"
 #include "../assoc.h"
 #define TESTCAP 15053
-#define DOTFILE 10000
+/*#define DOTFILE 10000*/
 
 /*((1-(1/100000))^100000)*100000 = probability that
 number does not appear at least once*/
@@ -21,8 +21,9 @@ typedef struct test_struct_str
 }test_struct_str;
 
 /*just going to have a go for fun
-using your queues one as sort of a template*/
-void to_dot(void* key);
+using your queues one as sort of a template
+doesnt work that amazingly
+void to_dot(assoc* n_assoc);*/
 
 
 assoc* _assoc_resized(int keysize,int n_cap,int old_cap);
@@ -34,17 +35,22 @@ unsigned int _sec_hash(void* key,const assoc* a);
 so taking its modulus will mean that all numbers land within
 the unsigned int range*/
 unsigned long _byte_convert(void* key,const assoc* a);
+
 assoc* _resize(assoc* a);
 bool _insertion(assoc* a, k_v_pair* kv);
-bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point);
-/*double hash does the probing to find empty spot*/
-bool _double_hash(unsigned int step_size,unsigned int start_point, assoc* a, k_v_pair* kv);
+bool _insertion_helper(assoc* a,k_v_pair* kv,\
+                        int insertion_point);
+/*going through array and probing for empty space*/
+bool _double_hash(unsigned int step_size,\
+      unsigned int start_point, assoc* a, k_v_pair* kv);
 
 
 void* _safe_calloc(size_t nitems, size_t size);
 k_v_pair* _init_kv_pair(void* key, void* data);
+/*creates a bigger array thats size is prime*/
 assoc* _bigger_array(assoc* a);
-bool _same_key(const void* key1,const void* key2,int bytesize);
+bool _same_key(const void* key1,const void* key2,\
+               int bytesize);
 int _sieve_of_e_helper(int new_cap_target);
 
 /*pretty much the reverse of _double_hash()*/
@@ -53,12 +59,7 @@ void* _assoc_lookup_helper(int step_size,int start_point,\
 /*frees structs but not kv pairs*/
 void _partial_free(assoc* a);
 void test(void);
-int main(void)
-{
 
-   test();
-   return 0;
-}
 
 
 void test(void)
@@ -81,8 +82,8 @@ void test(void)
    assoc* test_assoc,*test_assoc2;
 
    test_s.test=10;
-   i=10;
-   to_dot(&i);
+
+
 
    test_assoc=assoc_init(sizeof(test_struct));
    test_assoc2=assoc_init(sizeof(int));
@@ -116,7 +117,7 @@ void test(void)
    test_assoc=assoc_init(0);
    test_assoc->capacity=TESTCAP;
 
-   fp = fopen("../../../Data/Words/eng_370k_shuffle.txt", "rt");
+   fp = fopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
    if(fp==NULL)
    {
       fprintf(stderr,"file not there?\n");
@@ -196,6 +197,9 @@ void test(void)
    }
    test_assoc->capacity=INITSIZE;
    assoc_free(test_assoc);
+
+
+
 
 
 
@@ -599,6 +603,8 @@ void test(void)
 
    /*testing lookup*/
 
+   /*look for NULLs*/
+   /*look for everything*/
 
    test_assoc=assoc_init(sizeof(int));
    i=0;
@@ -618,7 +624,7 @@ void test(void)
 
    test_assoc=assoc_init(0);
 
-   fp = fopen("../../../Data/Words/eng_370k_shuffle.txt", "rt");
+   fp = fopen("../../Data/Words/eng_370k_shuffle.txt", "rt");
    if(fp==NULL)
    {
       fprintf(stderr,"file not there?\n");
@@ -675,17 +681,18 @@ void* _safe_calloc(size_t nitems, size_t size)
 assoc* assoc_init(int keysize)
 {
    assoc* n_assoc;
-   /*static bool tested=false;
+   static bool tested=false;
    if(!tested)
    {
       tested=true;
       test();
-   }*/
+   }
    assert(keysize>=0);
    n_assoc=_safe_calloc(1,sizeof(assoc));
    n_assoc->capacity=INITSIZE;
    n_assoc->bytesize=keysize;
-   n_assoc->arr=(k_v_pair**)_safe_calloc(INITSIZE,sizeof(k_v_pair*));
+   n_assoc->arr=(k_v_pair**)_safe_calloc(INITSIZE,\
+                                    sizeof(k_v_pair*));
    /*set to 0 because insertion function updates this*/
    n_assoc->size=0;
    n_assoc->lower_prime=INITLOWPRIME;
@@ -704,7 +711,8 @@ assoc* _assoc_resized(int keysize,int n_cap,int old_cap)
       fprintf(stderr,"warning -potential overflow in next resize\n");
    }
    n_assoc->bytesize=keysize;
-   n_assoc->arr=(k_v_pair**)_safe_calloc(n_cap,sizeof(k_v_pair*));
+   n_assoc->arr=(k_v_pair**)_safe_calloc(n_cap,\
+                              sizeof(k_v_pair*));
    /*set to 0 because insertion function updates this*/
    n_assoc->size=0;
    n_assoc->lower_prime=old_cap;
@@ -739,11 +747,7 @@ void _partial_free(assoc* a)
 
 int _wrap_around(int max_num,int position)
 {
-   if(position<0)
-   {
-      return max_num-position;
-   }
-   return position % max_num;
+   return abs(position % max_num);
 }
 
 
@@ -763,7 +767,8 @@ unsigned int _first_hash(void* key,const assoc* a)
    {
       for(i=0;i< a->bytesize;i++,str++)
       {
-         hash+= (*str)+(hash<<SDBM_ROLL_1) +(hash<<SDBM_ROLL_2)-hash;
+         hash+= (*str)+(hash<<SDBM_ROLL_1) +\
+               (hash<<SDBM_ROLL_2)-hash;
       }
       return hash% a->capacity;
    }
@@ -772,7 +777,8 @@ unsigned int _first_hash(void* key,const assoc* a)
       i=0;
       while(str[i])
       {
-         hash+= str[i]+(hash<<SDBM_ROLL_1) +(hash<<SDBM_ROLL_2)-hash;
+         hash+= str[i]+(hash<<SDBM_ROLL_1) +\
+                     (hash<<SDBM_ROLL_2)-hash;
          i++;
       }
       return hash% a->capacity;
@@ -783,8 +789,8 @@ unsigned int _first_hash(void* key,const assoc* a)
 
 
 
-/*https://www.geeksforgeeks.org/double-hashing/ idea for second
-hashing function
+/*https://www.geeksforgeeks.org/double-hashing/
+idea for second hashing function
  */
 unsigned int _sec_hash(void* key,const assoc* a)
 {
@@ -852,7 +858,8 @@ assoc* _bigger_array(assoc* a)
          bigger_table=_sieve_of_e_helper(prime_limit);
          prime_limit=(double)prime_limit*PRIMESCALE;
       }
-      a_n=_assoc_resized(a->bytesize,bigger_table,a->capacity);
+      a_n=_assoc_resized(a->bytesize,\
+               bigger_table,a->capacity);
       return a_n;
    }
    return NULL;
@@ -863,12 +870,14 @@ int _sieve_of_e_helper(int new_cap_target)
 {
    bool *bool_arr;
    int i,p;
-   bool_arr= (bool *)_safe_calloc(new_cap_target,sizeof(bool));
+   bool_arr= (bool *)_safe_calloc(new_cap_target,\
+                                 sizeof(bool));
    for (i=0 ; i<new_cap_target;i++)
    {
       bool_arr[i]=true;
    }
-   /*if val is true go through and turn all of its powers false*/
+   /*if val is true go through and
+   turn all of its powers false*/
    for(p=START;p*p<new_cap_target;p++)
    {
       if(bool_arr[p]==true)
@@ -923,7 +932,8 @@ that a free space is found eventually if there is one
 and we check that the array is not full before _insertion
 it is ok to have a seemingly infinite loop
 however we will also put a count that acts as safeguard*/
-bool _double_hash(unsigned int step_size,unsigned int start_point, assoc* a, k_v_pair* kv)
+bool _double_hash(unsigned int step_size,\
+         unsigned int start_point, assoc* a, k_v_pair* kv)
 {
    int i;
    unsigned int count,ind;
@@ -945,7 +955,8 @@ bool _double_hash(unsigned int step_size,unsigned int start_point, assoc* a, k_v
 }
 
 
-bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point)
+bool _insertion_helper(assoc* a,k_v_pair* kv,\
+                        int insertion_point)
 {
 
    if(kv)
@@ -958,7 +969,8 @@ bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point)
       }
       else
       {
-         if(_same_key(a->arr[insertion_point]->key,kv->key,a->bytesize))
+         if(_same_key(a->arr[insertion_point]->key,\
+                        kv->key,a->bytesize))
          {
             free(a->arr[insertion_point]);
             a->arr[insertion_point]=kv;
@@ -972,10 +984,10 @@ bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point)
 
 
 /*although technically if key1 and key2 are NULLs
-they would be the same but for this im going to
-say they arent because i want functions to exit
-if both are NULL anyway*/
-bool _same_key(const void* key1,const void* key2,int bytesize)
+they would be the same but doesnt really make sense
+in this context to allow for it*/
+bool _same_key(const void* key1,const void* key2,\
+               int bytesize)
 {
    if(key1 && key2)
    {
@@ -1015,7 +1027,8 @@ k_v_pair* _init_kv_pair(void* key, void* data)
 
 
 
-
+/*creates bigger hash map then puts all the contents
+pf the old array into the bigger hash map*/
 assoc* _resize(assoc* a)
 {
    unsigned int i;
@@ -1033,7 +1046,11 @@ assoc* _resize(assoc* a)
          {
             if(!_insertion(n_ass,a->arr[i]))
             {
-               fprintf(stderr, "error in reinserting values to hash table\n");
+               /*this should never happen as there should
+               always be space whihc should always
+               be found- should is the operative word*/
+               fprintf(stderr, "error in reinserting \
+                              values to hash table\n");
                exit(EXIT_FAILURE);
             }
          }
@@ -1064,7 +1081,8 @@ void assoc_insert(assoc** a, void* key, void* data)
          kv=_init_kv_pair(key,data);
          if(!_insertion(a_ref,kv))
          {
-            /*failsafe if insertion fails for memory leaks*/
+            /*failsafe if insertion fails for memory leaks
+            although should never happen*/
             if(kv)
             {
                free(kv);
@@ -1152,62 +1170,54 @@ void* _assoc_lookup_helper(int step_size,int start_point,\
 
 
 
-/*this is for ints, only use for small tables,give it a key and
-it will show you where it double bounces*/
-void to_dot(void* key)
+/*this is for ints, only use for small tables,
+works sort of but quite messy
+would like to learn more about this*/
+/*void to_dot(assoc* n_assoc)
 {
-   assoc* n_assoc;
    char str[DOTFILE];
    char tmp[DOTFILE];
    unsigned int i;
-   int next_step,first_step,step_size,prev_step,count;
+   int next_step;
    FILE* fp;
-   n_assoc=assoc_init(sizeof(int));
 
    sprintf(str, "digraph g {graph [ rankdir=\"LR\"];Subgraph cluster{");
 
    for(i=0;i<n_assoc->capacity;i++)
    {
-
-       sprintf(tmp, "n%d [label=\"position=%d",i,i);
-       strcat(str, tmp);
-       sprintf(tmp, " }\" shape = \"record\"];\n");
-       strcat(str, tmp);
-
+      if(n_assoc->arr[i])
+      {
+         sprintf(tmp, "n%d [label=\"{position=%d key=%d "\
+                  ,i,i, *(int*)n_assoc->arr[i]->key);
+         strcat(str, tmp);
+         next_step= _wrap_around(n_assoc->capacity,\
+                  i-_sec_hash(n_assoc->arr[i]->key,n_assoc));
+         sprintf(tmp, "next step= %d }\" shape = \"record\"];\n"\
+                  ,next_step);
+         strcat(str, tmp);
+      }
+      else
+      {
+         sprintf(tmp, "n%d [label=\"position=%d empty",i,i);
+         strcat(str, tmp);
+         sprintf(tmp, "|next step= none }\" shape = \"record\"];\n");
+         strcat(str, tmp);
+      }
 
    }
-   sprintf(tmp, "n%d [label=\"{data incoming key =%d}\"] ",-1, *(int*)key);
-   strcat(str, tmp);
-   first_step=_first_hash(key,n_assoc);
-   sprintf(tmp, "n%d->n%d;",-1,first_step );
-   strcat(str, tmp);
-   step_size=_sec_hash(key,n_assoc);
-   prev_step=first_step;
-   next_step=_wrap_around(n_assoc->capacity,first_step-step_size);
-   count=0;
-   while(count<n_assoc->capacity)
-   {
-
-      sprintf(tmp, "n%d->n%d;",prev_step,next_step);
-      strcat(str, tmp);
-      prev_step=next_step;
-      next_step=_wrap_around(n_assoc->capacity,next_step-step_size);
-      count++;
-   }
-
-
-   /*for(i=0;i<n_assoc->capacity;i++)
+   for(i=0;i<n_assoc->capacity;i++)
    {
       if(n_assoc->arr[i])
       {
-         next_step= _wrap_around(n_assoc->capacity,i-_sec_hash(n_assoc->arr[i]->key,n_assoc));
+         next_step= _wrap_around(n_assoc->capacity,\
+            i-_sec_hash(n_assoc->arr[i]->key,n_assoc));
          sprintf(tmp, "n%d->n%d;",i,next_step );
          strcat(str, tmp);
       }
-   }*/
+   }
    strcat(str,"}}");
    fp = fopen("test.dot", "wt");
    fprintf(fp, "%s\n", str);
    fclose(fp);
-   assoc_free(n_assoc);
 }
+*/

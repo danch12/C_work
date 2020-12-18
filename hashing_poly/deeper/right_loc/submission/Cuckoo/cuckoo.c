@@ -11,7 +11,7 @@ typedef struct test_struct_str
 
 
 table* _table_init(assoc* a,\
-                  unsigned int (*hash_f)(void*,const table* ));
+            unsigned int (*hash_f)(void*,const table* ));
 /*return void then cast when appropriate*/
 void* _safe_calloc(size_t nitems, size_t size);
 int _wrap_around(int max_num,int position);
@@ -23,18 +23,22 @@ unsigned int _sec_hash(void* key,const table* a);
 
 k_v_pair* _init_kv_pair(void* key, void* data);
 /*returns true if keys are same*/
-bool _same_key(const void* key1,const void* key2,int bytesize);
+bool _same_key(const void* key1,const void* key2,\
+               int bytesize);
 
-/*returns null if successful otherwise returns kv pair it kicked out
+/*returns null if successful otherwise
+returns kv pair it kicked out
 this basically tells us we need to resize*/
 k_v_pair* _table_insertion(table* a, k_v_pair* kv);
-/*different to table_insertion - tries to put in whole table
+/*different to table_insertion -
+ tries to put in whole table to a new assoc
 and returns true if successful*/
 bool _table_reinsert(assoc* n_assoc, table* old_table);
 
 assoc* _bigger_array(assoc* a,int n_size);
 assoc* _assoc_resized(assoc* old_assoc,int n_cap);
-/*this func keeps resizing until everything can fit- only resizes to
+/*this func keeps resizing until
+everything can fit- only resizes to
 prime numbers */
 assoc* _resize(assoc* a, k_v_pair* leftover,int n_size);
 bool _table_reinsert(assoc* n_assoc, table* old_table);
@@ -46,15 +50,12 @@ void _partial_free(assoc* a);
 
 void* _table_lookup(void* key,table* to_look);
 
+/*returns largest prime that is under new_cap_target*/
 int _sieve_of_e_helper(int new_cap_target);
 int _log_2(int num);
 void test(void);
-/*
-int main(void)
-{
-   test();
-   return 0;
-}*/
+
+
 
 void test(void)
 {
@@ -474,22 +475,25 @@ assoc* assoc_init(int keysize)
    {
       if(i%NUMTABLES==0)
       {
-         n_assoc->table_arr[i]=_table_init(n_assoc,&_first_hash);
+         n_assoc->table_arr[i]=_table_init(n_assoc,\
+                                       &_first_hash);
       }
       else
       {
-         n_assoc->table_arr[i]=_table_init(n_assoc,&_sec_hash);
+         n_assoc->table_arr[i]=_table_init(n_assoc,\
+                                          &_sec_hash);
       }
    }
    return n_assoc;
 }
 
 table* _table_init(assoc* a,\
-                  unsigned int (*hash_f)(void*,const table* ))
+            unsigned int (*hash_f)(void*,const table* ))
 {
    table* n_table;
    n_table=(table*) _safe_calloc(1,sizeof(table));
-   n_table->arr=(k_v_pair**)_safe_calloc(a->capacity,sizeof(k_v_pair*));
+   n_table->arr=(k_v_pair**)_safe_calloc(a->capacity,\
+                                 sizeof(k_v_pair*));
    n_table->hash_func=hash_f;
    n_table->capacity=a->capacity;
    n_table->bytesize=a->bytesize;
@@ -542,7 +546,8 @@ unsigned int _first_hash(void* key,const table* a)
       for(i=0;i< a->bytesize;i++,str++)
       {
 
-         hash+= (*str)+(hash<<SDBM_ROLL_1) +(hash<<SDBM_ROLL_2)-hash;
+         hash+= (*str)+(hash<<SDBM_ROLL_1) \
+               +(hash<<SDBM_ROLL_2)-hash;
       }
       return hash% a->capacity;
    }
@@ -552,7 +557,8 @@ unsigned int _first_hash(void* key,const table* a)
       while(str[i])
       {
 
-         hash+= str[i]+(hash<<SDBM_ROLL_1) +(hash<<SDBM_ROLL_2)-hash;
+         hash+= str[i]+(hash<<SDBM_ROLL_1) \
+                  +(hash<<SDBM_ROLL_2)-hash;
          i++;
       }
 
@@ -614,7 +620,8 @@ k_v_pair* _init_kv_pair(void* key, void* data)
 
 
 /*from previous exercise*/
-bool _same_key(const void* key1,const void* key2,int bytesize)
+bool _same_key(const void* key1,const void* key2,\
+               int bytesize)
 {
    if(key1 && key2)
    {
@@ -640,7 +647,7 @@ bool _same_key(const void* key1,const void* key2,int bytesize)
 
 
 
-/*gunna have a table insert func that returns NULL if it
+/* table insert func returns NULL if it
 places into an empty space otherwise will return the
 thing it kicked out
 */
@@ -651,21 +658,21 @@ k_v_pair* _table_insertion(table* a, k_v_pair* kv)
    if(kv&&a)
    {
       insertion_point= a->hash_func(kv->key, a);
-
-
       if(a->arr[insertion_point]==NULL)
       {
-
-         /*only increasing size when your putting a kv pair into a empty space*/
+         /*only increasing size when your putting a
+         kv pair into a empty space*/
          a->size++;
          a->arr[insertion_point]=kv;
          return NULL;
       }
       else
       {
-         if(_same_key(a->arr[insertion_point]->key,kv->key,a->bytesize))
+         if(_same_key(a->arr[insertion_point]->key,\
+                     kv->key,a->bytesize))
          {
-            /*if it isnt the same kv pair*/
+            /*if it isnt the same kv pair but has same key
+               then free and insert new*/
             if(a->arr[insertion_point]!=kv)
             {
                free(a->arr[insertion_point]);
@@ -703,8 +710,9 @@ k_v_pair* _outer_insert(k_v_pair* kv,assoc* a)
       while(count<max_bounce)
       {
          /*count%NUMTABLES will be within bounds*/
-         to_place=_table_insertion(a->table_arr[count%NUMTABLES],to_place);
-         /*if val was bumped out*/
+         to_place=_table_insertion(a->table_arr[count%NUMTABLES]\
+                                    ,to_place);
+         /*if nothing bumped out*/
          if(!to_place)
          {
             return NULL;
@@ -716,7 +724,6 @@ k_v_pair* _outer_insert(k_v_pair* kv,assoc* a)
 
    }
    return NULL;
-
 }
 
 
@@ -732,11 +739,13 @@ assoc* _assoc_resized(assoc* old_assoc,int n_cap)
    {
       if(i%NUMTABLES==0)
       {
-         n_assoc->table_arr[i]=_table_init(n_assoc,&_first_hash);
+         n_assoc->table_arr[i]=_table_init(n_assoc,\
+                                          &_first_hash);
       }
       else
       {
-         n_assoc->table_arr[i]=_table_init(n_assoc,&_sec_hash);
+         n_assoc->table_arr[i]=_table_init(n_assoc,\
+                                          &_sec_hash);
       }
    }
    return n_assoc;
@@ -752,7 +761,6 @@ assoc* _resize(assoc* a, k_v_pair* leftover,int n_size)
       /*loop through the tables until everything inserted*/
       for(i=0;i<NUMTABLES;i++)
       {
-
          if(!_table_reinsert(n_ass,a->table_arr[i]))
          {
             _partial_free(n_ass);
@@ -762,13 +770,11 @@ assoc* _resize(assoc* a, k_v_pair* leftover,int n_size)
       /*add in the leftover*/
       if(_outer_insert(leftover,n_ass))
       {
-
          _partial_free(n_ass);
          return _resize(a,leftover,n_size*SCALEFACTOR);
       }
       _partial_free(a);
       return n_ass;
-
    }
    return NULL;
 }
@@ -882,12 +888,14 @@ int _sieve_of_e_helper(int new_cap_target)
 {
    bool *bool_arr;
    int i,p;
-   bool_arr= (bool *)_safe_calloc(new_cap_target,sizeof(bool));
+   bool_arr= (bool *)_safe_calloc(new_cap_target,\
+                                    sizeof(bool));
    for (i=0 ; i<new_cap_target;i++)
    {
       bool_arr[i]=true;
    }
-   /*if val is true go through and turn all of its powers false*/
+   /*if val is true go through and
+   turn all of its powers false*/
    for(p=START;p*p<new_cap_target;p++)
    {
       if(bool_arr[p]==true)

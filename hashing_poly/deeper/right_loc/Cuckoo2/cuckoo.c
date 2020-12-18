@@ -9,16 +9,20 @@ typedef struct test_struct_str
    int number;
 }test_struct_str;
 
-
-table* _table_init(assoc* a,\
-                  unsigned int (*hash_f)(void*,const table* ));
+void assoc_free(assoc* a);
+void* assoc_lookup(assoc* a, void* key);
+unsigned int assoc_count(assoc* a);
+void assoc_insert(assoc** a, void* key, void* data);
+assoc* assoc_init(int keysize);
+table* _table_init(assoc* a,int table_num,\
+                  unsigned int (*hash_f)(void*,const table*,int ));
 /*return void then cast when appropriate*/
 void* _safe_calloc(size_t nitems, size_t size);
 int _wrap_around(int max_num,int position);
 /*http://www.cse.yorku.ca/~oz/hash.html#djb2 sdbm*/
 unsigned int _first_hash(void* key,const table* a);
-/*your version of Bernstein pretty much*/
-unsigned int _sec_hash(void* key,const table* a);
+/*your version of Bernstein pretty much modified a little*/
+unsigned int _sec_hash(void* key,const table* a,int table_num);
 
 
 k_v_pair* _init_kv_pair(void* key, void* data);
@@ -37,7 +41,7 @@ assoc* _assoc_resized(assoc* old_assoc,int n_cap);
 /*this func keeps resizing until everything can fit- only resizes to
 prime numbers */
 assoc* _resize(assoc* a, k_v_pair* leftover,int n_size);
-bool _table_reinsert(assoc* n_assoc, table* old_table);
+
 /*returns NULL if we dont need to resize
 otherwise returns the pair that was bumped out last*/
 k_v_pair* _outer_insert(k_v_pair* kv,assoc* a);
@@ -49,12 +53,12 @@ void* _table_lookup(void* key,table* to_look);
 int _sieve_of_e_helper(int new_cap_target);
 int _log_2(int num);
 void test(void);
-/*
+
 int main(void)
 {
    test();
    return 0;
-}*/
+}
 
 void test(void)
 {
@@ -76,15 +80,15 @@ void test(void)
    test_assoc=assoc_init(sizeof(int));
    test_assoc->table_arr[0]->capacity=TESTCAP;
    test_assoc->table_arr[1]->capacity=TESTCAP;
-   assert(test_assoc->table_arr[0]->hash_func!=test_assoc->table_arr[1]->hash_func);
+   /*assert(test_assoc->table_arr[0]->hash_func!=test_assoc->table_arr[1]->hash_func);*/
    assert(test_assoc->bytesize==sizeof(int));
 
 
    for(i=0;i<10000;i++)
    {
       test_arr[i]=i;
-      test_hashes[i]=test_assoc->table_arr[0]->hash_func(&test_arr[i],test_assoc->table_arr[0]);
-      test_hashes2[i]=test_assoc->table_arr[1]->hash_func(&test_arr[i],test_assoc->table_arr[1]);
+      test_hashes[i]=test_assoc->table_arr[0]->hash_func(&test_arr[i],test_assoc->table_arr[0],0);
+      test_hashes2[i]=test_assoc->table_arr[1]->hash_func(&test_arr[i],test_assoc->table_arr[1],1);
       assert(test_hashes[i]<TESTCAP&&test_hashes[i]>=0);
       assert(test_hashes2[i]<TESTCAP&&test_hashes2[i]>=0);
 
@@ -105,7 +109,7 @@ void test(void)
          }
       }
    }
-   assert(count<10);
+   assert(count<150);
    test_assoc->table_arr[0]->capacity=INITSIZE;
    test_assoc->table_arr[1]->capacity=INITSIZE;
    assoc_free(test_assoc);
@@ -128,8 +132,8 @@ void test(void)
          fprintf(stderr,"failed scan of word\n");
          exit(EXIT_FAILURE);
       }
-      test_hashes[i]=test_assoc->table_arr[0]->hash_func(word,test_assoc->table_arr[0]);
-      test_hashes2[i]=test_assoc->table_arr[1]->hash_func(word,test_assoc->table_arr[1]);
+      test_hashes[i]=test_assoc->table_arr[0]->hash_func(word,test_assoc->table_arr[0],0);
+      test_hashes2[i]=test_assoc->table_arr[1]->hash_func(word,test_assoc->table_arr[1],1);
       assert(test_hashes[i]<TESTCAP&&test_hashes[i]>=0);
       assert(test_hashes2[i]<TESTCAP&&test_hashes2[i]>=0);
    }
@@ -160,8 +164,8 @@ void test(void)
 
    for(i=0,d_i=0.0;d_i<10;d_i+=0.01,i++)
    {
-      test_hashes[i]=test_assoc->table_arr[0]->hash_func(&d_i,test_assoc->table_arr[0]);
-      test_hashes2[i]=test_assoc->table_arr[1]->hash_func(&d_i,test_assoc->table_arr[1]);
+      test_hashes[i]=test_assoc->table_arr[0]->hash_func(&d_i,test_assoc->table_arr[0],0);
+      test_hashes2[i]=test_assoc->table_arr[1]->hash_func(&d_i,test_assoc->table_arr[1],1);
       assert(test_hashes[i]<TESTCAP&&test_hashes[i]>=0);
       assert(test_hashes2[i]<TESTCAP&&test_hashes2[i]>=0);
    }
@@ -196,11 +200,11 @@ void test(void)
    assert(_table_insertion(test_assoc->table_arr[0],NULL)==NULL);
    /*this doesnt increase the size of the whole assoc yet*/
    assert(_table_insertion(test_assoc->table_arr[0],test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_arr[0]->arr[_first_hash(&i,test_assoc->table_arr[0])]->key)==0);
+   assert(*(int*)(test_assoc->table_arr[0]->arr[_sec_hash(&i,test_assoc->table_arr[0],0)]->key)==0);
    j=2;
    test_kv= _init_kv_pair(&i,&j);
    assert(_table_insertion(test_assoc->table_arr[0],test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_arr[0]->arr[_first_hash(&i,test_assoc->table_arr[0])]->value)==2);
+   assert(*(int*)(test_assoc->table_arr[0]->arr[_sec_hash(&i,test_assoc->table_arr[0],0)]->value)==2);
    assoc_free(test_assoc);
 
 
@@ -214,7 +218,7 @@ void test(void)
    test_kv=_table_insertion(test_assoc->table_arr[0],test_kv);
    assert(*(int*)test_kv->key==1);
 
-   assert(*(int*)(test_assoc->table_arr[0]->arr[_first_hash(&j,test_assoc->table_arr[0])]->value)==1);
+   assert(*(int*)(test_assoc->table_arr[0]->arr[_sec_hash(&j,test_assoc->table_arr[0],0)]->value)==1);
    free(test_kv);
    assoc_free(test_assoc);
 
@@ -225,7 +229,7 @@ void test(void)
    assert(_table_insertion(test_assoc->table_arr[0],test_kv)==NULL);
    test_kv= _init_kv_pair(word,&i);
    assert(_table_insertion(test_assoc->table_arr[0],test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_arr[0]->arr[_first_hash(word,test_assoc->table_arr[0])]->value)==1);
+   assert(*(int*)(test_assoc->table_arr[0]->arr[_sec_hash(word,test_assoc->table_arr[0],0)]->value)==1);
 
 
    assoc_free(test_assoc);
@@ -240,11 +244,11 @@ void test(void)
    assert(_table_insertion(test_assoc->table_arr[1],NULL)==NULL);
    /*this doesnt increase the size of the whole assoc yet*/
    assert(_table_insertion(test_assoc->table_arr[1],test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(&i,test_assoc->table_arr[1])]->key)==0);
+   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(&i,test_assoc->table_arr[1],1)]->key)==0);
    j=2;
    test_kv= _init_kv_pair(&i,&j);
    assert(_table_insertion(test_assoc->table_arr[1],test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(&i,test_assoc->table_arr[1])]->value)==2);
+   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(&i,test_assoc->table_arr[1],1)]->value)==2);
    assoc_free(test_assoc);
 
 
@@ -259,7 +263,7 @@ void test(void)
    test_kv=_table_insertion(test_assoc->table_arr[1],test_kv);
    assert(*(int*)test_kv->key==1);
    assert(*(int*)test_kv->value==9);
-   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(&j,test_assoc->table_arr[1])]->value)==1);
+   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(&j,test_assoc->table_arr[1],1)]->value)==1);
    free(test_kv);
    assoc_free(test_assoc);
 
@@ -270,7 +274,7 @@ void test(void)
    assert(_table_insertion(test_assoc->table_arr[1],test_kv)==NULL);
    test_kv= _init_kv_pair(word,&i);
    assert(_table_insertion(test_assoc->table_arr[1],test_kv)==NULL);
-   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(word,test_assoc->table_arr[1])]->value)==1);
+   assert(*(int*)(test_assoc->table_arr[1]->arr[_sec_hash(word,test_assoc->table_arr[1],1)]->value)==1);
    assoc_free(test_assoc);
 
 
@@ -297,8 +301,8 @@ void test(void)
    free(test_kv);
 
    /*x bounces out j which bounces out i which bounces out x and so on*/
-   assert(*(int*)test_assoc->table_arr[0]->arr[_first_hash(&x,test_assoc->table_arr[0])]->value==i);
-   assert(*(int*)test_assoc->table_arr[1]->arr[_sec_hash(&x,test_assoc->table_arr[1])]->value==x);
+   assert(*(int*)test_assoc->table_arr[0]->arr[_sec_hash(&x,test_assoc->table_arr[0],0)]->value==i);
+   assert(*(int*)test_assoc->table_arr[1]->arr[_sec_hash(&x,test_assoc->table_arr[1],1)]->value==x);
    assoc_free(test_assoc);
 
    test_assoc2=assoc_init(sizeof(int));
@@ -472,20 +476,13 @@ assoc* assoc_init(int keysize)
    n_assoc->bytesize=keysize;
    for(i=0;i<NUMTABLES;i++)
    {
-      if(i%NUMTABLES==0)
-      {
-         n_assoc->table_arr[i]=_table_init(n_assoc,&_first_hash);
-      }
-      else
-      {
-         n_assoc->table_arr[i]=_table_init(n_assoc,&_sec_hash);
-      }
+      n_assoc->table_arr[i]=_table_init(n_assoc,i,&_sec_hash);
    }
    return n_assoc;
 }
 
-table* _table_init(assoc* a,\
-                  unsigned int (*hash_f)(void*,const table* ))
+table* _table_init(assoc* a,int table_num,\
+                  unsigned int (*hash_f)(void*,const table*,int ))
 {
    table* n_table;
    n_table=(table*) _safe_calloc(1,sizeof(table));
@@ -494,6 +491,7 @@ table* _table_init(assoc* a,\
    n_table->capacity=a->capacity;
    n_table->bytesize=a->bytesize;
    n_table->size=0;
+   n_table->table_num=table_num;
    return n_table;
 }
 
@@ -563,13 +561,14 @@ unsigned int _first_hash(void* key,const table* a)
 }
 
 /*your version of Bernstein modified a little*/
-unsigned int _sec_hash(void* key,const table* a)
+unsigned int _sec_hash(void* key,const table* a,int table_num)
 {
    unsigned long hash;
    unsigned int i;
    char* str;
    str= (char*) key;
-   hash=BERSTEIN_START;
+   /*random prime number*/
+   hash=_sieve_of_e_helper(table_num*BERSTEIN_START);
    if(a->bytesize!=0)
    {
       for(i=0;i< a->bytesize;i++,str++)
@@ -650,12 +649,9 @@ k_v_pair* _table_insertion(table* a, k_v_pair* kv)
    int insertion_point;
    if(kv&&a)
    {
-      insertion_point= a->hash_func(kv->key, a);
-
-
+      insertion_point= a->hash_func(kv->key, a,a->table_num);
       if(a->arr[insertion_point]==NULL)
       {
-
          /*only increasing size when your putting a kv pair into a empty space*/
          a->size++;
          a->arr[insertion_point]=kv;
@@ -730,14 +726,9 @@ assoc* _assoc_resized(assoc* old_assoc,int n_cap)
    n_assoc->bytesize=old_assoc->bytesize;
    for(i=0;i<NUMTABLES;i++)
    {
-      if(i%NUMTABLES==0)
-      {
-         n_assoc->table_arr[i]=_table_init(n_assoc,&_first_hash);
-      }
-      else
-      {
-         n_assoc->table_arr[i]=_table_init(n_assoc,&_sec_hash);
-      }
+
+      n_assoc->table_arr[i]=_table_init(n_assoc,i,&_sec_hash);
+
    }
    return n_assoc;
 }
@@ -847,7 +838,7 @@ void* assoc_lookup(assoc* a, void* key)
 void* _table_lookup(void* key,table* to_look)
 {
    unsigned int hash;
-   hash=to_look->hash_func(key,to_look);
+   hash=to_look->hash_func(key,to_look,to_look->table_num);
    return to_look->arr[hash];
 }
 

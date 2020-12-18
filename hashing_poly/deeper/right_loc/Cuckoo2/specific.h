@@ -19,7 +19,7 @@
 #define START 2
 #define SDBM_ROLL_1 6
 #define SDBM_ROLL_2 16
-#define BERSTEIN_START 5381
+#define BERSTEIN_START 15053
 #define BERN_MULT 33
 typedef enum bool {false, true} bool;
 
@@ -50,10 +50,11 @@ functions as well as the table
 struct table
 {
    k_v_pair** arr;
-   unsigned int(*hash_func)(void*,const table*);
+   unsigned int(*hash_func)(void*,const table*,int);
    unsigned long bytesize;
    unsigned int capacity;
    unsigned int size;
+   int table_num;
 };
 
 
