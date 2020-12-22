@@ -16,7 +16,7 @@
 #define SCALEFACTOR 2
 
 typedef enum direction {left, right,invalid} direction;
-
+typedef enum op {plus, minus,mult,divide,invalid_op} op;
 
 typedef struct coord
 {
@@ -50,7 +50,7 @@ typedef struct word_container
    char** words;
    int position;
    int capacity;
-
+   stack* stackptr;
 }word_cont;
 
 typedef struct line_container
@@ -73,24 +73,38 @@ bool rotate(double degrees,coord* to_rotate, coord* rotation_point);
 coord* init_coords(double x, double y);
 bool get_num(word_cont* to_check,double* num);
 
-/*pretty much the same as parser except we
-dont increase the position at the end*/
+/*pretty much the same as parser valid_num except we
+dont increase the position at the end
+called different things because we import*/
 bool valid_num(word_cont* to_check);
 
 /*potentially add pending line in to word_cont -
 as word cont deals with intermediate stages of instructions
 which is basically what pending line is*/
-bool do_instruction(word_cont* to_check,line_cont* line_arr,\
+bool run_instruction(word_cont* to_check,line_cont* line_arr,\
                      line* pending_line);
+bool run_instruction_list(word_cont* to_check,line_cont* line_arr,\
+                           line* pending_line);
+bool run_main(word_cont* to_check,line_cont* line_arr,\
+            line* pending_line);
 bool get_rotation(word_cont* to_check,line* pending_line);
 direction direction_helper(word_cont* to_check);
-bool valid_num(word_cont* to_check);
+
 bool move_forward(word_cont* to_check,line* pending_line,line_cont* l_arr);
 line* init_origin(void);
 bool free_line(line* to_free);
 line* finish_line(line* prev_line,coord* endpoint);
 
 
+/*get op v similar to parser except we dont increase position
+and we return a op instead of bool*/
+op get_op(word_cont* to_check);
+bool do_operation(word_cont* to_check);
+bool polish_num(word_cont* to_check);
+/*need to get remaining num and check only one num there*/
+bool finish_polish(word_cont* to_check,double* result);
+/*num is going to be passed in by set function*/
+bool run_polish(word_cont* to_check,double* num);
 /*returns true if same*/
 bool compare_doubles(double d_1, double d_2);
 void test(void);
@@ -295,7 +309,8 @@ void test(void)
    }
    free_line_cont(test_line_cont);
 
-   /*test move forward*/
+   /*************test move forward**************/
+
    test_line_cont=init_line_cont();
    test_cont=init_word_cont();
    test_line=init_origin();
@@ -413,12 +428,15 @@ void test(void)
    strcpy(test_cont->words[2],"FD");
    strcpy(test_cont->words[3],"30");
 
-   assert(do_instruction(test_cont,test_line_cont,test_line));
+   /******* test run_instruction ***********/
+
+
+   assert(run_instruction(test_cont,test_line_cont,test_line));
    assert(compare_doubles(test_line->rotation,90));
    assert(test_cont->position==2);
    assert(test_line_cont->size==0);
 
-   assert(do_instruction(test_cont,test_line_cont,test_line));
+   assert(run_instruction(test_cont,test_line_cont,test_line));
    assert(test_cont->position==4);
    assert(test_line_cont->size==1);
    assert(compare_doubles(test_line_cont->array[0]->end->y,0));
@@ -426,8 +444,306 @@ void test(void)
    assert(compare_doubles(test_line->start->y,0));
    assert(compare_doubles(test_line->start->x,-30));
 
+   strcpy(test_cont->words[0],"L");
+   test_cont->position=0;
+   assert(!run_instruction(test_cont,test_line_cont,test_line));
+   strcpy(test_cont->words[0],"LT");
+
+   test_cont->position=0;
+   strcpy(test_cont->words[1],"LT");
+   assert(!run_instruction(test_cont,test_line_cont,test_line));
+   strcpy(test_cont->words[1],"90");
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"");
+   assert(!run_instruction(test_cont,test_line_cont,test_line));
+   strcpy(test_cont->words[0],"LT");
+
    free_line(test_line);
    free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
+
+   /************* test run instruction list + run_main *********/
+   test_line_cont=init_line_cont();
+   test_line=init_origin();
+   test_cont=init_word_cont();
+
+   strcpy(test_cont->words[0],"LT");
+   strcpy(test_cont->words[1],"90");
+   strcpy(test_cont->words[2],"FD");
+   strcpy(test_cont->words[3],"30");
+   strcpy(test_cont->words[4],"}");
+   assert(run_instruction_list(test_cont,test_line_cont,test_line));
+   assert(test_cont->position==5);
+   assert(test_line_cont->size==1);
+   assert(compare_doubles(test_line_cont->array[0]->end->y,0));
+   assert(compare_doubles(test_line_cont->array[0]->end->x,-30));
+   assert(compare_doubles(test_line->start->y,0));
+   assert(compare_doubles(test_line->start->x,-30));
+   free_line(test_line);
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
+
+   test_line_cont=init_line_cont();
+   test_line=init_origin();
+   test_cont=init_word_cont();
+
+   strcpy(test_cont->words[0],"LT");
+   strcpy(test_cont->words[1],"90");
+   strcpy(test_cont->words[2],"FD");
+   strcpy(test_cont->words[3],"30");
+
+   strcpy(test_cont->words[4],"LT");
+   strcpy(test_cont->words[5],"90");
+   strcpy(test_cont->words[6],"FD");
+   strcpy(test_cont->words[7],"30");
+
+   strcpy(test_cont->words[8],"LT");
+   strcpy(test_cont->words[9],"90");
+   strcpy(test_cont->words[10],"FD");
+   strcpy(test_cont->words[11],"30");
+
+   strcpy(test_cont->words[12],"RT");
+   strcpy(test_cont->words[13],"90");
+   strcpy(test_cont->words[14],"FD");
+   strcpy(test_cont->words[15],"30");
+
+   strcpy(test_cont->words[16],"}");
+   assert(!run_main(test_cont,test_line_cont,test_line));
+   assert(run_instruction_list(test_cont,test_line_cont,test_line));
+   assert(test_cont->position==17);
+   assert(test_line_cont->size==4);
+   assert(compare_doubles(test_line->rotation,180));
+
+   assert(compare_doubles(test_line_cont->array[0]->rotation,90));
+   assert(compare_doubles(test_line_cont->array[1]->rotation,180));
+   assert(compare_doubles(test_line_cont->array[2]->rotation,270));
+   assert(compare_doubles(test_line_cont->array[3]->rotation,180));
+
+
+   assert(compare_doubles(test_line_cont->array[0]->start->x,0));
+   assert(compare_doubles(test_line_cont->array[0]->start->y,0));
+   assert(compare_doubles(test_line_cont->array[0]->end->x,-30));
+   assert(compare_doubles(test_line_cont->array[0]->end->y,0));
+
+   assert(compare_doubles(test_line_cont->array[1]->start->x,-30));
+   assert(compare_doubles(test_line_cont->array[1]->start->y,0));
+   assert(compare_doubles(test_line_cont->array[1]->end->x,-30));
+   assert(compare_doubles(test_line_cont->array[1]->end->y,-30));
+
+   assert(compare_doubles(test_line_cont->array[2]->start->x,-30));
+   assert(compare_doubles(test_line_cont->array[2]->start->y,-30));
+   assert(compare_doubles(test_line_cont->array[2]->end->x,0));
+   assert(compare_doubles(test_line_cont->array[2]->end->y,-30));
+
+
+   assert(compare_doubles(test_line_cont->array[3]->start->x,0));
+   assert(compare_doubles(test_line_cont->array[3]->start->y,-30));
+   assert(compare_doubles(test_line_cont->array[3]->end->x,0));
+   assert(compare_doubles(test_line_cont->array[3]->end->y,-60));
+
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"NO");
+   assert(!run_instruction_list(test_cont,test_line_cont,test_line));
+   strcpy(test_cont->words[0],"LT");
+
+   test_cont->position=0;
+   strcpy(test_cont->words[1],"LT");
+   assert(!run_instruction_list(test_cont,test_line_cont,test_line));
+   strcpy(test_cont->words[1],"90");
+
+   test_cont->position=0;
+   strcpy(test_cont->words[16],"FD");
+   assert(!run_instruction_list(test_cont,test_line_cont,test_line));
+   strcpy(test_cont->words[16],"}");
+
+   test_cont->position=0;
+   strcpy(test_cont->words[11],"}");
+   assert(!run_instruction_list(test_cont,test_line_cont,test_line));
+   strcpy(test_cont->words[11],"30");
+
+   test_cont->position=0;
+   strcpy(test_cont->words[1],"");
+   assert(!run_instruction_list(test_cont,test_line_cont,test_line));
+   strcpy(test_cont->words[1],"90");
+
+   test_cont->position=0;
+   strcpy(test_cont->words[1],"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa90");
+   assert(!run_instruction_list(test_cont,test_line_cont,test_line));
+   strcpy(test_cont->words[1],"90");
+
+   free_line(test_line);
+   free_line_cont(test_line_cont);
+
+   test_cont->position=0;
+   test_line_cont=init_line_cont();
+   test_line=init_origin();
+
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"LT");
+   strcpy(test_cont->words[2],"90");
+   strcpy(test_cont->words[3],"FD");
+   strcpy(test_cont->words[4],"30");
+
+   strcpy(test_cont->words[5],"LT");
+   strcpy(test_cont->words[6],"90");
+   strcpy(test_cont->words[7],"FD");
+   strcpy(test_cont->words[8],"30");
+
+   strcpy(test_cont->words[9],"LT");
+   strcpy(test_cont->words[10],"90");
+   strcpy(test_cont->words[11],"FD");
+   strcpy(test_cont->words[12],"30");
+
+   strcpy(test_cont->words[13],"RT");
+   strcpy(test_cont->words[14],"90");
+   strcpy(test_cont->words[15],"FD");
+   strcpy(test_cont->words[16],"30");
+
+   strcpy(test_cont->words[17],"}");
+   /*running main should be exactly the same so going to use same tests*/
+   assert(!run_instruction_list(test_cont,test_line_cont,test_line));
+   assert(run_main(test_cont,test_line_cont,test_line));
+   free_line(test_line);
+   free_line_cont(test_line_cont);
+
+
+   test_cont->position=0;
+   test_line_cont=init_line_cont();
+   test_line=init_origin();
+
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"LT");
+   strcpy(test_cont->words[2],"89.25");
+   strcpy(test_cont->words[3],"FD");
+   strcpy(test_cont->words[4],"30");
+
+   strcpy(test_cont->words[5],"LT");
+   strcpy(test_cont->words[6],"89.25");
+   strcpy(test_cont->words[7],"FD");
+   strcpy(test_cont->words[8],"30");
+
+   strcpy(test_cont->words[9],"LT");
+   strcpy(test_cont->words[10],"89.25");
+   strcpy(test_cont->words[11],"FD");
+   strcpy(test_cont->words[12],"30");
+
+   strcpy(test_cont->words[13],"LT");
+   strcpy(test_cont->words[14],"89.25");
+   strcpy(test_cont->words[15],"FD");
+   strcpy(test_cont->words[16],"30");
+
+   strcpy(test_cont->words[17],"}");
+
+   assert(run_main(test_cont,test_line_cont,test_line));
+
+   assert(compare_doubles(test_line->rotation,357));
+   free_line(test_line);
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
+
+
+   /******** polish tests no variables ************/
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"+");
+   assert(get_op(test_cont)==plus);
+   strcpy(test_cont->words[0],"-");
+   assert(get_op(test_cont)==minus);
+   strcpy(test_cont->words[0],"*");
+   assert(get_op(test_cont)==mult);
+   strcpy(test_cont->words[0],"/");
+   assert(get_op(test_cont)==divide);
+   strcpy(test_cont->words[0],"29");
+   assert(get_op(test_cont)==invalid_op);
+
+   assert(polish_num(test_cont));
+   assert(test_cont->position==1);
+   assert(compare_doubles(test_cont->stackptr->start->num,29));
+   assert(test_cont->stackptr->size==1);
+   strcpy(test_cont->words[1],"90");
+   assert(polish_num(test_cont));
+   assert(compare_doubles(test_cont->stackptr->start->num,90));
+   assert(compare_doubles(test_cont->stackptr->start->next->num,29));
+   assert(test_cont->stackptr->size==2);
+
+   strcpy(test_cont->words[2],"no");
+   assert(!polish_num(test_cont));
+   assert(test_cont->stackptr->size==2);
+
+   strcpy(test_cont->words[2],"70.a");
+   assert(!polish_num(test_cont));
+   assert(test_cont->stackptr->size==2);
+
+   strcpy(test_cont->words[2],"");
+   assert(!polish_num(test_cont));
+   assert(test_cont->stackptr->size==2);
+
+   strcpy(test_cont->words[2],"+");
+   assert(do_operation(test_cont));
+   assert(compare_doubles(test_cont->stackptr->start->num,119));
+   assert(!test_cont->stackptr->start->next);
+   assert(test_cont->stackptr->size==1);
+   assert(test_cont->position==3);
+
+   strcpy(test_cont->words[3],"1.1");
+   assert(polish_num(test_cont));
+   strcpy(test_cont->words[4],"-");
+   assert(do_operation(test_cont));
+   assert(compare_doubles(test_cont->stackptr->start->num,117.9));
+
+   strcpy(test_cont->words[5],"2");
+   assert(polish_num(test_cont));
+   strcpy(test_cont->words[6],"/");
+   assert(do_operation(test_cont));
+   assert(compare_doubles(test_cont->stackptr->start->num,58.95));
+   strcpy(test_cont->words[7],"*");
+   assert(!do_operation(test_cont));
+
+   strcpy(test_cont->words[7],"56");
+   assert(polish_num(test_cont));
+   strcpy(test_cont->words[8],")");
+   assert(!do_operation(test_cont));
+   strcpy(test_cont->words[8],"");
+   assert(!do_operation(test_cont));
+
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   /*not enough numbers*/
+   assert(!finish_polish(test_cont,&test_double));
+   strcpy(test_cont->words[0],"90");
+   assert(polish_num(test_cont));
+   strcpy(test_cont->words[1],"90");
+   assert(polish_num(test_cont));
+   /*too many numbers*/
+   assert(!finish_polish(test_cont,&test_double));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"90");
+   assert(polish_num(test_cont));
+   strcpy(test_cont->words[1],"90");
+   assert(polish_num(test_cont));
+   strcpy(test_cont->words[2],"+");
+   assert(do_operation(test_cont));
+   /*goldilocks amount*/
+   assert(finish_polish(test_cont,&test_double));
+   assert(compare_doubles(test_double,180));
+   free_word_cont(test_cont);
+
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"90");
+   strcpy(test_cont->words[1],"90");
+   strcpy(test_cont->words[2],"+");
+   strcpy(test_cont->words[3],";");
+   assert(run_polish(test_cont,&test_double));
+   assert(compare_doubles(test_double,180));
    free_word_cont(test_cont);
 }
 
@@ -505,12 +821,6 @@ bool free_line(line* to_free)
 
 
 
-
-/*basically add however much to current y coord
-then rotate however much
-this will return false if NULL is passed
-or if its not a turn move*/
-
 bool get_num(word_cont* to_check,double* num)
 {
 
@@ -555,8 +865,54 @@ bool valid_num(word_cont* to_check)
    return true;
 }
 
-/*bool do_instruct(word_cont* to_check,)*/
 
+bool run_main(word_cont* to_check,line_cont* line_arr,\
+            line* pending_line)
+{
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
+   if(strcmp(to_check->words[to_check->position],"{")==0)
+   {
+      to_check->position++;
+
+      if(run_instruction_list(to_check,line_arr,pending_line))
+      {
+         return true;
+      }
+   }
+   return false;
+}
+
+
+
+bool run_instruction_list(word_cont* to_check,line_cont* line_arr,\
+                           line* pending_line)
+{
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
+   if(strcmp(to_check->words[to_check->position],"}")==0)
+   {
+      /*doesnt matter for end but for do loops important
+      to increase position*/
+      to_check->position++;
+      return true;
+   }
+   else
+   {
+      if(run_instruction(to_check,line_arr,pending_line))
+      {
+         if(run_instruction_list(to_check,line_arr,pending_line))
+         {
+            return true;
+         }
+      }
+   }
+   return false;
+}
 
 
 
@@ -564,7 +920,7 @@ bool valid_num(word_cont* to_check)
 /*potentially add pending line in to word_cont -
 as word cont deals with intermediate stages of instructions
 which is basically what pending line is*/
-bool do_instruction(word_cont* to_check,line_cont* line_arr,\
+bool run_instruction(word_cont* to_check,line_cont* line_arr,\
                      line* pending_line)
 {
    int init_pos;
@@ -740,6 +1096,8 @@ word_cont* init_word_cont(void)
       n_cont->words[i][0]='\0';
    }
    n_cont->position=0;
+
+   n_cont->stackptr=stack_init();
    return n_cont;
 }
 
@@ -753,13 +1111,144 @@ bool free_word_cont(word_cont* to_free)
          free(to_free->words[i]);
       }
       free(to_free->words);
+      stack_free(to_free->stackptr);
       free(to_free);
    }
+
    return true;
 }
 
 
 
+/*get op v similar to parser except we dont increase position
+and we return a op instead of bool*/
+op get_op(word_cont* to_check)
+{
+   if(to_check->position>=to_check->capacity)
+   {
+      return invalid_op;
+   }
+   if(strcmp(to_check->words[to_check->position],"+")==0)
+   {
+      return plus;
+   }
+   if(strcmp(to_check->words[to_check->position],"-")==0)
+   {
+      return minus;
+   }
+   if(strcmp(to_check->words[to_check->position],"*")==0)
+   {
+      return mult;
+   }
+   if(strcmp(to_check->words[to_check->position],"/")==0)
+   {
+      return divide;
+   }
+   return invalid_op;
+}
+
+bool do_operation(word_cont* to_check)
+{
+   op operator;
+   double result, num1, num2;
+   operator=get_op(to_check);
+   if(operator==invalid_op)
+   {
+      return false;
+   }
+   if(!stack_pop(to_check->stackptr, &num2) || \
+      !stack_pop(to_check->stackptr, &num1))
+   {
+      return false;
+   }
+   switch(operator)
+   {
+      case plus:
+      result= num1 + num2;
+      break;
+
+      case minus:
+      result= num1 - num2;
+      break;
+
+      case mult:
+      result= num1 * num2;
+      break;
+
+      case divide:
+      result =  num1 / num2;
+      break;
+
+      default:
+      fprintf(stderr,"unexpected operator\n");
+      exit(EXIT_FAILURE);
+   }
+   stack_push(to_check->stackptr,result);
+   to_check->position++;
+   return true;
+}
+
+/*add variables option here*/
+bool polish_num(word_cont* to_check)
+{
+   double num;
+   if(get_num(to_check,&num))
+   {
+      stack_push(to_check->stackptr,num);
+      return true;
+   }
+   return false;
+
+}
+
+/*need to get remaining num and check only one num there*/
+bool finish_polish(word_cont* to_check,double* result)
+{
+   if(!stack_pop(to_check->stackptr,result))
+   {
+      return false;
+   }
+   /*if numbers left over then something is wrong*/
+   if(stack_peek(to_check->stackptr,result))
+   {
+      return false;
+   }
+   return true;
+
+}
+
+/*num is going to be passed in by set function*/
+bool run_polish(word_cont* to_check,double* num)
+{
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
+   if(strcmp(to_check->words[to_check->position],";")==0)
+   {
+      /*need to get num and check only one num here*/
+      if(finish_polish(to_check,num))
+      {
+         to_check->position++;
+         return true;
+      }
+   }
+   if(do_operation(to_check))
+   {
+      if(run_polish(to_check,num))
+      {
+         return true;
+      }
+   }
+   if(polish_num(to_check))
+   {
+      if(run_polish(to_check,num))
+      {
+         return true;
+      }
+   }
+   return false;
+}
 
 
 

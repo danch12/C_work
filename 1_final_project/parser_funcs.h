@@ -22,11 +22,7 @@ typedef struct word_container
 {
    char** words;
    int position;
-   /*dont need to worry about
-   carried_out until interpreter stage*/
-   int carried_out;
    int capacity;
-
 }word_cont;
 
 /*valid funcs return true if entry is valid*/
