@@ -1,6 +1,6 @@
 #include "stack_funcs.h"
 
-/*these funcs are pretty
+/*these funcs are very
 similar to your stack funcs*/
 stack* stack_init(void)
 {

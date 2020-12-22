@@ -3,7 +3,7 @@
 #include "general.h"
 #include "stack_funcs.h"
 
-
+#define MAXERRLEN 50
 #define PI 3.14159265359
 #define DEGTORAD 180
 #define DEGREES 360
@@ -14,6 +14,8 @@
 #define MAXTESTLEN 50
 #define INITSIZE 16
 #define SCALEFACTOR 2
+#define NUMVARS 26
+#define LETTER_TO_NUM 65
 
 typedef enum direction {left, right,invalid} direction;
 typedef enum op {plus, minus,mult,divide,invalid_op} op;
@@ -33,8 +35,17 @@ typedef struct line
    coord* end;
 }line;
 
+/*was going to use a hash map to store variables but
+seems a bit extravagent when there are only 26 possible
+variables - if i implement functions in future i will
+use hash map though- although this also leads to an
+interesting question of how we indicate a variable hasnt
+been created as something like set A := 0 should be valid
+so cant just fill with zeros. because of this going to use
+pointers so we know that when we see a not NULL pointer
+that variable has been set
 
-/*may store the stack and any hashmaps in the
+may store the stack and any variable arrays in the
 word container as they are sort of like input
 controls where as line container is more of
 a output control so will keep separate
@@ -45,12 +56,17 @@ because of this it makes sense to include a pending_line
 member that tracks the progress of a line before we
 have recieved a FD call
  */
+
+
+ /*would be cool to have an error message container*/
 typedef struct word_container
 {
    char** words;
    int position;
    int capacity;
    stack* stackptr;
+   double* var_array[NUMVARS];
+   /*char err_message[MAXERRLEN];*/
 }word_cont;
 
 typedef struct line_container
@@ -105,6 +121,14 @@ bool polish_num(word_cont* to_check);
 bool finish_polish(word_cont* to_check,double* result);
 /*num is going to be passed in by set function*/
 bool run_polish(word_cont* to_check,double* num);
+
+bool run_set(word_cont* to_check);
+/*pass position back through var_p
+*we see vars as A- Z but really they could be 0-25*/
+bool get_var_pos(word_cont* to_check,int* var_p);
+bool valid_var(word_cont* to_check);
+bool get_var(word_cont* to_check,double* num);
+bool get_varnum(word_cont* to_check,double* num);
 /*returns true if same*/
 bool compare_doubles(double d_1, double d_2);
 void test(void);
@@ -745,6 +769,305 @@ void test(void)
    assert(run_polish(test_cont,&test_double));
    assert(compare_doubles(test_double,180));
    free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"90");
+   strcpy(test_cont->words[1],"90");
+   strcpy(test_cont->words[2],"+");
+   strcpy(test_cont->words[3],"40");
+   strcpy(test_cont->words[4],"/");
+   strcpy(test_cont->words[5],"19.3");
+   strcpy(test_cont->words[6],"-");
+   strcpy(test_cont->words[7],";");
+   assert(run_polish(test_cont,&test_double));
+   assert(compare_doubles(test_double,-14.8));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"90");
+   strcpy(test_cont->words[1],";");
+   assert(run_polish(test_cont,&test_double));
+   assert(compare_doubles(test_double,90));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],";");
+   assert(!run_polish(test_cont,&test_double));
+   assert(test_cont->position==0);
+
+   strcpy(test_cont->words[0],"7");
+   assert(!run_polish(test_cont,&test_double));
+
+   strcpy(test_cont->words[1],"7");
+   strcpy(test_cont->words[2],";");
+   assert(!run_polish(test_cont,&test_double));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"7");
+   strcpy(test_cont->words[1],"7");
+   strcpy(test_cont->words[2],"+");
+   strcpy(test_cont->words[3],"+");
+   strcpy(test_cont->words[4],";");
+   assert(!run_polish(test_cont,&test_double));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"7");
+   assert(!run_polish(test_cont,&test_double));
+   free_word_cont(test_cont);
+
+
+   /*test set funcs*/
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"A");
+   assert(valid_var(test_cont));
+   strcpy(test_cont->words[0],"Z");
+   assert(valid_var(test_cont));
+   strcpy(test_cont->words[0],"a");
+   assert(!valid_var(test_cont));
+   strcpy(test_cont->words[0],"");
+   assert(!valid_var(test_cont));
+   strcpy(test_cont->words[0],"!");
+   assert(!valid_var(test_cont));
+
+   strcpy(test_cont->words[0],"A");
+   assert(get_var_pos(test_cont,&i));
+   assert(i==0);
+   test_cont->position=0;
+
+   strcpy(test_cont->words[0],"Z");
+   assert(get_var_pos(test_cont,&i));
+   assert(i==25);
+   test_cont->position=0;
+
+   strcpy(test_cont->words[0],"B");
+   assert(get_var_pos(test_cont,&i));
+   assert(i==1);
+   test_cont->position=0;
+
+
+   strcpy(test_cont->words[0],"0");
+   assert(!get_var_pos(test_cont,&i));
+   strcpy(test_cont->words[0],"AB");
+   assert(!get_var_pos(test_cont,&i));
+   strcpy(test_cont->words[0],"a");
+   assert(!get_var_pos(test_cont,&i));
+
+   free_word_cont(test_cont);
+
+
+   test_cont=init_word_cont();
+
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90");
+   strcpy(test_cont->words[4],"90");
+   strcpy(test_cont->words[5],"+");
+   strcpy(test_cont->words[6],";");
+   assert(run_set(test_cont));
+   assert(compare_doubles(*test_cont->var_array[0],180));
+   free_word_cont(test_cont);
+
+
+   test_cont=init_word_cont();
+
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"B");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90");
+   strcpy(test_cont->words[4],"2");
+   strcpy(test_cont->words[5],"/");
+   strcpy(test_cont->words[6],";");
+   assert(run_set(test_cont));
+   assert(compare_doubles(*test_cont->var_array[1],45));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   strcpy(test_cont->words[4],"2");
+   strcpy(test_cont->words[5],"/");
+   strcpy(test_cont->words[6],";");
+   assert(run_set(test_cont));
+   assert(compare_doubles(*test_cont->var_array[25],45.25));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   strcpy(test_cont->words[4],";");
+   assert(run_set(test_cont));
+   assert(compare_doubles(*test_cont->var_array[25],90.5));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   strcpy(test_cont->words[4],"2");
+   strcpy(test_cont->words[5],"/");
+   assert(!run_set(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   strcpy(test_cont->words[4],"/");
+   strcpy(test_cont->words[5],";");
+   assert(!run_set(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"a");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   assert(!run_set(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],":");
+   strcpy(test_cont->words[3],"90.5");
+   assert(!run_set(test_cont));
+   free_word_cont(test_cont);
+
+   /*test other funcs using variables especially polish*/
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   strcpy(test_cont->words[4],";");
+   strcpy(test_cont->words[5],"Z");
+   assert(run_set(test_cont));
+   assert(get_var(test_cont,&test_double));
+   assert(compare_doubles(test_double,90.5));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   strcpy(test_cont->words[4],";");
+   strcpy(test_cont->words[5],"z");
+   assert(run_set(test_cont));
+   assert(!get_var(test_cont,&test_double));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   strcpy(test_cont->words[4],";");
+   strcpy(test_cont->words[5],"A");
+   assert(run_set(test_cont));
+   assert(!get_var(test_cont,&test_double));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   strcpy(test_cont->words[4],";");
+   strcpy(test_cont->words[5],"Z");
+   assert(run_set(test_cont));
+   assert(get_varnum(test_cont,&test_double));
+   assert(test_cont->position==6);
+   assert(compare_doubles(test_double,90.5));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   strcpy(test_cont->words[4],";");
+   strcpy(test_cont->words[5],"90.5");
+   assert(run_set(test_cont));
+   assert(get_varnum(test_cont,&test_double));
+   assert(test_cont->position==6);
+   assert(compare_doubles(test_double,90.5));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"90.5");
+   assert(get_varnum(test_cont,&test_double));
+   assert(compare_doubles(test_double,90.5));
+   assert(test_cont->position==1);
+   free_word_cont(test_cont);
+
+
+   /*going to redo some of the previous tests with
+   some variables now that we can set them*/
+   test_line_cont=init_line_cont();
+   test_line=init_origin();
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90");
+   strcpy(test_cont->words[4],";");
+   strcpy(test_cont->words[5],"LT");
+   strcpy(test_cont->words[6],"Z");
+   strcpy(test_cont->words[7],"FD");
+   strcpy(test_cont->words[8],"30");
+   strcpy(test_cont->words[9],"}");
+   assert(run_instruction_list(test_cont,test_line_cont,test_line));
+   assert(test_cont->position==10);
+   assert(test_line_cont->size==1);
+   assert(compare_doubles(test_line_cont->array[0]->end->y,0));
+   assert(compare_doubles(test_line_cont->array[0]->end->x,-30));
+   assert(compare_doubles(test_line->start->y,0));
+   assert(compare_doubles(test_line->start->x,-30));
+   free_line(test_line);
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
+
+
+   test_line_cont=init_line_cont();
+   test_line=init_origin();
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90");
+   strcpy(test_cont->words[4],";");
+   strcpy(test_cont->words[5],"SET");
+   strcpy(test_cont->words[6],"A");
+   strcpy(test_cont->words[7],":=");
+   strcpy(test_cont->words[8],"30");
+   strcpy(test_cont->words[9],";");
+   strcpy(test_cont->words[10],"LT");
+   strcpy(test_cont->words[11],"Z");
+   strcpy(test_cont->words[12],"FD");
+   strcpy(test_cont->words[13],"A");
+   strcpy(test_cont->words[14],"}");
+   assert(run_instruction_list(test_cont,test_line_cont,test_line));
+   assert(test_cont->position==15);
+   assert(test_line_cont->size==1);
+   assert(compare_doubles(test_line_cont->array[0]->end->y,0));
+   assert(compare_doubles(test_line_cont->array[0]->end->x,-30));
+   assert(compare_doubles(test_line->start->y,0));
+   assert(compare_doubles(test_line->start->x,-30));
+   free_line(test_line);
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
 }
 
 
@@ -938,6 +1261,11 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr,\
    {
       return true;
    }
+   to_check->position=init_pos;
+   if(run_set(to_check))
+   {
+      return true;
+   }
    return false;
 }
 
@@ -953,7 +1281,7 @@ bool get_rotation(word_cont* to_check,line* pending_line)
    {
       return false;
    }
-   if(get_num(to_check,&num))
+   if(get_varnum(to_check,&num))
    {
       if(dir==left)
       {
@@ -1010,7 +1338,7 @@ bool move_forward(word_cont* to_check,line* pending_line,line_cont* l_arr)
    if(strcmp(to_check->words[to_check->position],"FD")==0)
    {
       to_check->position++;
-      if(get_num(to_check,&num))
+      if(get_varnum(to_check,&num))
       {
          n_y=pending_line->start->y +num;
          end_coord=init_coords(pending_line->start->x,n_y);
@@ -1021,8 +1349,9 @@ bool move_forward(word_cont* to_check,line* pending_line,line_cont* l_arr)
          {
             finished_line=finish_line(pending_line,end_coord);
             store_line(l_arr,finished_line);
-            /*reusing pending_line over and over by just changing
-            its start point to the last lines end point*/
+            /*reusing pending_line over and over by just
+             changing its start point to the last lines
+             end point*/
             pending_line->start->x =finished_line->end->x;
             pending_line->start->y =finished_line->end->y;
             return true;
@@ -1098,6 +1427,10 @@ word_cont* init_word_cont(void)
    n_cont->position=0;
 
    n_cont->stackptr=stack_init();
+   for(i=0;i<NUMVARS;i++)
+   {
+      n_cont->var_array[i]=NULL;
+   }
    return n_cont;
 }
 
@@ -1109,6 +1442,13 @@ bool free_word_cont(word_cont* to_free)
       for(i=0;i<to_free->capacity;i++)
       {
          free(to_free->words[i]);
+      }
+      for(i=0;i<NUMVARS;i++)
+      {
+         if(to_free->var_array[i])
+         {
+            free(to_free->var_array[i]);
+         }
       }
       free(to_free->words);
       stack_free(to_free->stackptr);
@@ -1192,7 +1532,7 @@ bool do_operation(word_cont* to_check)
 bool polish_num(word_cont* to_check)
 {
    double num;
-   if(get_num(to_check,&num))
+   if(get_varnum(to_check,&num))
    {
       stack_push(to_check->stackptr,num);
       return true;
@@ -1251,6 +1591,97 @@ bool run_polish(word_cont* to_check,double* num)
 }
 
 
+bool run_set(word_cont* to_check)
+{
+   double to_set;
+   int var_p;
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
+   if(strcmp(to_check->words[to_check->position],"SET")==0)
+   {
+      to_check->position++;
+      if(get_var_pos(to_check,&var_p))
+      {
+         if(strcmp(to_check->words[to_check->position],":=")==0)
+         {
+            to_check->position++;
+            if(run_polish(to_check,&to_set))
+            {
+               to_check->var_array[var_p]=safe_calloc(1,sizeof(double));
+               *to_check->var_array[var_p]=to_set;
+               return true;
+            }
+         }
+      }
+   }
+   return false;
+}
+
+
+bool valid_var(word_cont* to_check)
+{
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
+   if(strlen(to_check->words[to_check->position])==1)
+   {
+      if(to_check->words[to_check->position][0]>='A'&&\
+         to_check->words[to_check->position][0]<='Z')
+      {
+         return true;
+      }
+   }
+   return false;
+}
+
+/*pass position back through var_p
+*we see vars as A- Z but really they could be 0-25*/
+bool get_var_pos(word_cont* to_check,int* var_p)
+{
+   if(valid_var(to_check))
+   {
+      *var_p= to_check->words[to_check->position][0]-LETTER_TO_NUM;
+      to_check->position++;
+      return true;
+   }
+   return false;
+}
+
+
+
+bool get_var(word_cont* to_check,double* num)
+{
+   int pos;
+   if(get_var_pos(to_check,&pos))
+   {
+      /*if we have initialised something*/
+      if(to_check->var_array[pos])
+      {
+         *num= *to_check->var_array[pos];
+         /*get var pos increases position*/
+         return true;
+      }
+
+   }
+   return false;
+}
+
+bool get_varnum(word_cont* to_check,double* num)
+{
+   /*will return false before increaing position*/
+   if(get_var(to_check,num))
+   {
+      return true;
+   }
+   if(get_num(to_check,num))
+   {
+      return true;
+   }
+   return false;
+}
 
 /*keep all lines that you draw*/
 
