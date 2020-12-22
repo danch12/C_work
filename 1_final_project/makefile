@@ -24,8 +24,8 @@ test_stacks_san: stack_tests.c stack_funcs.c stack_funcs.h general.c general.h
 parser_san: parser.c parser_funcs.c parser_funcs.h general.c general.h
 	$(CC) parser.c parser_funcs.c general.c  -o parser_san $(CFLAGSSAN) $(LIDLIBS)
 
-interp_san: interpreter.c stack_funcs.c stack_funcs.h general.c general.h
-	$(CC) interpreter.c stack_funcs.c  general.c  -o interp_san $(CFLAGSSAN) $(LIDLIBS)
+interp_san: interpreter.c parser_funcs.c parser_funcs.h stack_funcs.c stack_funcs.h general.c general.h
+	$(CC) interpreter.c parser_funcs.c stack_funcs.c  general.c  -o interp_san $(CFLAGSSAN) $(LIDLIBS)
 
 clean:
 	rm -f parser_test_fast parser_test_san test_stacks_fast test_stacks_san  parser_san 

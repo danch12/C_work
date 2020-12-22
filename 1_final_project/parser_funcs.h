@@ -9,20 +9,25 @@
 #include <math.h>
 
 #include "general.h"
+#include "stack_funcs.h"
 
-#define MAXTESTCAP 100
-#define MAXTESTLEN 50
 #define NUMINSTRUCTIONS 3
 #define INSTRUCTLEN 3
 #define MAXLEN 1000
-
-
+#define MAXERRLEN 100
+#define NUMVARS 26
 
 typedef struct word_container
 {
    char** words;
    int position;
    int capacity;
+   stack* stackptr;
+   double* var_array[NUMVARS];
+
+    /*would be cool to have possibility of specific error
+    messages when theres stuff like stack errors etc*/
+   char err_message[MAXERRLEN];
 }word_cont;
 
 /*valid funcs return true if entry is valid*/

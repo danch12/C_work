@@ -1,5 +1,8 @@
 #include "parser_funcs.h"
 
+
+#define MAXTESTCAP 100
+#define MAXTESTLEN 50
 /*used for testing*/
 bool concat_word_cont(word_cont* to_concat, char target[MAXLEN]);
 word_cont* init_word_cont(void);

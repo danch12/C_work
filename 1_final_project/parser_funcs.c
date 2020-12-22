@@ -47,9 +47,18 @@ bool free_word_cont(word_cont* to_free)
       {
          free(to_free->words[i]);
       }
+      for(i=0;i<NUMVARS;i++)
+      {
+         if(to_free->var_array[i])
+         {
+            free(to_free->var_array[i]);
+         }
+      }
       free(to_free->words);
+      stack_free(to_free->stackptr);
       free(to_free);
    }
+
    return true;
 }
 
@@ -186,7 +195,6 @@ bool valid_instructlist(word_cont* to_check)
       /*doesnt matter for end but for do loops important
       to increase position*/
       to_check->position++;
-
       return true;
    }
    else
