@@ -35,11 +35,13 @@ test_interp_fast : interpreter_tests.c interpreter_funcs.c interpreter_funcs.h p
 	$(CC) interpreter_tests.c interpreter_funcs.c parser_funcs.c general.c stack_funcs.c -o test_interp_fast $(CFLAGSFAST) $(LIDLIBS)
 
 
-interp_san: interpreter.c parser_funcs.c parser_funcs.h stack_funcs.c stack_funcs.h general.c general.h
-	$(CC) interpreter.c parser_funcs.c stack_funcs.c  general.c  -o interp_san $(CFLAGSSAN) $(LIDLIBS)
 
-interp_sdl: interpreter.c parser_funcs.c parser_funcs.h neillsdl2.c neillsdl2.h  stack_funcs.c stack_funcs.h general.c general.h
-	$(CC) interpreter.c parser_funcs.c neillsdl2.c stack_funcs.c  general.c  -o interp_sdl $(CFLAGSSDL) $(LIDLIBSSDL)
+interp: interpreter.c parser_funcs.c parser_funcs.h interpreter_funcs.c interpreter_funcs.h  neillsdl2.c neillsdl2.h  stack_funcs.c stack_funcs.h general.c general.h
+	$(CC) interpreter.c parser_funcs.c interpreter_funcs.c  neillsdl2.c stack_funcs.c  general.c  -o interp $(CFLAGSSDL) $(LIDLIBSSDL)
+
+
+
+
 
 
 #runs a series of invalid files and stores error message in p_errors.txt the | true stops the makefile from terminating after seeing an error
@@ -68,6 +70,17 @@ run_parser_val: parser_fast
 	./parser_fast test_files/test_turtles/parser/valid/stupid_valid_do.txt
 	./parser_fast test_files/test_turtles/parser/valid/using_variables.txt
 
+run_interp_err: interp
+	echo "test_files/test_turtles/interpreter/invalid/no_nums.txt" > i_errors.txt
+	./interp test_files/test_turtles/interpreter/invalid/no_nums.txt 2>> i_errors.txt |true
+	echo "test_files/test_turtles/interpreter/invalid/too_many_nums.txt" >> i_errors.txt
+	./interp test_files/test_turtles/interpreter/invalid/too_many_nums.txt 2>> i_errors.txt | true
+	echo "test_files/test_turtles/interpreter/invalid/unset_var.txt" >> i_errors.txt
+	./interp test_files/test_turtles/interpreter/invalid/unset_var.txt 2>> i_errors.txt | true
+	 echo "test_files/test_turtles/parser/invalid/invalid_nested_loop.txt" >> i_errors.txt
+	./interp test_files/test_turtles/parser/invalid/invalid_nested_loop.txt 2>> i_errors.txt | true
+	echo "test_files/test_turtles/parser/invalid/invalid_set.txt" >> i_errors.txt
+	./interp test_files/test_turtles/parser/invalid/invalid_set.txt 2>> i_errors.txt | true
 
 clean:
 	rm -f parser_test_fast parser_test_san test_stacks_fast test_stacks_san  parser_san test_interp_san test_interp_fast 

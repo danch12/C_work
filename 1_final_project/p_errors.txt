@@ -12,3 +12,4 @@ test_files/test_turtles/parser/invalid/invalid_set.txt
 error in processing file around word 1 SET
 test_files/test_turtles/parser/invalid/invalid_set_2.txt
 error in processing file around word 1 SET
+test_files/test_turtles/parser/invalid/invalid_nested_loop.txt

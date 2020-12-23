@@ -1,0 +1,13 @@
+test_files/test_turtles/interpreter/invalid/no_nums.txt
+error in processing file around word 1 SET
+no numbers on the stack at end of expr
+test_files/test_turtles/interpreter/invalid/too_many_nums.txt
+error in processing file around word 1 SET
+more than one number left on stack at end of expr
+test_files/test_turtles/interpreter/invalid/unset_var.txt
+error in processing file around word 1 FD
+potentially haven't set variable before calling it
+test_files/test_turtles/parser/invalid/invalid_nested_loop.txt
+error in processing file around word 18 ;
+test_files/test_turtles/parser/invalid/invalid_set.txt
+error in processing file around word 1 SET
