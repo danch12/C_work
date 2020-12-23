@@ -1,10 +1,10 @@
 Basic Idea for testing parsing section was to start with the commands that do not rely on the other commands eg VAR, OP etc. and then build the commands which use purely those and so on. Additionally I tried to first test each command by itself in its own struct before adding in other commands- so created a new struct to test POLISH, then a new struct for SET and so on. Was important to test the position that the functions move the struct to as well as this will be basis for how we move to next command.Using variables that haven't been set is not picked up in the parsing stage but will be in the interpreting stage.
 
-For my black box testing of parser.c you can see the results of different invalid files in the failure photos folder with the invalid files located in test_files/test_turtles/.
+For my black box testing of parser.c I have added in two commands to my makefile - run_parser_err which runs a series of invalid files and feeds the error messages into p_error.txt and run_parser_val which runs a series of valid files.
 
 Additionally created each of the ADTS separately tested them by themselves in their own test file and then introduced them into the parsing/interpreting functions. 
 
-For the interpreting section of the task testing a bit harder because a lot of it is outputing to SDL. Made sense to me to create a data structure that held all the points that were going to be fed to the SDL functions so that these could be tested and checked. Same theory went into building and testing the functions - start from the functions that can work by themselves and can be tested easily and then work our way up to functions that rely on these ones etc.
+For the interpreting section of the task testing a bit harder because a lot of it is outputing to SDL. Made sense to me to create a data structure that held all the points that were going to be fed to the SDL function so that these could be tested and checked. Another benefit of this is that we can separate out the SDL functions from our interpreter tests and check if any of our interpreter functions have memory leaks outside of SDL.  Same theory went into building and testing the functions - start from the functions that can work by themselves and can be tested easily and then work our way up to functions that rely on these ones etc.
 
 For an example the order in which I created the first few main functions in interpreter went -
 
@@ -15,3 +15,4 @@ move_forward - dependancies - get_num and rotate
 do_instruction - dependancies get_rotation and move_forward
 
 This allows for easier testing as we test each function thoroughly before moving onto the next so if there is a problem we do not have to dive deep into multiple layers of functions-abstracting away the complexities of rotating around a point or getting numbers as we go.
+

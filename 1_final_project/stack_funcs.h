@@ -1,7 +1,6 @@
 #ifndef STACK_FUNCS_H
 #define STACK_FUNCS_H
 
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>

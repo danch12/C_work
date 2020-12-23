@@ -17,16 +17,36 @@
 #define MAXERRLEN 100
 #define NUMVARS 26
 
+/*was going to use a hash map to store variables but
+seems a bit extravagent when there are only 26 possible
+variables - if i implement functions in future i will
+use hash map though- although this also leads to an
+interesting question of how we indicate a variable hasnt
+been created as something like set A := 0 should be valid
+so cant just fill with zeros. because of this going to use
+pointers so we know that when we see a not NULL pointer
+that variable has been set
+
+will store the stack and any variable arrays in the
+word container as they are sort of like input
+controls where as line container is more of
+a output control so will keep separate-
+we can see word_container as holding all the
+intermediate stages of instructions - basically
+everything apart from the moves
+
+ */
+
+
 typedef struct word_container
 {
    char** words;
    int position;
    int capacity;
+
+   /*below members are for interp stage*/
    stack* stackptr;
    double* var_array[NUMVARS];
-
-    /*would be cool to have possibility of specific error
-    messages when theres stuff like stack errors etc*/
    char err_message[MAXERRLEN];
 }word_cont;
 

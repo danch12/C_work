@@ -356,7 +356,7 @@ word_cont* read_in_file(char* filename)
 {
    FILE* fp;
    word_cont* n_cont;
-   int num_lines,count;
+   int num_lines,count,i;
    char buffer[MAXLEN];
    num_lines=0;
    n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
@@ -364,6 +364,8 @@ word_cont* read_in_file(char* filename)
    n_cont->capacity=num_lines;
    n_cont->position=0;
    n_cont->words= (char**)safe_calloc(num_lines,sizeof(char*));
+   n_cont->err_message[0]='\0';
+
    count=0;
    while(fscanf(fp,"%s",buffer)==1)
    {
@@ -373,6 +375,12 @@ word_cont* read_in_file(char* filename)
       count++;
    }
    fclose(fp);
+
+   n_cont->stackptr=stack_init();
+   for(i=0;i<NUMVARS;i++)
+   {
+      n_cont->var_array[i]=NULL;
+   }
    return n_cont;
 }
 

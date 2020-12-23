@@ -1,8 +1,6 @@
 #include "parser_funcs.h"
 
 
-
-
 int main(int argc, char* argv[])
 {
    word_cont* n_cont;

@@ -6,6 +6,7 @@ stack* stack_init(void)
 {
   stack* s;
   s=(stack*) safe_calloc(1,sizeof(stack));
+  s->size=0;
   return s;
 }
 

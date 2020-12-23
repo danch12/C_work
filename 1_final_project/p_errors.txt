@@ -1,0 +1,14 @@
+test_files/test_turtles/parser/invalid/bad_spacing.txt
+error in processing file around word 0 {DO
+test_files/test_turtles/parser/invalid/invalid_command.txt
+error in processing file around word 5 RZ
+test_files/test_turtles/parser/invalid/missing_bracket.txt
+error in processing file around word 0 FD
+test_files/test_turtles/parser/invalid/invalid_do.txt
+error in processing file around word 6 FT
+test_files/test_turtles/parser/invalid/invalid_nested_loop.txt
+error in processing file around word 18 ;
+test_files/test_turtles/parser/invalid/invalid_set.txt
+error in processing file around word 1 SET
+test_files/test_turtles/parser/invalid/invalid_set_2.txt
+error in processing file around word 1 SET

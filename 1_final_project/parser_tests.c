@@ -569,51 +569,51 @@ int main(void)
    assert(strcmp(test_str,"W2{}5678jnjffnvndkdke10")==0);
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/valid/using_variables.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/using_variables.txt");
    concat_word_cont(test_cont,test_str);
    assert(strcmp(test_str,"{DOAFROM1TO100{SETC:=A1.5*;FDCRT62}}")==0);
    assert(valid_main(test_cont));
    free_word_cont(test_cont);
 
 
-   test_cont=read_in_file("test_files/test_turtles/valid/adding_loops.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/adding_loops.txt");
    concat_word_cont(test_cont,test_str);
    assert(strcmp(test_str,"{DOAFROM1TO8{FD30LT45}}")==0);
 
    assert(valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/valid/nested_loops.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/nested_loops.txt");
    concat_word_cont(test_cont,test_str);
    assert(strcmp(test_str,"{DOAFROM1TO50{FDART30DOBFROM1TO8{SETC:=A5/;FDCRT45}}}")==0);
    assert(valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/valid/more_do.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/more_do.txt");
    concat_word_cont(test_cont,test_str);
    assert(strcmp(test_str,"{DOAFROM1TOC{FD50}}")==0);
    assert(valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/valid/polish.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/polish.txt");
    concat_word_cont(test_cont,test_str);
    assert(strcmp(test_str,"{SETA:=++34;}")==0);
    assert(valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/valid/polish_2.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/polish_2.txt");
    concat_word_cont(test_cont,test_str);
    assert(strcmp(test_str,"{SETA:=B+33+;}")==0);
    assert(valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/invalid/bad_spacing.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/invalid/bad_spacing.txt");
    concat_word_cont(test_cont,test_str);
    assert(strcmp(test_str,"{DOAFROM1TO50{FD40}}")==0);
    assert(!valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/invalid/missing_bracket.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/invalid/missing_bracket.txt");
    concat_word_cont(test_cont,test_str);
    assert(strcmp(test_str,"FD50LT30}")==0);
    assert(!valid_main(test_cont));
