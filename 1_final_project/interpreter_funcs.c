@@ -109,7 +109,8 @@ bool valid_number(word_cont* to_check)
    for(i=0;i<len;i++)
    {
       if(!isdigit(to_check->words[to_check->position][i])\
-         &&(to_check->words[to_check->position][i]!='.'))
+         &&(to_check->words[to_check->position][i]!='.')\
+         &&(to_check->words[to_check->position][i]!='-'))
       {
          return false;
       }
@@ -118,8 +119,7 @@ bool valid_number(word_cont* to_check)
 }
 
 
-bool run_main(word_cont* to_check,line_cont* line_arr,\
-            line* pending_line)
+bool run_main(word_cont* to_check,line_cont* line_arr)
 {
    if(to_check->position>=to_check->capacity)
    {
@@ -129,7 +129,7 @@ bool run_main(word_cont* to_check,line_cont* line_arr,\
    {
       to_check->position++;
 
-      if(run_instruction_list(to_check,line_arr,pending_line))
+      if(run_instruction_list(to_check,line_arr))
       {
          return true;
       }
@@ -139,8 +139,7 @@ bool run_main(word_cont* to_check,line_cont* line_arr,\
 
 
 
-bool run_instruction_list(word_cont* to_check,line_cont* line_arr,\
-                           line* pending_line)
+bool run_instruction_list(word_cont* to_check,line_cont* line_arr)
 {
    if(to_check->position>=to_check->capacity)
    {
@@ -155,9 +154,9 @@ bool run_instruction_list(word_cont* to_check,line_cont* line_arr,\
    }
    else
    {
-      if(run_instruction(to_check,line_arr,pending_line))
+      if(run_instruction(to_check,line_arr))
       {
-         if(run_instruction_list(to_check,line_arr,pending_line))
+         if(run_instruction_list(to_check,line_arr))
          {
             return true;
          }
@@ -172,8 +171,7 @@ bool run_instruction_list(word_cont* to_check,line_cont* line_arr,\
 /*potentially add pending line in to word_cont -
 as word cont deals with intermediate stages of instructions
 which is basically what pending line is*/
-bool run_instruction(word_cont* to_check,line_cont* line_arr,\
-                     line* pending_line)
+bool run_instruction(word_cont* to_check,line_cont* line_arr)
 {
    int init_pos;
    init_pos=to_check->position;
@@ -181,12 +179,12 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr,\
    {
       return false;
    }
-   if(get_rotation(to_check,pending_line))
+   if(get_rotation(to_check,line_arr))
    {
       return true;
    }
    to_check->position=init_pos;
-   if(move_forward(to_check,pending_line,line_arr))
+   if(move_forward(to_check,line_arr))
    {
       return true;
    }
@@ -196,7 +194,7 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr,\
       return true;
    }
    to_check->position=init_pos;
-   if(run_do(to_check,line_arr,pending_line))
+   if(run_do(to_check,line_arr))
    {
       return true;
    }
@@ -205,7 +203,7 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr,\
 
 
 
-bool get_rotation(word_cont* to_check,line* pending_line)
+bool get_rotation(word_cont* to_check,line_cont* line_arr)
 {
    double num;
    double temp;
@@ -219,14 +217,14 @@ bool get_rotation(word_cont* to_check,line* pending_line)
    {
       if(dir==left)
       {
-         temp=num+pending_line->rotation;
+         temp=num+line_arr->pending_line->rotation;
       }
       else
       {
-         temp= (DEGREES-num)+pending_line->rotation;
+         temp= (DEGREES-num)+line_arr->pending_line->rotation;
       }
       temp=fabs(fmod(temp,DEGREES));
-      pending_line->rotation=temp;
+      line_arr->pending_line->rotation=temp;
       return true;
    }
    return false;
@@ -263,8 +261,7 @@ line to the array so we dont have to deal with changing
 addresses or anything
 this is pretty much the meat and potatoes of the
 whole thing since lines only appear when you move forward*/
-bool move_forward(word_cont* to_check,line* pending_line,\
-                  line_cont* l_arr)
+bool move_forward(word_cont* to_check,line_cont* l_arr)
 {
    double num;
    double n_y;
@@ -275,20 +272,20 @@ bool move_forward(word_cont* to_check,line* pending_line,\
       to_check->position++;
       if(get_varnum(to_check,&num))
       {
-         n_y=pending_line->start->y +num;
-         end_coord=init_coords(pending_line->start->x,n_y);
+         n_y=l_arr->pending_line->start->y +num;
+         end_coord=init_coords(l_arr->pending_line->start->x,n_y);
          /*rotate returns true if sucessful even if it
          rotates by nothing*/
-         if(rotate(pending_line->rotation,\
-            end_coord,pending_line->start))
+         if(rotate(l_arr->pending_line->rotation,\
+            end_coord,l_arr->pending_line->start))
          {
-            finished_line=finish_line(pending_line,end_coord);
+            finished_line=finish_line(l_arr->pending_line,end_coord);
             store_line(l_arr,finished_line);
             /*reusing pending_line over and over by just
              changing its start point to the last lines
              end point*/
-            pending_line->start->x =finished_line->end->x;
-            pending_line->start->y =finished_line->end->y;
+            l_arr->pending_line->start->x =finished_line->end->x;
+            l_arr->pending_line->start->y =finished_line->end->y;
             return true;
          }
       }
@@ -325,6 +322,7 @@ line_cont* init_line_cont(void)
    l_arr->array=(line**)safe_calloc(INITSIZE,sizeof(line*));
    l_arr->capacity=INITSIZE;
    l_arr->size=0;
+   l_arr->pending_line=init_origin();
    return l_arr;
 }
 
@@ -338,6 +336,7 @@ bool free_line_cont(line_cont* to_free)
          free_line(to_free->array[i]);
       }
       free(to_free->array);
+      free_line(to_free->pending_line);
       free(to_free);
    }
    return true;
@@ -643,8 +642,7 @@ bool get_varnum(word_cont* to_check,double* num)
 }
 
 
-bool run_do(word_cont* to_check,line_cont* line_arr,\
-                           line* pending_line)
+bool run_do(word_cont* to_check,line_cont* line_arr)
 {
    int var_pos;
    int beg_loop;
@@ -661,7 +659,7 @@ bool run_do(word_cont* to_check,line_cont* line_arr,\
          }
          *to_check->var_array[var_pos]=i;
          to_check->position=beg_loop;
-         if(!run_instruction_list(to_check,line_arr,pending_line))
+         if(!run_instruction_list(to_check,line_arr))
          {
             return false;
          }
@@ -674,6 +672,7 @@ bool run_do(word_cont* to_check,line_cont* line_arr,\
    return false;
 }
 
+/*grabs info and checks validity*/
 bool do_helper(word_cont* to_check,int* var_pos,\
                double* start,double* end)
 {

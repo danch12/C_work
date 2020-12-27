@@ -2,8 +2,8 @@
 #define INTERPRETER_FUNCS_H
 
 #include "parser_funcs.h"
-#include "specific.h"
 
+#define MAXERRLEN 100
 #define PI 3.14159265359
 #define DEGTORAD 180
 #define DEGREES 360
@@ -45,6 +45,25 @@ typedef struct line_container
 }line_cont;
 
 
+/*we know that there is max 26 arguments
+so when we define the func we add a number
+into arg placer that tells us which var was
+used in that position eg if the first argument
+is a C we put a 2 in the first position of arg placer
+then when we run the function and an argument is used
+in the first position we can use the arg placer array
+to place the argument into the C spot in the var array
+and run the code from there*/
+typedef struct function_container
+{
+   int   arg_placer[NUMVARS];
+   double* var_array[NUMVARS];
+   char** words;
+   stack* stackptr;
+   int position;
+   int capacity;
+}func_cont;
+/*sss*/
 /*need to create new functions that do very similar things
 to parser stage but increment at different times - this is
 because we will use old parser functions to check for

@@ -8,9 +8,9 @@
 #include <ctype.h>
 #include <math.h>
 
-#include "general.h"
-#include "stack_funcs.h"
+#include "ADTS_and_general/general.h"
 
+#include "specific.h"
 #define NUMINSTRUCTIONS 3
 #define INSTRUCTLEN 3
 #define MAXLEN 1000
@@ -37,18 +37,18 @@ everything apart from the moves
 
  */
 
-
+/*
 typedef struct word_container
 {
    char** words;
    int position;
    int capacity;
 
-   /*below members are for interp stage*/
+
    stack* stackptr;
    double* var_array[NUMVARS];
    char err_message[MAXERRLEN];
-}word_cont;
+}word_cont;*/
 
 /*valid funcs return true if entry is valid*/
 bool valid_num(word_cont* to_check);
@@ -63,13 +63,11 @@ bool valid_polish(word_cont* to_check);
 bool valid_set(word_cont* to_check);
 bool valid_do(word_cont* to_check);
 
-
+/*
 FILE* get_file_words(char* filename,int* lines);
 word_cont* read_in_file(char* filename);
 bool free_word_cont(word_cont* to_free);
-/*used for testing
-bool concat_word_cont(word_cont* to_concat, char target[MAXLEN]);
-word_cont* init_word_cont(void);*/
+*/
 
 
 

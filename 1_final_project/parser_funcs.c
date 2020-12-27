@@ -1,43 +1,8 @@
 #include "parser_funcs.h"
 
 
-/*are we allowing negative numbers???*/
 
-/*pretty much just for testing so we dont
-deal with files until end*/
-/*word_cont* init_word_cont(void)
-{
-   word_cont* n_cont;
-   int i;
-   n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
-   n_cont->capacity=MAXTESTCAP;
-   n_cont->words= (char**)safe_calloc(MAXTESTCAP,sizeof(char*));
-   for(i=0;i<MAXTESTCAP;i++)
-   {
-      n_cont->words[i]=(char*)safe_calloc(MAXTESTLEN,sizeof(char));
-      n_cont->words[i][0]='\0';
-   }
-   n_cont->position=0;
-   return n_cont;
-}
-
-
-bool concat_word_cont(word_cont* to_concat, char target[MAXLEN])
-{
-   int i;
-   if(to_concat)
-   {
-      target[0]='\0';
-      for(i=0;i<to_concat->capacity;i++)
-      {
-         strcat(target,to_concat->words[i]);
-      }
-      return true;
-   }
-
-   return false;
-}*/
-
+/*
 bool free_word_cont(word_cont* to_free)
 {
    int i;
@@ -61,7 +26,7 @@ bool free_word_cont(word_cont* to_free)
 
    return true;
 }
-
+*/
 
 
 bool valid_num(word_cont* to_check)
@@ -81,7 +46,8 @@ bool valid_num(word_cont* to_check)
    for(i=0;i<len;i++)
    {
       if(!isdigit(to_check->words[to_check->position][i])\
-         &&(to_check->words[to_check->position][i]!='.'))
+         &&(to_check->words[to_check->position][i]!='.')\
+         &&(to_check->words[to_check->position][i]!='-'))
       {
          return false;
       }
@@ -351,7 +317,7 @@ bool valid_do(word_cont* to_check)
    return false;
 }
 
-
+/*
 word_cont* read_in_file(char* filename)
 {
    FILE* fp;
@@ -402,4 +368,4 @@ FILE* get_file_words(char* filename,int* lines)
    *lines=num_lines;
    rewind(fp);
    return fp;
-}
+}*/

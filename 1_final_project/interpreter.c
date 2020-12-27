@@ -1,5 +1,5 @@
 #include "interpreter_funcs.h"
-#include "neillsdl2.h"
+#include "../ADTS_and_general/neillsdl2.h"
 
 #define MIDWIDTH WWIDTH/2
 #define MIDHEIGHT WHEIGHT/2
@@ -13,7 +13,6 @@ void draw_lines(line_cont* l_arr);
 int main(int argc, char* argv[])
 {
    word_cont* w_cont;
-   line* start_line;
    line_cont* l_cont;
    if(argc!=2)
    {
@@ -23,11 +22,10 @@ int main(int argc, char* argv[])
    else
    {
       w_cont=read_in_file(argv[1]);
-      start_line=init_origin();
       l_cont=init_line_cont();
       if(w_cont)
       {
-         if(!run_main(w_cont,l_cont,start_line))
+         if(!run_main(w_cont,l_cont))
          {
             fprintf(stderr,"error in processing file around word %d %s\n",\
                   w_cont->position,w_cont->words[w_cont->position]);
@@ -41,7 +39,6 @@ int main(int argc, char* argv[])
       }
    }
 
-   free_line(start_line);
    free_line_cont(l_cont);
    free_word_cont(w_cont);
    return 0;

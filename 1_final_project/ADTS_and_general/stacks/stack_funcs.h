@@ -7,7 +7,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "general.h"
+#include "../general.h"
 
 #define MAXELELEN 50
 

@@ -1,0 +1,21 @@
+Thought it would be cool to create functions- going to start with ones that dont return anything then potentially turn to some that do. 
+
+Basic idea is that running a function should be almost the same as running the main code because the main code is pretty much a function in itself. 
+
+To be able to handle positional arguments because we know there's a max of 26 variables that could be arguments when we set the function we can record which position relates to which variable and then when running the function once you get everything set up its pretty much just running a instruction list.
+
+Used a hash map for holding the functions as wanted to use real identifiers for the function names - adds to clarity. Also since we have pretty much all the code made already from the last project it seemed like a good proof of concept to use a version of it. 
+
+Grammar for functions
+
+<SETFUNC> := "SETFUNC" <FUNCVAR> "{" <ARGS> "{" <INSTRUCTLIST>
+
+<ARGSSET> := <VAR><ARGSSET> | "}"
+
+<RUNFUNC> := <FUNCVAR> "{" <ARGCALL>
+
+<ARGCALL> := <VARNUM><ARGCALL> | "}"
+
+<FUNCVAR> := Σ n=50{a-z}
+
+For FUNCVAR it can be any combination of lowercase letters up to a length of 50, sorry I couldn't format it properly. Thought it would be a good idea to have them lowercase so they wouldn't interfere with any reserved words.
