@@ -1,6 +1,18 @@
 #include "hash_funcs.h"
 #define TESTCAP 15053
 
+#define INIT_SIZE_HASH 17
+#define INITLOWPRIME 13
+#define SCALEFACTOR 2
+#define PRIMESCALE 1.2
+#define NOKEY -1
+#define NOPRIME -1
+#define FAILSAFE 1
+#define START 2
+#define SDBM_ROLL_1 6
+#define SDBM_ROLL_2 16
+
+
 int _wrap_around(int max_num,int position);
 /*http://www.cse.yorku.ca/~oz/hash.html#djb2 sdbm*/
 unsigned int _first_hash(char* key,const assoc* a);
@@ -17,25 +29,19 @@ bool _double_hash(unsigned int step_size,unsigned int start_point,\
                   assoc* a, k_v_pair* kv);
 assoc* _assoc_resized(int n_cap,int old_cap);
 
-k_v_pair* _init_kv_pair(char* key, func_cont* data);
+k_v_pair* _init_kv_pair(char* key, void* data);
 assoc* _bigger_array(assoc* a);
 bool _same_key(const char* key1,const char* key2);
 int _sieve_of_e_helper(int new_cap_target);
 
 /*pretty much the reverse of _double_hash()*/
-func_cont* _assoc_lookup_helper(int step_size,int start_point,\
+void* _assoc_lookup_helper(int step_size,int start_point,\
                            const assoc* a,const char* key);
 /*frees structs but not kv pairs*/
 void _partial_free(assoc* a);
-void _free_func_cont(func_cont* to_free);
 
-func_cont* test_init_func_cont(int id)
-{
-   func_cont* n_func;
-   n_func=safe_calloc(1,sizeof(func_cont));
-   n_func->position=id;
-   return n_func;
-}
+
+
 
 
 void test(void)
@@ -50,7 +56,7 @@ void test(void)
    char word[50];
    char word2[50];
    char word_arr[500][50]={{'\0'}};
-   func_cont* test_fc;
+
 
    test_assoc=assoc_init();
    test_assoc->capacity=TESTCAP;
@@ -170,24 +176,24 @@ void test(void)
       }
    }
 
-   test_fc=test_init_func_cont(10);
+   i=10;
    test_assoc=assoc_init();
-   test_kv=_init_kv_pair(word,test_fc);
+   test_kv=_init_kv_pair(word,&i);
    assert(_insertion_helper(test_assoc,test_kv,0));
    assert(strcmp(word,test_assoc->arr[0]->key)==0);
-   assert(test_assoc->arr[0]->value->position==10);
+   assert(*(int*)test_assoc->arr[0]->value==10);
 
 
-   test_fc=test_init_func_cont(20);
-   test_kv=_init_kv_pair(word2,test_fc);
+   j=20;
+   test_kv=_init_kv_pair(word2,&j);
    assert(_double_hash(7,0,test_assoc,test_kv));
-   assert(test_assoc->arr[7]->value->position==20);
+   assert(*(int*)test_assoc->arr[7]->value==20);
 
 
-   test_fc=test_init_func_cont(30);
-   test_kv=_init_kv_pair(" ",test_fc);
+   count=30;
+   test_kv=_init_kv_pair(" ",&count);
    assert(_double_hash(7,0,test_assoc,test_kv));
-   assert(test_assoc->arr[14]->value->position==30);
+   assert(*(int*)test_assoc->arr[14]->value==30);
 
    assoc_free(test_assoc);
 
@@ -240,9 +246,9 @@ void test(void)
 
    for(i=0;i<15;i++)
    {
-      test_fc=test_init_func_cont(i);
+      test_hashes[i]=i;
       strcpy(word_arr[i],word);
-      test_kv=_init_kv_pair(word_arr[i],test_fc);
+      test_kv=_init_kv_pair(word_arr[i],&test_hashes[i]);
       assert(_insertion(test_assoc,test_kv));
       strcat(word,"a");
 
@@ -284,9 +290,9 @@ void test(void)
       strcpy(word_arr[i],word);
 
       assert(assoc_count(test_assoc)==(unsigned int)i);
-      test_fc=test_init_func_cont(i);
-      assoc_insert(&test_assoc, word_arr[i],test_fc);
-      assert(assoc_lookup(test_assoc,word_arr[i])->position==i);
+      test_hashes[i]=i;
+      assoc_insert(&test_assoc, word_arr[i],&test_hashes[i]);
+      assert(*(int*)assoc_lookup(test_assoc,word_arr[i])==i);
 
 
    }
@@ -345,14 +351,7 @@ void assoc_free(assoc* a)
       {
          if(a->arr[i])
          {
-            if(a->arr[i]->value)
-            {
-               /*we can do this as we will always
-               create a new func container for each function
-               so dont worry about freeing already freed stuff*/
-               _free_func_cont(a->arr[i]->value);
 
-            }
             free(a->arr[i]);
          }
       }
@@ -363,7 +362,7 @@ void assoc_free(assoc* a)
 
 
 
-
+/*
 void _free_func_cont(func_cont* to_free)
 {
    int i;
@@ -395,7 +394,7 @@ void _free_func_cont(func_cont* to_free)
    }
 
 }
-
+*/
 
 
 
@@ -548,7 +547,7 @@ bool _double_hash(unsigned int step_size,unsigned int start_point, \
    return false;
 }
 
-k_v_pair* _init_kv_pair(char* key, func_cont* data)
+k_v_pair* _init_kv_pair(char* key, void* data)
 {
 
    k_v_pair* n_kv;
@@ -593,7 +592,7 @@ assoc* _resize(assoc* a)
 }
 
 
-void assoc_insert(assoc** a, char* key, func_cont* data)
+void assoc_insert(assoc** a, char* key, void* data)
 {
    assoc* a_ref;
    k_v_pair* kv;
@@ -694,7 +693,7 @@ int _sieve_of_e_helper(int new_cap_target)
 }
 
 
-func_cont* assoc_lookup(assoc* a, char* key)
+void* assoc_lookup(assoc* a, char* key)
 {
    unsigned int hash_1, hash_2;
 
@@ -719,7 +718,7 @@ func_cont* assoc_lookup(assoc* a, char* key)
 }
 
 /*pretty much the reverse of _double_hash()*/
-func_cont* _assoc_lookup_helper(int step_size,int start_point,\
+void* _assoc_lookup_helper(int step_size,int start_point,\
                            const assoc* a,const char* key)
 {
    int i,ind;

@@ -1,8 +1,8 @@
 #ifndef INTERPRETER_FUNCS_H
 #define INTERPRETER_FUNCS_H
-
-#include "parser_funcs.h"
 #include "specific.h"
+#include "parser_funcs.h"
+
 
 #define PI 3.14159265359
 #define DEGTORAD 180

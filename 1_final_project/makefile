@@ -7,42 +7,58 @@ LIDLIBS = -lm
 CC =/usr/local/bin/gcc-10
 INCPARSE = -Iparse
 INCINTERP = -Iinterpreter
+INCEXTEN = -Iexten
 
-test_parser_fast: parser_funcs.h parser_tests.c parser_funcs.c parse/specific.h parse/specific.c ADTS_and_general/general.c ADTS_and_general/general.h
-	$(CC) parser_funcs.c parser_tests.c parse/specific.c ADTS_and_general/general.c  -o parser_test_fast $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
+GENERALFULL = ADTS_and_general/general.c ADTS_and_general/general.h
+GENERALRUN = ADTS_and_general/general.c
+STACKSFULL = ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/stacks/stack_funcs.h
+STACKSRUN = ADTS_and_general/stacks/stack_funcs.c
+HASHFULL = ADTS_and_general/hash_map/hash_funcs.c ADTS_and_general/hash_map/hash_funcs.h
+HASHRUN = ADTS_and_general/hash_map/hash_funcs.c
+INTERPFULL = interpreter_funcs.c  interpreter_funcs.h
+INTERPRUN = interpreter_funcs.c
+PARSEFULL = parser_funcs.c parser_funcs.h
+PARSERUN = parser_funcs.c
 
-test_parser_san: parser_funcs.h parser_tests.c parser_funcs.c parse/specific.h parse/specific.c ADTS_and_general/general.c ADTS_and_general/general.h
-	$(CC) parser_funcs.c parser_tests.c parse/specific.c ADTS_and_general/general.c  -o parser_test_san $(CFLAGSSAN) $(INCPARSE) $(LIDLIBS)
+test_parser_fast:  parser_tests.c $(PARSEFULL) parse/specific.h parse/specific.c $(GENERALFULL)
+	$(CC) $(PARSERUN) parser_tests.c parse/specific.c $(GENERALRUN)  -o parser_test_fast $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
 
-test_stacks_fast: ADTS_and_general/stacks/stack_tests.c ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/stacks/stack_funcs.h ADTS_and_general/general.c  ADTS_and_general/general.h
-	$(CC) ADTS_and_general/stacks/stack_tests.c ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/general.c  -o test_stacks_fast $(CFLAGSFAST) $(LIDLIBS)
+test_parser_san: parser_tests.c $(PARSEFULL) parse/specific.h parse/specific.c $(GENERALFULL)
+	$(CC) $(PARSERUN) parser_tests.c parse/specific.c $(GENERALRUN)  -o parser_test_san $(CFLAGSSAN) $(INCPARSE) $(LIDLIBS)
 
-test_stacks_san: ADTS_and_general/stacks/stack_tests.c ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/stacks/stack_funcs.h ADTS_and_general/general.c  ADTS_and_general/general.h
-	 $(CC) ADTS_and_general/stacks/stack_tests.c ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/general.c -o test_stacks_san $(CFLAGSSAN) $(LIDLIBS)
+test_stacks_fast: ADTS_and_general/stacks/stack_tests.c $(STACKSFULL) $(GENERALFULL)
+	$(CC) ADTS_and_general/stacks/stack_tests.c $(STACKSRUN) $(GENERALRUN)  -o test_stacks_fast $(CFLAGSFAST) $(LIDLIBS)
 
-hash_map_fast: ADTS_and_general/hash_map/hash_map_tests.c ADTS_and_general/hash_map/hash_funcs.c ADTS_and_general/hash_map/hash_funcs.h extension.h parser_funcs.c parser_funcs.h ADTS_and_general/general.c ADTS_and_general/general.h ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/stacks/stack_funcs.h interpreter/specific.c interpreter/specific.h
-	$(CC) ADTS_and_general/hash_map/hash_map_tests.c ADTS_and_general/hash_map/hash_funcs.c parser_funcs.c ADTS_and_general/general.c ADTS_and_general/stacks/stack_funcs.c interpreter/specific.c -o hash_map_fast $(CFLAGSFAST) $(INCINTERP) $(LIDLIBS)
+test_stacks_san: ADTS_and_general/stacks/stack_tests.c $(STACKSFULL) $(GENERALFULL)
+	 $(CC) ADTS_and_general/stacks/stack_tests.c $(STACKSRUN) $(GENERALRUN) -o test_stacks_san $(CFLAGSSAN) $(LIDLIBS)
 
-hash_map_san: ADTS_and_general/hash_map/hash_map_tests.c ADTS_and_general/hash_map/hash_funcs.c ADTS_and_general/hash_map/hash_funcs.h extension.h parser_funcs.c parser_funcs.h ADTS_and_general/general.c ADTS_and_general/general.h ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/stacks/stack_funcs.h interpreter/specific.c interpreter/specific.h
-	$(CC) ADTS_and_general/hash_map/hash_map_tests.c ADTS_and_general/hash_map/hash_funcs.c parser_funcs.c ADTS_and_general/general.c ADTS_and_general/stacks/stack_funcs.c interpreter/specific.c -o hash_map_san $(CFLAGSSAN) $(INCINTERP) $(LIDLIBS)
+hash_map_fast: ADTS_and_general/hash_map/hash_map_tests.c $(HASHFULL) $(GENERALFULL)
+	$(CC) ADTS_and_general/hash_map/hash_map_tests.c $(HASHRUN) $(GENERALRUN) -o hash_map_fast $(CFLAGSFAST) $(LIDLIBS)
 
-parser_san: parser.c parser_funcs.c parser_funcs.h ADTS_and_general/general.c ADTS_and_general/general.h ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/stacks/stack_funcs.h parse/specific.h parse/specific.c
-	$(CC) parser.c parser_funcs.c ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/general.c parse/specific.c  -o parser_san $(CFLAGSSAN) $(INCPARSE) $(LIDLIBS)
+hash_map_san: ADTS_and_general/hash_map/hash_map_tests.c $(HASHFULL) $(GENERALFULL)
+	$(CC) ADTS_and_general/hash_map/hash_map_tests.c $(HASHRUN) $(GENERALRUN) -o hash_map_san $(CFLAGSSAN) $(LIDLIBS)
 
-parser_fast: parser.c parser_funcs.c parser_funcs.h ADTS_and_general/general.c ADTS_and_general/general.h ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/stacks/stack_funcs.h parse/specific.h parse/specific.c
-	$(CC) parser.c parser_funcs.c ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/general.c parse/specific.c  -o parser_fast $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
+parser_san: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
+	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser_san $(CFLAGSSAN) $(INCPARSE) $(LIDLIBS)
 
-
-test_interp_san : interpreter_tests.c interpreter_funcs.c interpreter/specific.c interpreter/specific.h interpreter_funcs.h parser_funcs.c parser_funcs.h ADTS_and_general/general.c ADTS_and_general/general.h ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/stacks/stack_funcs.h
-	$(CC) interpreter_tests.c interpreter_funcs.c interpreter/specific.c parser_funcs.c ADTS_and_general/general.c ADTS_and_general/stacks/stack_funcs.c  -o test_interp_san $(CFLAGSSAN) $(INCINTERP) $(LIDLIBS)
-
-test_interp_fast : interpreter_tests.c interpreter_funcs.c interpreter/specific.c interpreter/specific.h interpreter_funcs.h parser_funcs.c parser_funcs.h ADTS_and_general/general.c ADTS_and_general/general.h ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/stacks/stack_funcs.h
-	$(CC) interpreter_tests.c interpreter_funcs.c interpreter/specific.c parser_funcs.c ADTS_and_general/general.c ADTS_and_general/stacks/stack_funcs.c  -o test_interp_fast $(CFLAGSFAST) $(INCINTERP) $(LIDLIBS)
+parser_fast: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
+	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser_fast $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
 
 
+test_interp_san : interpreter_tests.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL)
+	$(CC) interpreter_tests.c interpreter/specific.c  $(PARSERUN) $(INTERPRUN) $(STACKSRUN) $(GENERALRUN) -o test_interp_san $(CFLAGSSAN) $(INCINTERP) $(LIDLIBS)
 
-interp: interpreter.c parser_funcs.c parser_funcs.h interpreter_funcs.c interpreter_funcs.h interpreter/specific.c interpreter/specific.h  ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h  ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/stacks/stack_funcs.h ADTS_and_general/general.c ADTS_and_general/general.h
-	$(CC) interpreter.c parser_funcs.c interpreter_funcs.c interpreter/specific.c   ADTS_and_general/neillsdl2.c ADTS_and_general/stacks/stack_funcs.c  ADTS_and_general/general.c  -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
+test_interp_fast : interpreter_tests.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL)
+	$(CC) interpreter_tests.c interpreter/specific.c  $(PARSERUN) $(INTERPRUN) $(STACKSRUN) $(GENERALRUN)  -o test_interp_fast $(CFLAGSFAST) $(INCINTERP) $(LIDLIBS)
+
+
+
+interp: interpreter.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h  ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h  $(STACKSFULL) $(GENERALFULL)
+	$(CC) interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
+
+extension: extension.c extension.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
+	$(CC) extension.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o extension $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
+
 
 
 

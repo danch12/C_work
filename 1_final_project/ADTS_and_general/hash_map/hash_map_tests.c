@@ -6,7 +6,7 @@
 /*assigns a int to position member for easy
 testing without having to worry about properly
 creating function holder */
-func_cont* test_init_func_c(int id);
+
 
 
 /* Make a copy, reversed */
@@ -15,26 +15,27 @@ char* strduprev(char* str);
 int main(void)
 {
    static char strs[WORDS][50]={{0}};
+   static int i[WORDS];
    char target[50];
    FILE *fp;
    char* tstr;
-   func_cont *p;
+
    unsigned int lngst;
    unsigned int j;
    assoc* a;
-   func_cont* test_cont;
+   void* p;
 
    a = assoc_init();
    fp = safe_fopen("eng_370k_shuffle.txt");
    for(j=0; j<WORDS; j++){
      assert(assoc_count(a)==j);
-
-     test_cont=test_init_func_c(j);
-     if(fscanf(fp, "%s", strs[j])!=1){
+      i[j] = j;
+     if(fscanf(fp, "%s", strs[j])!=1)
+     { 
         fprintf(stderr,"Failed to scan in a word?");
         exit(EXIT_FAILURE);
      }
-     assoc_insert(&a, strs[j], test_cont);
+     assoc_insert(&a, strs[j], &i[j]);
    }
    fclose(fp);
 
@@ -43,14 +44,18 @@ int main(void)
      correctly when reversed, but is not a palindrome ?
    */
    lngst = 0;
-   for(j=0; j<WORDS; j++){
+   for(j=0; j<WORDS; j++)
+   {
      /* Longest */
-     if(strlen(strs[j]) > lngst){
+     if(strlen(strs[j]) > lngst)
+     {
         tstr = strduprev(strs[j]);
         /* Not a palindrome */
-        if(strcmp(tstr, strs[j])){
+        if(strcmp(tstr, strs[j]))
+        {
            /* Spelled correctly */
-           if((p = assoc_lookup(a, tstr))!=NULL){
+           if((p = assoc_lookup(a, tstr))!=NULL)
+           {
               lngst = strlen(tstr);
               sprintf(target,"%s", tstr);
            }
@@ -65,14 +70,7 @@ int main(void)
 }
 
 
-/*for testing */
-func_cont* test_init_func_c(int id)
-{
-   func_cont* n_func;
-   n_func=safe_calloc(1,sizeof(func_cont));
-   n_func->position=id;
-   return n_func;
-}
+
 
 
 /* Make a copy, reversed */

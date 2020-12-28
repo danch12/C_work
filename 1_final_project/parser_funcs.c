@@ -2,31 +2,6 @@
 
 
 
-/*
-bool free_word_cont(word_cont* to_free)
-{
-   int i;
-   if(to_free)
-   {
-      for(i=0;i<to_free->capacity;i++)
-      {
-         free(to_free->words[i]);
-      }
-      for(i=0;i<NUMVARS;i++)
-      {
-         if(to_free->var_array[i])
-         {
-            free(to_free->var_array[i]);
-         }
-      }
-      free(to_free->words);
-      stack_free(to_free->stackptr);
-      free(to_free);
-   }
-
-   return true;
-}
-*/
 
 
 bool valid_num(word_cont* to_check)
