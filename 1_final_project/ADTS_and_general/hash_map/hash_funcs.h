@@ -10,18 +10,6 @@
 #include "../general.h"
 
 
-/*
-#define INIT_SIZE_HASH 17
-#define INITLOWPRIME 13
-#define SCALEFACTOR 2
-#define PRIMESCALE 1.2
-#define NOKEY -1
-#define NOPRIME -1
-#define FAILSAFE 1
-#define START 2
-#define SDBM_ROLL_1 6
-#define SDBM_ROLL_2 16*/
-
 
 /*make value void so we dont have to have a cascade
 of includes that rely on one another */

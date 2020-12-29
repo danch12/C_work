@@ -12,7 +12,6 @@
 
 #include "specific.h"
 #define NUMINSTRUCTIONS 3
-#define INSTRUCTLEN 3
 #define MAXLEN 1000
 #define MAXERRLEN 100
 #define NUMVARS 26
@@ -34,25 +33,12 @@ a output control so will keep separate-
 we can see word_container as holding all the
 intermediate stages of instructions - basically
 everything apart from the moves
+*/
 
- */
-
-/*
-typedef struct word_container
-{
-   char** words;
-   int position;
-   int capacity;
-
-
-   stack* stackptr;
-   double* var_array[NUMVARS];
-   char err_message[MAXERRLEN];
-}word_cont;*/
 
 /*valid funcs return true if entry is valid*/
 bool valid_num(word_cont* to_check);
-bool valid_instruct(word_cont* to_check);
+
 bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN]);
 bool valid_instructlist(word_cont* to_check);
 bool valid_main(word_cont* to_check);

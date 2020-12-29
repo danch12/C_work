@@ -12,7 +12,7 @@ Used a hash map for holding the functions as wanted to use real identifiers for 
 
 Grammar for functions
 
-<SETFUNC> := "SETFUNC" <FUNCVAR> "{" <ARGSSET> "{" <MAIN>
+<SETFUNC> := "SETFUNC" <FUNCVAR> "{" <ARGSSET> "{" <INSTRUCTLIST>
 
 <ARGSSET> := <VAR><ARGSSET> | "}"
 

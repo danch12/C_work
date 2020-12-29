@@ -12,11 +12,18 @@
 #define MAXLEN 1000
 #define NUMVARS 26
 #define MAXERRLEN 100
+#define INSTRUCTLEN 3
+#define NUMINSTRUCTIONS 3
 
 
-
+/*started off by making a struct that specifically holds
+functions - but makes more sense to just add that
+functionality to word_container so we dont have to redo
+every function so it allows function containers*/
 typedef struct word_container
 {
+   int arg_placer[NUMVARS];
+   int n_args;
    char** words;
    int position;
    int capacity;
@@ -26,6 +33,31 @@ typedef struct word_container
    assoc* func_map;
 }word_cont;
 
+typedef struct coord
+{
+   double x;
+   double y;
+}coord;
+
+typedef struct line
+{
+   coord* start;
+   /*going to be a running total
+   take abs(num%360) */
+   double rotation;
+   coord* end;
+}line;
+
+
+typedef struct line_container
+{
+   line* pending_line;
+   line** array;
+   int size;
+   int capacity;
+}line_cont;
+
+/*
 typedef struct function_container
 {
 
@@ -38,9 +70,11 @@ typedef struct function_container
    int capacity;
    assoc* func_map;
 }func_cont;
-
+*/
 
 FILE* get_file_words(char* filename,int* lines);
 word_cont* read_in_file(char* filename);
 bool free_word_cont(word_cont* to_free);
+bool run_instruction(word_cont* to_check,line_cont* line_arr);
+bool valid_instruct(word_cont* to_check);
 #endif

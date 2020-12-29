@@ -20,29 +20,6 @@ typedef enum op {plus, minus,mult,divide,invalid_op} op;
 
 
 
-typedef struct coord
-{
-   double x;
-   double y;
-}coord;
-
-typedef struct line
-{
-   coord* start;
-   /*going to be a running total
-   take abs(num%360) */
-   double rotation;
-   coord* end;
-}line;
-
-
-typedef struct line_container
-{
-   line* pending_line;
-   line** array;
-   int size;
-   int capacity;
-}line_cont;
 
 
 /*need to create new functions that do very similar things

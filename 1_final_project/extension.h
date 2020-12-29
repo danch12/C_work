@@ -11,8 +11,8 @@
 #define INITFUNCCAP 20
 #define FUNCSCALE 2
 #define UNUSED -1
-
-
+#define START 0
+#define START_BRACKET 1
 /*we know that there is max 26 arguments
 so when we define the func we add a number
 into arg placer that tells us which var was
@@ -27,17 +27,7 @@ https://tenthousandmeters.com/blog/python-behind-the-scenes-1-how-the-cpython-vm
 had a look at this for a bit of inspiration but definitely
 nowhere near as advanced
 
-typedef struct function_container
-{
-
-   int   arg_placer[NUMVARS];
-   double* var_array[NUMVARS];
-   char** words;
-   stack* stackptr;
-   int position;
-   int capacity;
-   assoc* func_map;
-}func_cont;*/
+*/
 
 
 

@@ -7,21 +7,27 @@
 bool set_funcvar(word_cont* to_check,char func_name[MAXFUNCLEN]);
 bool valid_funcvar(word_cont* to_check);
 
-bool get_argset(word_cont* to_check,func_cont* n_func);
-bool get_arg(word_cont* to_check,func_cont* n_func);
-bool get_func_info(word_cont* to_check,func_cont* n_func);
+bool valid_argset(word_cont* to_check);
+bool get_argset(word_cont* to_check,word_cont* n_func);
+bool get_arg(word_cont* to_check,word_cont* n_func);
+bool get_func_info(word_cont* to_check,word_cont* n_func);
+bool valid_funcset(word_cont* to_check);
 bool run_funcset(word_cont* to_check);
+bool copy_over(word_cont* to_check,word_cont* n_func);
 
-bool get_funcvar(word_cont* to_check,func_cont** to_get);
-bool place_arg(word_cont* to_check,func_cont* n_func,\
+bool get_funcvar(word_cont* to_check,word_cont** to_get);
+bool place_arg(word_cont* to_check,word_cont* n_func,\
                int position);
-bool place_all_args(word_cont* to_check,func_cont* n_func,int pos);
+bool place_all_args(word_cont* to_check,word_cont* n_func,int pos);
+void reset_func(word_cont* func);
+bool valid_argsrun(word_cont* to_check);
+bool valid_funcrun(word_cont* to_check);
+bool run_funcrun(word_cont* to_check,line_cont* line_arr);
 
-
-func_cont* init_func_cont(void);
-bool free_func_cont(func_cont* to_free);
+word_cont* init_func_cont(void);
+bool free_word_cont(word_cont* to_free);
 word_cont* init_word_cont(void);
-void resize(func_cont* n_func);
+void resize(word_cont* n_func);
 
 
 bool compare_doubles(double d_1, double d_2);
@@ -30,10 +36,10 @@ void test(void);
 int main(void)
 {
    word_cont* test_cont;
-   func_cont* test_func;
+   word_cont* test_func;
    int i;
    char word[MAXTESTLEN];
-
+   line_cont* test_line_cont;
 
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"aaabbbccc");
@@ -77,7 +83,7 @@ int main(void)
    test_cont->position=0;
    assert(!get_arg(test_cont,test_func));
    assert(strcmp(test_cont->err_message,"used same var twice when defining function")==0);
-   free_func_cont(test_func);
+   free_word_cont(test_func);
 
    test_func=init_func_cont();
    strcpy(test_cont->words[0],"Z");
@@ -105,7 +111,7 @@ int main(void)
    strcpy(test_cont->words[0],"AA");
    assert(!get_arg(test_cont,test_func));
 
-   free_func_cont(test_func);
+   free_word_cont(test_func);
    free_word_cont(test_cont);
 
    test_func=init_func_cont();
@@ -115,40 +121,47 @@ int main(void)
    strcpy(test_cont->words[1],"B");
    strcpy(test_cont->words[2],"C");
    strcpy(test_cont->words[3],"}");
-
+   assert(valid_argset(test_cont));
+   test_cont->position=0;
    assert(get_argset(test_cont,test_func));
    assert(test_func->arg_placer[0]==0);
    assert(test_func->arg_placer[1]==1);
    assert(test_func->arg_placer[2]==2);
    assert(test_cont->position==4);
 
-   free_func_cont(test_func);
+   free_word_cont(test_func);
    test_func=init_func_cont();
 
    test_cont->position=0;
    strcpy(test_cont->words[3],"D");
+   assert(!valid_argset(test_cont));
+   test_cont->position=0;
    assert(!get_argset(test_cont,test_func));
 
 
-   free_func_cont(test_func);
+   free_word_cont(test_func);
    test_func=init_func_cont();
 
    test_cont->position=0;
    strcpy(test_cont->words[2],"B");
    strcpy(test_cont->words[3],"}");
+   assert(valid_argset(test_cont));
+   test_cont->position=0;
    assert(!get_argset(test_cont,test_func));
    assert(strcmp(test_cont->err_message,"used same var twice when defining function")==0);
 
    test_cont->position=0;
-   free_func_cont(test_func);
+   free_word_cont(test_func);
    test_func=init_func_cont();
    strcpy(test_cont->words[0],"A");
    strcpy(test_cont->words[1],"DD");
    strcpy(test_cont->words[2],"C");
    strcpy(test_cont->words[3],"}");
+   assert(!valid_argset(test_cont));
+   test_cont->position=0;
    assert(!get_argset(test_cont,test_func));
 
-   free_func_cont(test_func);
+   free_word_cont(test_func);
 
    test_func=init_func_cont();
    test_func->words[0]=safe_calloc(10,1);
@@ -160,7 +173,7 @@ int main(void)
    resize(test_func);
    assert(strcmp(test_func->words[0],"hello")==0);
    assert(strcmp(test_func->words[2],"goodbye")==0);
-   free_func_cont(test_func);
+   free_word_cont(test_func);
    free_word_cont(test_cont);
 
    test_func=init_func_cont();
@@ -178,7 +191,7 @@ int main(void)
    assert(test_func->position==0);
    assert(test_cont->position==5);
 
-   free_func_cont(test_func);
+   free_word_cont(test_func);
    free_word_cont(test_cont);
 
 
@@ -208,7 +221,7 @@ int main(void)
    strcpy(test_cont->words[3],"30");
    strcpy(test_cont->words[4],"}");
    assert(get_func_info(test_cont,test_func));
-   free_func_cont(test_func);
+   free_word_cont(test_func);
    free_word_cont(test_cont);
 
    test_func=init_func_cont();
@@ -219,7 +232,7 @@ int main(void)
    strcpy(test_cont->words[3],"30");
    strcpy(test_cont->words[4],"}");
    assert(get_func_info(test_cont,test_func));
-   free_func_cont(test_func);
+   free_word_cont(test_func);
    free_word_cont(test_cont);
 
 
@@ -285,20 +298,28 @@ int main(void)
    strcpy(test_cont->words[6],"FD");
    strcpy(test_cont->words[7],"A");
    strcpy(test_cont->words[8],"}");
+   assert(!valid_funcset(test_cont));
+   test_cont->position=0;
    assert(!run_funcset(test_cont));
 
    strcpy(test_cont->words[1],"");
+   test_cont->position=0;
+   assert(!valid_funcset(test_cont));
    test_cont->position=0;
    assert(!run_funcset(test_cont));
 
    test_cont->position=0;
    strcpy(test_cont->words[1],"abc");
    strcpy(test_cont->words[3],"a");
+   assert(!valid_funcset(test_cont));
+   test_cont->position=0;
    assert(!run_funcset(test_cont));
 
    test_cont->position=0;
    strcpy(test_cont->words[3],"A");
    strcpy(test_cont->words[7],"dnjdbjfnekdddd");
+   assert(!valid_funcset(test_cont));
+   test_cont->position=0;
    assert(!run_funcset(test_cont));
 
    free_word_cont(test_cont);
@@ -535,6 +556,8 @@ int main(void)
    strcpy(test_cont->words[5],"}");
    strcpy(test_cont->words[6],"abc");
    strcpy(test_cont->words[7],"21");
+   assert(valid_funcset(test_cont));
+   test_cont->position=0;
    assert(run_funcset(test_cont));
    assert(get_funcvar(test_cont,&test_func));
    assert(!place_arg(test_cont,test_func,0));
@@ -562,6 +585,33 @@ int main(void)
    assert(compare_doubles(*test_func->var_array[0],90.5));
    free_word_cont(test_cont);
 
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   strcpy(test_cont->words[4],";");
+   strcpy(test_cont->words[5],"SETFUNC");
+   strcpy(test_cont->words[6],"abc");
+   strcpy(test_cont->words[7],"{");
+   strcpy(test_cont->words[8],"A");
+   strcpy(test_cont->words[9],"}");
+   strcpy(test_cont->words[10],"{");
+   strcpy(test_cont->words[11],"}");
+   strcpy(test_cont->words[12],"abc");
+   strcpy(test_cont->words[13],"Z");
+   strcpy(test_cont->words[14],"}");
+   assert(run_set(test_cont));
+   assert(valid_funcset(test_cont));
+   test_cont->position=5;
+   assert(run_funcset(test_cont));
+   assert(get_funcvar(test_cont,&test_func));
+   assert(valid_argsrun(test_cont));
+   test_cont->position=13;
+   assert(place_all_args(test_cont,test_func,0));
+   assert(compare_doubles(*test_func->var_array[0],90.5));
+   free_word_cont(test_cont);
+
 
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"SETFUNC");
@@ -576,8 +626,12 @@ int main(void)
    strcpy(test_cont->words[9],"-30");
    strcpy(test_cont->words[10],"3.78");
    strcpy(test_cont->words[11],"}");
+   assert(valid_funcset(test_cont));
+   test_cont->position=0;
    assert(run_funcset(test_cont));
    assert(get_funcvar(test_cont,&test_func));
+   assert(valid_argsrun(test_cont));
+   test_cont->position=9;
    assert(place_all_args(test_cont,test_func,0));
    assert(compare_doubles(*test_func->var_array[0],-30));
    assert(compare_doubles(*test_func->var_array[25],3.78));
@@ -594,8 +648,12 @@ int main(void)
    strcpy(test_cont->words[7],"abc");
    strcpy(test_cont->words[8],"-30");
    strcpy(test_cont->words[9],"}");
+   assert(valid_funcset(test_cont));
+   test_cont->position=0;
    assert(run_funcset(test_cont));
    assert(get_funcvar(test_cont,&test_func));
+   assert(valid_argsrun(test_cont));
+   test_cont->position=8;
    assert(place_all_args(test_cont,test_func,0));
    assert(compare_doubles(*test_func->var_array[0],-30));
    free_word_cont(test_cont);
@@ -612,8 +670,12 @@ int main(void)
    strcpy(test_cont->words[8],"-30");
    strcpy(test_cont->words[9],"3.78");
    strcpy(test_cont->words[10],"}");
+   assert(valid_funcset(test_cont));
+   test_cont->position=0;
    assert(run_funcset(test_cont));
    assert(get_funcvar(test_cont,&test_func));
+   assert(valid_argsrun(test_cont));
+   test_cont->position=8;
    assert(!place_all_args(test_cont,test_func,0));
    free_word_cont(test_cont);
 
@@ -627,13 +689,527 @@ int main(void)
    strcpy(test_cont->words[6],"{");
    strcpy(test_cont->words[7],"}");
    strcpy(test_cont->words[8],"abc");
-   strcpy(test_cont->words[9],"-30");   
+   strcpy(test_cont->words[9],"-30");
    strcpy(test_cont->words[10],"}");
+   assert(valid_funcset(test_cont));
+   test_cont->position=0;
    assert(run_funcset(test_cont));
    assert(get_funcvar(test_cont,&test_func));
+   assert(valid_argsrun(test_cont));
+   test_cont->position=9;
    assert(!place_all_args(test_cont,test_func,0));
    free_word_cont(test_cont);
 
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"abc");
+   strcpy(test_cont->words[8],"A");
+   strcpy(test_cont->words[9],"}");
+   assert(valid_funcset(test_cont));
+   test_cont->position=0;
+   assert(run_funcset(test_cont));
+   assert(get_funcvar(test_cont,&test_func));
+   assert(valid_argsrun(test_cont));
+   test_cont->position=8;
+   assert(!place_all_args(test_cont,test_func,0));
+   free_word_cont(test_cont);
+
+
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"abc");
+   strcpy(test_cont->words[8],"");
+   strcpy(test_cont->words[9],"}");
+   assert(run_funcset(test_cont));
+   assert(get_funcvar(test_cont,&test_func));
+   assert(!valid_argsrun(test_cont));
+   test_cont->position=8;
+   assert(!place_all_args(test_cont,test_func,0));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"abc");
+   strcpy(test_cont->words[8],"1");
+   strcpy(test_cont->words[9],"");
+   assert(run_funcset(test_cont));
+   assert(get_funcvar(test_cont,&test_func));
+   assert(!valid_argsrun(test_cont));
+   test_cont->position=8;
+   assert(!place_all_args(test_cont,test_func,0));
+   free_word_cont(test_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"abc");
+   strcpy(test_cont->words[8],"{");
+   strcpy(test_cont->words[9],"10");
+   strcpy(test_cont->words[10],"}");
+   assert(run_funcset(test_cont));
+
+   assert(valid_funcrun(test_cont));
+   test_cont->position=7;
+   assert(run_funcrun(test_cont,test_line_cont));
+   assert(test_cont->position==11);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"abc");
+   strcpy(test_cont->words[8],"{");
+   strcpy(test_cont->words[9],"ddddddd");
+   strcpy(test_cont->words[10],"}");
+   assert(run_funcset(test_cont));
+   assert(!valid_funcrun(test_cont));
+   test_cont->position=7;
+   assert(!run_funcrun(test_cont,test_line_cont));
+
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"LT");
+   strcpy(test_cont->words[7],"A");
+   strcpy(test_cont->words[8],"FD");
+   strcpy(test_cont->words[9],"A");
+   strcpy(test_cont->words[10],"}");
+
+   strcpy(test_cont->words[11],"abc");
+   strcpy(test_cont->words[12],"{");
+   strcpy(test_cont->words[13],"90");
+   strcpy(test_cont->words[14],"}");
+   strcpy(test_cont->words[15],"abc");
+   strcpy(test_cont->words[16],"{");
+   strcpy(test_cont->words[17],"90");
+   strcpy(test_cont->words[18],"}");
+   assert(run_funcset(test_cont));
+   assert(run_funcrun(test_cont,test_line_cont));
+   assert(test_cont->position==15);
+   assert(run_funcrun(test_cont,test_line_cont));
+   assert(test_line_cont->size==2);
+   assert(compare_doubles(test_line_cont->array[0]->end->x,-90));
+   assert(compare_doubles(test_line_cont->array[0]->end->y,0));
+   assert(compare_doubles(test_line_cont->array[1]->end->x,-90));
+   assert(compare_doubles(test_line_cont->array[1]->end->y,-90));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"abc");
+   strcpy(test_cont->words[8],"{");
+   strcpy(test_cont->words[9],"");
+   strcpy(test_cont->words[10],"}");
+   assert(run_funcset(test_cont));
+   assert(!run_funcrun(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"abc");
+   strcpy(test_cont->words[8],"");
+   strcpy(test_cont->words[9],"{");
+   strcpy(test_cont->words[10],"90");
+   strcpy(test_cont->words[11],"}");
+   assert(run_funcset(test_cont));
+   assert(!run_funcrun(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"bca");
+   strcpy(test_cont->words[8],"{");
+   strcpy(test_cont->words[9],"90");
+   strcpy(test_cont->words[10],"}");
+
+   assert(run_funcset(test_cont));
+   assert(valid_funcrun(test_cont));
+   test_cont->position=7;
+   assert(!run_funcrun(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"abc");
+   strcpy(test_cont->words[8],"{");
+   strcpy(test_cont->words[9],"}");
+
+   assert(run_funcset(test_cont));
+   assert(valid_funcrun(test_cont));
+   test_cont->position=7;
+   assert(!run_funcrun(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"{");
+
+   strcpy(test_cont->words[1],"SETFUNC");
+   strcpy(test_cont->words[2],"abc");
+   strcpy(test_cont->words[3],"{");
+   strcpy(test_cont->words[4],"A");
+   strcpy(test_cont->words[5],"}");
+
+   strcpy(test_cont->words[6],"{");
+   strcpy(test_cont->words[7],"}");
+
+   strcpy(test_cont->words[8],"abc");
+   strcpy(test_cont->words[9],"{");
+   strcpy(test_cont->words[10],"90");
+   strcpy(test_cont->words[11],"}");
+
+   strcpy(test_cont->words[12],"}");
+   assert(run_main(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"{");
+
+   strcpy(test_cont->words[1],"SETFUNC");
+   strcpy(test_cont->words[2],"abc");
+   strcpy(test_cont->words[3],"{");
+   strcpy(test_cont->words[4],"A");
+   strcpy(test_cont->words[5],"}");
+
+   strcpy(test_cont->words[6],"{");
+
+
+   strcpy(test_cont->words[7],"FD");
+   strcpy(test_cont->words[8],"A");
+   strcpy(test_cont->words[9],"LT");
+   strcpy(test_cont->words[10],"40");
+   strcpy(test_cont->words[11],"}");
+
+   strcpy(test_cont->words[12],"abc");
+   strcpy(test_cont->words[13],"{");
+   strcpy(test_cont->words[14],"90");
+   strcpy(test_cont->words[15],"}");
+
+   strcpy(test_cont->words[16],"}");
+
+
+   assert(run_main(test_cont,test_line_cont));
+
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"{");
+
+   strcpy(test_cont->words[1],"SETFUNC");
+   strcpy(test_cont->words[2],"abc");
+   strcpy(test_cont->words[3],"{");
+   strcpy(test_cont->words[4],"A");
+   strcpy(test_cont->words[5],"}");
+
+   strcpy(test_cont->words[6],"{");
+
+   strcpy(test_cont->words[7],"SETFUNC");
+   strcpy(test_cont->words[8],"abc");
+   strcpy(test_cont->words[9],"{");
+   strcpy(test_cont->words[10],"A");
+   strcpy(test_cont->words[11],"}");
+
+   strcpy(test_cont->words[12],"{");
+   strcpy(test_cont->words[13],"FD");
+   strcpy(test_cont->words[14],"A");
+   strcpy(test_cont->words[15],"}");
+
+
+   strcpy(test_cont->words[16],"abc");
+   strcpy(test_cont->words[17],"{");
+   strcpy(test_cont->words[18],"A");
+   strcpy(test_cont->words[19],"}");
+
+   strcpy(test_cont->words[20],"}");
+
+   strcpy(test_cont->words[21],"abc");
+   strcpy(test_cont->words[22],"{");
+   strcpy(test_cont->words[23],"90");
+   strcpy(test_cont->words[24],"}");
+
+   strcpy(test_cont->words[25],"}");
+   assert(run_main(test_cont,test_line_cont));
+   assert(test_line_cont->size==1);
+   assert(compare_doubles(test_line_cont->array[0]->end->y,90));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"{");
+
+   strcpy(test_cont->words[1],"SETFUNC");
+   strcpy(test_cont->words[2],"abc");
+   strcpy(test_cont->words[3],"{");
+   strcpy(test_cont->words[4],"A");
+   strcpy(test_cont->words[5],"}");
+
+   strcpy(test_cont->words[6],"{");
+
+   strcpy(test_cont->words[7],"DO");
+   strcpy(test_cont->words[8],"B");
+   strcpy(test_cont->words[9],"FROM");
+   strcpy(test_cont->words[10],"A");
+   strcpy(test_cont->words[11],"TO");
+   strcpy(test_cont->words[12],"9");
+   strcpy(test_cont->words[13],"{");
+   strcpy(test_cont->words[14],"FD");
+   strcpy(test_cont->words[15],"A");
+   strcpy(test_cont->words[16],"RT");
+   strcpy(test_cont->words[17],"A");
+   strcpy(test_cont->words[18],"}");
+
+   strcpy(test_cont->words[19],"}");
+
+   strcpy(test_cont->words[20],"abc");
+   strcpy(test_cont->words[21],"{");
+   strcpy(test_cont->words[22],"1");
+   strcpy(test_cont->words[23],"}");
+
+   strcpy(test_cont->words[24],"}");
+   assert(run_main(test_cont,test_line_cont));
+   assert(test_line_cont->size==9);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"{");
+
+   strcpy(test_cont->words[1],"SETFUNC");
+   strcpy(test_cont->words[2],"abc");
+   strcpy(test_cont->words[3],"{");
+   strcpy(test_cont->words[4],"A");
+   strcpy(test_cont->words[5],"}");
+
+   strcpy(test_cont->words[6],"{");
+
+   strcpy(test_cont->words[7],"DO");
+   strcpy(test_cont->words[8],"B");
+   strcpy(test_cont->words[9],"FROM");
+   strcpy(test_cont->words[10],"1");
+   strcpy(test_cont->words[11],"TO");
+   strcpy(test_cont->words[12],"9");
+   strcpy(test_cont->words[13],"{");
+   strcpy(test_cont->words[14],"FD");
+   strcpy(test_cont->words[15],"A");
+   strcpy(test_cont->words[16],"RT");
+   strcpy(test_cont->words[17],"A");
+   strcpy(test_cont->words[18],"}");
+
+   strcpy(test_cont->words[19],"}");
+
+   strcpy(test_cont->words[20],"DO");
+   strcpy(test_cont->words[21],"B");
+   strcpy(test_cont->words[22],"FROM");
+   strcpy(test_cont->words[23],"1");
+
+   strcpy(test_cont->words[24],"TO");
+   strcpy(test_cont->words[25],"9");
+   strcpy(test_cont->words[26],"{");
+   strcpy(test_cont->words[27],"abc");
+   strcpy(test_cont->words[28],"{");
+   strcpy(test_cont->words[29],"1");
+   strcpy(test_cont->words[30],"}");
+
+   strcpy(test_cont->words[31],"}");
+   strcpy(test_cont->words[32],"}");
+
+   assert(run_main(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"{");
+
+   strcpy(test_cont->words[1],"SET");
+   strcpy(test_cont->words[2],"A");
+   strcpy(test_cont->words[3],":=");
+   strcpy(test_cont->words[4],"9");
+   strcpy(test_cont->words[5],";");
+
+   strcpy(test_cont->words[6],"SETFUNC");
+
+   strcpy(test_cont->words[7],"abc");
+   strcpy(test_cont->words[8],"{");
+   strcpy(test_cont->words[9],"A");
+   strcpy(test_cont->words[10],"}");
+
+   strcpy(test_cont->words[11],"{");
+   strcpy(test_cont->words[12],"FD");
+   strcpy(test_cont->words[13],"A");
+   strcpy(test_cont->words[14],"}");
+   strcpy(test_cont->words[15],"RT");
+   strcpy(test_cont->words[16],"A");
+   strcpy(test_cont->words[17],"abc");
+   strcpy(test_cont->words[18],"{");
+   strcpy(test_cont->words[19],"A");
+   strcpy(test_cont->words[20],"}");
+   strcpy(test_cont->words[21],"}");
+
+   assert(run_main(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"{");
+
+   strcpy(test_cont->words[1],"SET");
+   strcpy(test_cont->words[2],"A");
+   strcpy(test_cont->words[3],":=");
+   strcpy(test_cont->words[4],"9");
+   strcpy(test_cont->words[5],";");
+
+   strcpy(test_cont->words[6],"setfunc");
+
+   strcpy(test_cont->words[7],"abc");
+   strcpy(test_cont->words[8],"{");
+   strcpy(test_cont->words[9],"A");
+   strcpy(test_cont->words[10],"}");
+
+   strcpy(test_cont->words[11],"{");
+   strcpy(test_cont->words[12],"FD");
+   strcpy(test_cont->words[13],"A");
+   strcpy(test_cont->words[14],"}");
+   strcpy(test_cont->words[15],"RT");
+   strcpy(test_cont->words[16],"A");
+   strcpy(test_cont->words[17],"abc");
+   strcpy(test_cont->words[18],"{");
+   strcpy(test_cont->words[19],"A");
+   strcpy(test_cont->words[20],"}");
+   strcpy(test_cont->words[21],"}");
+
+   assert(!run_main(test_cont,test_line_cont));
+   test_cont->position=0;
+   strcpy(test_cont->words[6],"SETFUNC");
+   strcpy(test_cont->words[7],"ABC");
+   strcpy(test_cont->words[17],"ABC");
+   assert(!run_main(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"{");
+
+   strcpy(test_cont->words[1],"SET");
+   strcpy(test_cont->words[2],"A");
+   strcpy(test_cont->words[3],":=");
+   strcpy(test_cont->words[4],"9");
+   strcpy(test_cont->words[5],";");
+
+   strcpy(test_cont->words[6],"SETFUNC");
+
+   strcpy(test_cont->words[7],"bac");
+   strcpy(test_cont->words[8],"{");
+   strcpy(test_cont->words[9],"A");
+   strcpy(test_cont->words[10],"}");
+
+   strcpy(test_cont->words[11],"{");
+   strcpy(test_cont->words[12],"FD");
+   strcpy(test_cont->words[13],"A");
+   strcpy(test_cont->words[14],"}");
+   strcpy(test_cont->words[15],"RT");
+   strcpy(test_cont->words[16],"A");
+   strcpy(test_cont->words[17],"abc");
+   strcpy(test_cont->words[18],"{");
+   strcpy(test_cont->words[19],"A");
+   strcpy(test_cont->words[20],"}");
+   strcpy(test_cont->words[21],"}");
+
+   assert(!run_main(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
    return 0;
 }
 
@@ -665,11 +1241,11 @@ word_cont* init_word_cont(void)
 }
 
 
-func_cont* init_func_cont(void)
+word_cont* init_func_cont(void)
 {
-   func_cont* n_cont;
+   word_cont* n_cont;
    int i;
-   n_cont=(func_cont*)safe_calloc(1,sizeof(func_cont));
+   n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    n_cont->capacity=INITFUNCCAP;
    n_cont->words=(char**)safe_calloc(INITFUNCCAP,sizeof(char*));
    n_cont->position=0;
@@ -721,7 +1297,37 @@ bool set_funcvar(word_cont* to_check,char func_name[MAXFUNCLEN])
    return false;
 }
 
-bool get_funcvar(word_cont* to_check,func_cont** to_get)
+bool valid_funcset(word_cont* to_check)
+{
+   if(strcmp(to_check->words[to_check->position],"SETFUNC")==0)
+   {
+      to_check->position++;
+      if(valid_funcvar(to_check))
+      {
+         to_check->position++;
+         if(strcmp(to_check->words[to_check->position],"{")==0)
+         {
+            to_check->position++;
+            if(valid_argset(to_check))
+            {
+               if(strcmp(to_check->words[to_check->position],"{")==0)
+               {
+                  to_check->position++;
+                  {
+                     if(valid_instructlist(to_check))
+                     {
+                        return true;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+   return false;
+}
+
+bool get_funcvar(word_cont* to_check,word_cont** to_get)
 {
    if(valid_funcvar(to_check))
    {
@@ -740,7 +1346,7 @@ bool get_funcvar(word_cont* to_check,func_cont** to_get)
 
 /*downside is that we will only see errors like using undeclared vars
 when the function is called not when it is set*/
-bool get_func_info(word_cont* to_check,func_cont* n_func)
+bool get_func_info(word_cont* to_check,word_cont* n_func)
 {
    int initial_pos;
    initial_pos=to_check->position;
@@ -748,35 +1354,57 @@ bool get_func_info(word_cont* to_check,func_cont* n_func)
    {
 
       to_check->position=initial_pos;
-      /*now we know it is valid we can just copy over*/
-      while(strcmp(to_check->words[to_check->position],"}"))
+      if(copy_over(to_check,n_func))
       {
-         n_func->words[n_func->position]=(char*)safe_calloc(strlen(to_check->words[to_check->position])+1,\
-                     sizeof(char));
-         strcpy(n_func->words[n_func->position],\
-               to_check->words[to_check->position]);
-         n_func->position++;
-         to_check->position++;
-         if(n_func->position>=n_func->capacity)
-         {
-            resize(n_func);
-         }
+         n_func->position=0;
+         return true;
       }
-      /*copy over the } and move word_cont on*/
-      n_func->words[n_func->position]=(char*)safe_calloc(strlen(to_check->words[to_check->position])+1,\
-                  sizeof(char));
-      strcpy(n_func->words[n_func->position],\
-            to_check->words[to_check->position]);
-      to_check->position++;
-      /*set func position to zero*/
       n_func->position=0;
       return true;
    }
    return false;
 }
 
+/*there are better ways to balance brackets out there
+but this will be adequate*/
+bool copy_over(word_cont* to_check,word_cont* n_func)
+{
 
-void resize(func_cont* n_func)
+   int left_brackets,right_brackets;
+   left_brackets=START_BRACKET;
+   right_brackets=0;
+   while(left_brackets!=right_brackets)
+   {
+      if(to_check->position>=to_check->capacity)
+      {
+         return false;
+      }
+      if(strcmp(to_check->words[to_check->position],"}")==0)
+      {
+         right_brackets++;
+      }
+      if(strcmp(to_check->words[to_check->position],"{")==0)
+      {
+         left_brackets++;
+      }
+      n_func->words[n_func->position]=(char*)safe_calloc(\
+            strlen(to_check->words[to_check->position])+1,sizeof(char));
+
+      strcpy(n_func->words[n_func->position],\
+            to_check->words[to_check->position]);
+
+      n_func->position++;
+      to_check->position++;
+      if(n_func->position>=n_func->capacity)
+      {
+         resize(n_func);
+      }
+   }
+
+   return true;
+}
+
+void resize(word_cont* n_func)
 {
    char** n_words;
    char** temp;
@@ -817,17 +1445,20 @@ breaks it*/
 
 bool run_funcset(word_cont* to_check)
 {
-   func_cont* n_func;
+   word_cont* n_func;
    char* func_name;
    func_name=(char*)safe_calloc(MAXFUNCLEN,sizeof(char));
    n_func=init_func_cont();
    if(strcmp(to_check->words[to_check->position],"SETFUNC")==0)
    {
+
       to_check->position++;
       if(set_funcvar(to_check,func_name))
       {
+
          if(strcmp(to_check->words[to_check->position],"{")==0)
          {
+
             to_check->position++;
             if(get_argset(to_check,n_func))
             {
@@ -845,16 +1476,32 @@ bool run_funcset(word_cont* to_check)
          }
       }
    }
-   free_func_cont(n_func);
+   free_word_cont(n_func);
    free(func_name);
    return false;
 }
 
 
+bool valid_argset(word_cont* to_check)
+{
+   if(strcmp(to_check->words[to_check->position],"}")==0)
+   {
+      to_check->position++;
+      return true;
+   }
+   if(valid_variable(to_check))
+   {
+      to_check->position++;
+      if(valid_argset(to_check))
+      {
+         return true;
+      }
+   }
+   return false;
+}
 
 
-
-bool get_argset(word_cont* to_check,func_cont* n_func)
+bool get_argset(word_cont* to_check,word_cont* n_func)
 {
    if(strcmp(to_check->words[to_check->position],"}")==0)
    {
@@ -871,7 +1518,7 @@ bool get_argset(word_cont* to_check,func_cont* n_func)
    return false;
 }
 
-bool get_arg(word_cont* to_check,func_cont* n_func)
+bool get_arg(word_cont* to_check,word_cont* n_func)
 {
 
    int i;
@@ -901,7 +1548,7 @@ bool get_arg(word_cont* to_check,func_cont* n_func)
 }
 
 
-bool place_arg(word_cont* to_check,func_cont* n_func,\
+bool place_arg(word_cont* to_check,word_cont* n_func,\
                int position)
 {
    double to_place;
@@ -923,7 +1570,7 @@ bool place_arg(word_cont* to_check,func_cont* n_func,\
 }
 
 
-bool place_all_args(word_cont* to_check,func_cont* n_func,int pos)
+bool place_all_args(word_cont* to_check,word_cont* n_func,int pos)
 {
 
    if(strcmp(to_check->words[to_check->position],"}")==0)
@@ -949,23 +1596,79 @@ bool place_all_args(word_cont* to_check,func_cont* n_func,int pos)
 
 /*the function name sounds silly but
 keeps the theme*/
-/*
-bool run_runfunc(word_cont* to_check)
+
+bool run_funcrun(word_cont* to_check,line_cont* line_arr)
 {
-   func_cont* to_run;
+   word_cont* to_run;
    to_run=NULL;
    if(get_funcvar(to_check,&to_run))
    {
       if(strcmp(to_check->words[to_check->position],"{")==0)
       {
          to_check->position++;
-         if(place_args(to_check,to_run))
+         if(place_all_args(to_check,to_run,START))
+         {
+            if(run_instruction_list(to_run,line_arr))
+            {
+               /*set back to beginning*/
+               reset_func(to_run);
+               return true;
+            }
+         }
       }
    }
-}*/
+   return false;
+}
 
 
+bool valid_argsrun(word_cont* to_check)
+{
+   if(strcmp(to_check->words[to_check->position],"}")==0)
+   {
+      to_check->position++;
+      return true;
+   }
+   if(valid_varnum(to_check))
+   {
+      if(valid_argsrun(to_check))
+      {
+         return true;
+      }
+   }
+   return false;
+}
 
+bool valid_funcrun(word_cont* to_check)
+{
+   if(valid_funcvar(to_check))
+   {
+      to_check->position++;
+      if(strcmp(to_check->words[to_check->position],"{")==0)
+      {
+         to_check->position++;
+         if(valid_argsrun(to_check))
+         {
+            return true;
+         }
+      }
+   }
+   return false;
+
+}
+
+void reset_func(word_cont* func)
+{
+   int i;
+   func->position=0;
+   for(i=0;i<NUMVARS;i++)
+   {
+      if(func->var_array[i])
+      {
+         free(func->var_array[i]);
+         func->var_array[i]=NULL;
+      }
+   }
+}
 
 
 

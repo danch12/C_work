@@ -1,5 +1,9 @@
 #include "specific.h"
 
+bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN]);
+bool valid_set(word_cont* to_check);
+bool valid_do(word_cont* to_check);
+
 bool free_word_cont(word_cont* to_free)
 {
    int i;
@@ -56,4 +60,41 @@ FILE* get_file_words(char* filename,int* lines)
    *lines=num_lines;
    rewind(fp);
    return fp;
+}
+
+
+
+bool valid_instruct(word_cont* to_check)
+{
+   int i;
+   int init_pos;
+   char instructions[NUMINSTRUCTIONS][INSTRUCTLEN]= {"FD", "LT","RT"};
+   init_pos=to_check->position;
+   if(init_pos>=to_check->capacity)
+   {
+      return false;
+   }
+   for(i=0;i<NUMINSTRUCTIONS;i++)
+   {
+      if(valid_mv(to_check,instructions[i]))
+      {
+         return true;
+      }
+      else
+      {
+         to_check->position=init_pos;
+      }
+   }
+   if(valid_set(to_check))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
+
+   if(valid_do(to_check))
+   {
+      return true;
+   }
+
+   return false;
 }

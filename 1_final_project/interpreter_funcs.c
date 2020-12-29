@@ -168,40 +168,6 @@ bool run_instruction_list(word_cont* to_check,line_cont* line_arr)
 
 
 
-/*potentially add pending line in to word_cont -
-as word cont deals with intermediate stages of instructions
-which is basically what pending line is*/
-bool run_instruction(word_cont* to_check,line_cont* line_arr)
-{
-   int init_pos;
-   init_pos=to_check->position;
-   if(init_pos>=to_check->capacity)
-   {
-      return false;
-   }
-   if(get_rotation(to_check,line_arr))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(move_forward(to_check,line_arr))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(run_set(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(run_do(to_check,line_arr))
-   {
-      return true;
-   }
-   return false;
-}
-
-
 
 bool get_rotation(word_cont* to_check,line_cont* line_arr)
 {
@@ -342,57 +308,6 @@ bool free_line_cont(line_cont* to_free)
    return true;
 
 }
-
-
-/*pretty much just for testing so we dont
-deal with files until end*/
-/*word_cont* init_word_cont(void)
-{
-   word_cont* n_cont;
-   int i;
-   n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
-   n_cont->capacity=MAXTESTCAP;
-   n_cont->words= (char**)safe_calloc(MAXTESTCAP,sizeof(char*));
-   for(i=0;i<MAXTESTCAP;i++)
-   {
-      n_cont->words[i]=(char*)safe_calloc(MAXTESTLEN,sizeof(char));
-      n_cont->words[i][0]='\0';
-   }
-   n_cont->position=0;
-
-   n_cont->stackptr=stack_init();
-   for(i=0;i<NUMVARS;i++)
-   {
-      n_cont->var_array[i]=NULL;
-   }
-   n_cont->err_message[0]='\0';
-   return n_cont;
-}*/
-
-/*bool free_word_cont(word_cont* to_free)
-{
-   int i;
-   if(to_free)
-   {
-      for(i=0;i<to_free->capacity;i++)
-      {
-         free(to_free->words[i]);
-      }
-      for(i=0;i<NUMVARS;i++)
-      {
-         if(to_free->var_array[i])
-         {
-            free(to_free->var_array[i]);
-         }
-      }
-      free(to_free->words);
-      stack_free(to_free->stackptr);
-      free(to_free);
-   }
-
-   return true;
-}*/
-
 
 
 /*get op v similar to parser except we dont increase position
