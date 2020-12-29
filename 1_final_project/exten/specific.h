@@ -26,7 +26,18 @@ typedef struct word_container
    assoc* func_map;
 }word_cont;
 
+typedef struct function_container
+{
 
+   int arg_placer[NUMVARS];
+   int n_args;
+   double* var_array[NUMVARS];
+   char** words;
+   stack* stackptr;
+   int position;
+   int capacity;
+   assoc* func_map;
+}func_cont;
 
 
 FILE* get_file_words(char* filename,int* lines);

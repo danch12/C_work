@@ -1,5 +1,63 @@
 #include "specific.h"
 
+void deep_free_assoc(assoc* a);
+
+void free_func_cont(func_cont* to_free)
+{
+   int i;
+   if(to_free)
+   {
+      for(i=0;i<to_free->capacity;i++)
+      {
+         free(to_free->words[i]);
+      }
+      for(i=0;i<NUMVARS;i++)
+      {
+         if(to_free->var_array[i])
+         {
+            free(to_free->var_array[i]);
+         }
+      }
+      if(to_free->words)
+      {
+         free(to_free->words);
+      }
+      if(to_free->stackptr)
+      {
+         stack_free(to_free->stackptr);
+      }
+      deep_free_assoc(to_free->func_map);
+      free(to_free);
+   }
+
+}
+
+void deep_free_assoc(assoc* a)
+{
+   unsigned int i;
+   if(a)
+   {
+      for(i=0;i<a->capacity;i++)
+      {
+         if(a->arr[i])
+         {
+            free(a->arr[i]->key);
+            if(a->arr[i]->value)
+            {
+
+               free_func_cont(a->arr[i]->value);
+            }
+
+            free(a->arr[i]);
+         }
+      }
+      free(a->arr);
+      free(a);
+   }
+}
+
+
+
 bool free_word_cont(word_cont* to_free)
 {
    int i;
@@ -18,12 +76,14 @@ bool free_word_cont(word_cont* to_free)
       }
       free(to_free->words);
       stack_free(to_free->stackptr);
-      assoc_free(to_free->func_map);
+      deep_free_assoc(to_free->func_map);
       free(to_free);
    }
 
    return true;
 }
+
+
 
 
 word_cont* read_in_file(char* filename)

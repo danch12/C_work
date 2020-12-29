@@ -26,7 +26,7 @@ and run the code from there
 https://tenthousandmeters.com/blog/python-behind-the-scenes-1-how-the-cpython-vm-works/
 had a look at this for a bit of inspiration but definitely
 nowhere near as advanced
-*/
+
 typedef struct function_container
 {
 
@@ -37,13 +37,9 @@ typedef struct function_container
    int position;
    int capacity;
    assoc* func_map;
-}func_cont;
+}func_cont;*/
 
-/*need to create new functions that do very similar things
-to parser stage but increment at different times - this is
-because we will use old parser functions to check for
-syntax errors in do loops so even if do loop not executed
-it will throw errors for bad syntax*/
+
 
 
  #endif

@@ -558,7 +558,7 @@ bool run_set(word_cont* to_check)
             {
                if(!to_check->var_array[var_p])
                {
-                  to_check->var_array[var_p]=safe_calloc(1,\
+                  to_check->var_array[var_p]=(double*)safe_calloc(1,\
                                              sizeof(double));
                }
                *to_check->var_array[var_p]=to_set;

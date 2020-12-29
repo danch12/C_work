@@ -2,6 +2,10 @@ Thought it would be cool to create functions- going to start with ones that dont
 
 Basic idea is that running a function should be almost the same as running the main code because the main code is pretty much a function in itself. 
 
+Also had a look at how cython does their functions for a bit of inspiration but stripped the things back quite a lot as it seemed a bit overkill - https://tenthousandmeters.com/blog/python-behind-the-scenes-1-how-the-cpython-vm-works/
+
+
+
 To be able to handle positional arguments because we know there's a max of 26 variables that could be arguments when we set the function we can record which position relates to which variable and then when running the function once you get everything set up its pretty much just running a instruction list.
 
 Used a hash map for holding the functions as wanted to use real identifiers for the function names - adds to clarity. Also since we have pretty much all the code made already from the last project it seemed like a good proof of concept to use a version of it. 
