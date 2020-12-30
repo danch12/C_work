@@ -56,11 +56,14 @@ test_interp_fast : interpreter_tests.c $(PARSEFULL) $(INTERPFULL) interpreter/sp
 interp: interpreter.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h  ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h  $(STACKSFULL) $(GENERALFULL)
 	$(CC) interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
-extension: extension.c extension.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
-	$(CC) extension.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o extension $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
+exten_test_san: extension_func_tests.c extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
+	$(CC) extension_func_tests.c extension_funcs.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_test_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
+exten_test_fast:extension_func_tests.c extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
+	$(CC) extension_func_tests.c extension_funcs.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_test_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
 
-
+extension: extension.c extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h
+	$(CC) extension.c extension_funcs.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) ADTS_and_general/neillsdl2.c -o extension $(CFLAGSSDL) $(INCEXTEN) $(LIDLIBSSDL)
 
 run_tests: test_interp_san test_interp_fast hash_map_san hash_map_fast test_stacks_san test_stacks_fast test_parser_san test_parser_fast
 	./parser_test_fast

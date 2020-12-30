@@ -1,4 +1,4 @@
-Thought it would be cool to create functions- going to start with ones that dont return anything then potentially turn to some that do. 
+Thought it would be cool to create functions- allowing for functions to take arguments as well. Cant do recursion properly until we do flow control but may try to implement in the future.
 
 Basic idea is that running a function should be almost the same as running the main code because the main code is pretty much a function in itself. 
 
@@ -16,9 +16,9 @@ Grammar for functions
 
 <ARGSSET> := <VAR><ARGSSET> | "}"
 
-<RUNFUNC> := <FUNCVAR> "{" <ARGCALL>
+<RUNFUNC> := <FUNCVAR> "{" <ARGRUN>
 
-<ARGCALL> := <VARNUM><ARGCALL> | "}"
+<ARGRUN> := <VARNUM><ARGRUN> | "}"
 
 <FUNCVAR> := Σ n=50{a-z}
 

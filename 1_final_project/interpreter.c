@@ -1,5 +1,5 @@
 #include "interpreter_funcs.h"
-#include "../ADTS_and_general/neillsdl2.h"
+#include "ADTS_and_general/neillsdl2.h"
 
 #define MIDWIDTH WWIDTH/2
 #define MIDHEIGHT WHEIGHT/2

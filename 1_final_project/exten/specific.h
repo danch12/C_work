@@ -14,7 +14,7 @@
 #define MAXERRLEN 100
 #define INSTRUCTLEN 3
 #define NUMINSTRUCTIONS 3
-
+#define UNUSED -1
 
 /*started off by making a struct that specifically holds
 functions - but makes more sense to just add that
@@ -57,20 +57,7 @@ typedef struct line_container
    int capacity;
 }line_cont;
 
-/*
-typedef struct function_container
-{
 
-   int arg_placer[NUMVARS];
-   int n_args;
-   double* var_array[NUMVARS];
-   char** words;
-   stack* stackptr;
-   int position;
-   int capacity;
-   assoc* func_map;
-}func_cont;
-*/
 
 FILE* get_file_words(char* filename,int* lines);
 word_cont* read_in_file(char* filename);

@@ -49,11 +49,6 @@ bool valid_polish(word_cont* to_check);
 bool valid_set(word_cont* to_check);
 bool valid_do(word_cont* to_check);
 
-/*
-FILE* get_file_words(char* filename,int* lines);
-word_cont* read_in_file(char* filename);
-bool free_word_cont(word_cont* to_free);
-*/
 
 
 

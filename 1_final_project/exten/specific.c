@@ -97,7 +97,7 @@ word_cont* read_in_file(char* filename)
       n_cont->var_array[i]=NULL;
    }
    n_cont->func_map=assoc_init();
-
+   n_cont->n_args=UNUSED;
    return n_cont;
 }
 
