@@ -1078,6 +1078,56 @@ int main(void)
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
 
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"{");
+
+   strcpy(test_cont->words[1],"SETFUNC");
+   strcpy(test_cont->words[2],"abc");
+   strcpy(test_cont->words[3],"{");
+   strcpy(test_cont->words[4],"A");
+   strcpy(test_cont->words[5],"}");
+
+   strcpy(test_cont->words[6],"{");
+
+   strcpy(test_cont->words[7],"DO");
+   strcpy(test_cont->words[8],"B");
+   strcpy(test_cont->words[9],"FROM");
+   strcpy(test_cont->words[10],"1");
+   strcpy(test_cont->words[11],"TO");
+   strcpy(test_cont->words[12],"9");
+   strcpy(test_cont->words[13],"{");
+   strcpy(test_cont->words[14],"FD");
+   strcpy(test_cont->words[15],"A");
+   strcpy(test_cont->words[16],"RT");
+   strcpy(test_cont->words[17],"A");
+   strcpy(test_cont->words[18],"}");
+
+   strcpy(test_cont->words[19],"}");
+
+   strcpy(test_cont->words[20],"SETFUNC");
+   strcpy(test_cont->words[21],"xyz");
+   strcpy(test_cont->words[22],"{");
+   strcpy(test_cont->words[23],"}");
+
+   strcpy(test_cont->words[24],"{");
+
+   strcpy(test_cont->words[25],"abc");
+   strcpy(test_cont->words[26],"{");
+   strcpy(test_cont->words[27],"20");
+   strcpy(test_cont->words[28],"}");
+
+   strcpy(test_cont->words[29],"}");
+   strcpy(test_cont->words[30],"xyz");
+
+   strcpy(test_cont->words[31],"{");
+   strcpy(test_cont->words[32],"}");
+   strcpy(test_cont->words[33],"}");
+
+   assert(run_main(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
 
    test_cont=init_word_cont();
    test_line_cont=init_line_cont();

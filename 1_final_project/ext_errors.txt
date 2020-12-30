@@ -1,0 +1,12 @@
+test_files/test_turtles/extension/invalid/no_arguments.txt
+error in processing file around word 10 }
+incorrect amount of args passed to function
+test_files/test_turtles/extension/invalid/too_many_args.txt
+error in processing file around word 10 }
+too many arguments for function
+test_files/test_turtles/extension/invalid/unknown_func.txt
+error in processing file around word 8 bca
+function name not found, has it been set?
+test_files/test_turtles/extension/invalid/same_var.txt
+error in processing file around word 1 SETFUNC
+used same var twice when defining function

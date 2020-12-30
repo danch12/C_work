@@ -7,11 +7,13 @@ bool run_set(word_cont* to_check);
 bool run_do(word_cont* to_check,line_cont* line_arr);
 bool run_funcset(word_cont* to_check);
 bool run_funcrun(word_cont* to_check,line_cont* line_arr);
+
 bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN]);
 bool valid_set(word_cont* to_check);
 bool valid_do(word_cont* to_check);
 bool valid_funcrun(word_cont* to_check);
 bool valid_funcset(word_cont* to_check);
+bool valid_flowstate(word_cont* to_check);
 
 void deep_free_assoc(assoc* a)
 {
@@ -98,6 +100,7 @@ word_cont* read_in_file(char* filename)
    }
    n_cont->func_map=assoc_init();
    n_cont->n_args=UNUSED;
+   n_cont->parent=NULL;
    return n_cont;
 }
 
@@ -204,6 +207,11 @@ bool valid_instruct(word_cont* to_check)
    }
    to_check->position=init_pos;
    if(valid_funcrun(to_check))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
+   if(valid_flowstate(to_check))
    {
       return true;
    }

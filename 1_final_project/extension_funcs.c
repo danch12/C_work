@@ -92,17 +92,36 @@ bool valid_funcset(word_cont* to_check)
 
 bool get_funcvar(word_cont* to_check,word_cont** to_get)
 {
+   word_cont* temp;
    if(valid_funcvar(to_check))
    {
+      /*first look for local functions*/
       *to_get=assoc_lookup(to_check->func_map,\
                            to_check->words[to_check->position]);
-      if(*to_get==NULL)
+
+      if(*to_get!=NULL)
       {
-         strcpy(to_check->err_message,"function name not found, has it been set?");
-         return false;
+         to_check->position++;
+         return true;
       }
-      to_check->position++;
-      return true;
+
+      temp=to_check->parent;
+      /*if not found look at parents functions*/
+      while(temp)
+      {
+         *to_get=assoc_lookup(temp->func_map,\
+                              to_check->words[to_check->position]);
+         if(*to_get!=NULL)
+         {
+            to_check->position++;
+            return true;
+         }
+         temp=temp->parent;
+      }
+
+      strcpy(to_check->err_message,"function name not found, has it been set?");
+
+
    }
    return false;
 }
@@ -209,6 +228,8 @@ bool run_funcset(word_cont* to_check)
    char* func_name;
    func_name=(char*)safe_calloc(MAXFUNCLEN,sizeof(char));
    n_func=init_func_cont();
+   /*set here so easier testing with init_func_cont*/
+   n_func->parent=to_check;
    if(strcmp(to_check->words[to_check->position],"SETFUNC")==0)
    {
 

@@ -1,0 +1,2 @@
+{ SETFUNC square { A } { DO B FROM 1 TO 4 { FD A LT 90 } } 
+SETFUNC sqsq { A } { square { A } } sqsq { 50 } }

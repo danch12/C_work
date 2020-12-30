@@ -321,6 +321,20 @@ int main(void)
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
 
+
+   /*no reason for it to break but
+    just wanted to test a massive number to make sure*/
+   test_line_cont=init_line_cont();
+   test_cont=init_word_cont();
+
+   strcpy(test_cont->words[0],"FD");
+   strcpy(test_cont->words[1],"100000000");
+   assert(move_forward(test_cont,test_line_cont));
+   assert(compare_doubles(test_line_cont->pending_line->start->y,100000000));
+   assert(compare_doubles(test_line_cont->pending_line->start->x,0));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
    /******* test run_instruction ***********/
    test_line_cont=init_line_cont();
    test_cont=init_word_cont();

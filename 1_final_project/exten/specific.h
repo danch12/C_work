@@ -19,7 +19,11 @@
 /*started off by making a struct that specifically holds
 functions - but makes more sense to just add that
 functionality to word_container so we dont have to redo
-every function so it allows function containers*/
+every function so it allows function containers
+also adding a pointer to the functions "parent"
+basically so we can use mains functions within other
+functions
+*/
 typedef struct word_container
 {
    int arg_placer[NUMVARS];
@@ -31,6 +35,7 @@ typedef struct word_container
    double* var_array[NUMVARS];
    char err_message[MAXERRLEN];
    assoc* func_map;
+   struct word_container* parent;
 }word_cont;
 
 typedef struct coord

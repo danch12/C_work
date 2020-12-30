@@ -1,0 +1,2 @@
+{ SETFUNC square { A } { DO B FROM 1 TO 4 { FD A LT 90 } } 
+DO C FROM 1 TO 4 { SET D := C 50 * ; FD 90 square { D } LT 90 } }

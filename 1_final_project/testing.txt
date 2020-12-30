@@ -19,3 +19,6 @@ This allows for easier testing as we test each function thoroughly before moving
 For the black box testing in regards to the interpreting stage I did a similar thing to the parsing stage where I threw a load of invalid inputs into the makefile and sent the outputs to i_error.txt. Added to this in turtle outputs you can see the output of different files - the name of the picture correlates to the file ran.
 
 Also not sure if this is the correct place to say this but I put functions that are specific to each part of the project into their own specific.c and specific.h along with struct definitions. This means that we can pretty much run any of the testing files with any version of the specific.c/h files. Pick'n'Mix testing.
+
+
+Lastly for the extension I followed pretty much the same ideas as the interpreter - although I split up the extension into two parts, one for functions and one for control flow. This meant that I was able to test each part easily without worrying about their interactions first. Then I have another test file that tests both of them together. 

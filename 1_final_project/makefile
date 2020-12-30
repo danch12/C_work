@@ -51,21 +51,25 @@ test_interp_san : interpreter_tests.c $(PARSEFULL) $(INTERPFULL) interpreter/spe
 test_interp_fast : interpreter_tests.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL)
 	$(CC) interpreter_tests.c interpreter/specific.c  $(PARSERUN) $(INTERPRUN) $(STACKSRUN) $(GENERALRUN)  -o test_interp_fast $(CFLAGSFAST) $(INCINTERP) $(LIDLIBS)
 
-
-
 interp: interpreter.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h  ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h  $(STACKSFULL) $(GENERALFULL)
 	$(CC) interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
-exten_test_san: extension_func_tests.c extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
-	$(CC) extension_func_tests.c extension_funcs.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_test_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
+exten_func_san: extension_func_tests.c extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
+	$(CC) extension_func_tests.c extension_funcs.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_func_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
-exten_test_fast:extension_func_tests.c extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
-	$(CC) extension_func_tests.c extension_funcs.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_test_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
+exten_func_fast:extension_func_tests.c extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
+	$(CC) extension_func_tests.c extension_funcs.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_func_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
+
+exten_flow_san: extension_flow.c extension_flow.h extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
+	$(CC) extension_flow.c extension_funcs.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_flow_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
 extension: extension.c extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h
 	$(CC) extension.c extension_funcs.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) ADTS_and_general/neillsdl2.c -o extension $(CFLAGSSDL) $(INCEXTEN) $(LIDLIBSSDL)
 
-run_tests: test_interp_san test_interp_fast hash_map_san hash_map_fast test_stacks_san test_stacks_fast test_parser_san test_parser_fast
+
+
+
+run_tests: test_interp_san test_interp_fast hash_map_san hash_map_fast test_stacks_san test_stacks_fast test_parser_san test_parser_fast exten_func_fast exten_func_san
 	./parser_test_fast
 	./parser_test_san
 	./test_stacks_fast
@@ -74,7 +78,8 @@ run_tests: test_interp_san test_interp_fast hash_map_san hash_map_fast test_stac
 	./hash_map_san
 	./test_interp_san
 	./test_interp_fast
-
+	./exten_func_fast
+	./exten_func_san
 
 #runs a series of invalid files and stores error message in p_errors.txt the | true stops the makefile from terminating after seeing an error
 run_parser_err: parser_fast
@@ -104,7 +109,7 @@ run_parser_val: parser_fast
 
 run_interp_err: interp
 	echo "test_files/test_turtles/interpreter/invalid/no_nums.txt" > i_errors.txt
-	./interp test_files/test_turtles/interpreter/invalid/no_nums.txt 2>> i_errors.txt |true
+	./interp test_files/test_turtles/interpreter/invalid/no_nums.txt 2>> i_errors.txt | true
 	echo "test_files/test_turtles/interpreter/invalid/too_many_nums.txt" >> i_errors.txt
 	./interp test_files/test_turtles/interpreter/invalid/too_many_nums.txt 2>> i_errors.txt | true
 	echo "test_files/test_turtles/interpreter/invalid/unset_var.txt" >> i_errors.txt
@@ -114,5 +119,17 @@ run_interp_err: interp
 	echo "test_files/test_turtles/parser/invalid/invalid_set.txt" >> i_errors.txt
 	./interp test_files/test_turtles/parser/invalid/invalid_set.txt 2>> i_errors.txt | true
 
+run_extension_err:extension
+	echo "test_files/test_turtles/extension/invalid/no_arguments.txt" > ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/no_arguments.txt 2>> ext_errors.txt | true
+	echo "test_files/test_turtles/extension/invalid/too_many_args.txt" >> ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/too_many_args.txt 2>> ext_errors.txt | true
+	echo "test_files/test_turtles/extension/invalid/unknown_func.txt" >> ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/unknown_func.txt 2>> ext_errors.txt | true
+	echo "test_files/test_turtles/extension/invalid/same_var.txt" >> ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/same_var.txt 2>> ext_errors.txt | true
+
+
+
 clean:
-	rm -f parser_test_fast parser_test_san test_stacks_fast test_stacks_san  parser_san test_interp_san test_interp_fast hash_map_san hash_map_fast interp
+	rm -f parser_test_fast parser_test_san test_stacks_fast test_stacks_san  parser_san test_interp_san test_interp_fast hash_map_san hash_map_fast interp extension exten_test_fast exten_test_san parser_fast
