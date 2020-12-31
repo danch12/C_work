@@ -1,0 +1,2 @@
+{ SETFUNC t { A }
+{ FD A RT 90 FD 30 FD -60 } t { -100 } }

@@ -64,7 +64,6 @@ bool free_line(line* to_free)
    {
       free(to_free->start);
       free(to_free->end);
-
       free(to_free);
 
    }
@@ -408,7 +407,7 @@ bool finish_polish(word_cont* to_check,double* result)
       strcpy(to_check->err_message,"no numbers on the stack at end of expr");
       return false;
    }
-   /*if numbers left over then something is wrong*/
+   /*if numbers left over after first pop then something is wrong*/
    if(stack_peek(to_check->stackptr,result))
    {
       strcpy(to_check->err_message,"more than one number left on stack at end of expr");

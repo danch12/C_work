@@ -62,6 +62,10 @@ bool set_funcvar(word_cont* to_check,char func_name[MAXFUNCLEN])
 
 bool valid_funcset(word_cont* to_check)
 {
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
    if(strcmp(to_check->words[to_check->position],"SETFUNC")==0)
    {
       to_check->position++;
@@ -265,6 +269,10 @@ bool run_funcset(word_cont* to_check)
 
 bool valid_argset(word_cont* to_check)
 {
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
    if(strcmp(to_check->words[to_check->position],"}")==0)
    {
       to_check->position++;
@@ -402,6 +410,10 @@ bool run_funcrun(word_cont* to_check,line_cont* line_arr)
 
 bool valid_argsrun(word_cont* to_check)
 {
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
    if(strcmp(to_check->words[to_check->position],"}")==0)
    {
       to_check->position++;
@@ -419,6 +431,10 @@ bool valid_argsrun(word_cont* to_check)
 
 bool valid_funcrun(word_cont* to_check)
 {
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
    if(valid_funcvar(to_check))
    {
       to_check->position++;

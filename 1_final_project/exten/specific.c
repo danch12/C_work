@@ -7,6 +7,7 @@ bool run_set(word_cont* to_check);
 bool run_do(word_cont* to_check,line_cont* line_arr);
 bool run_funcset(word_cont* to_check);
 bool run_funcrun(word_cont* to_check,line_cont* line_arr);
+bool run_flowstate(word_cont* to_check,line_cont* line_arr);
 
 bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN]);
 bool valid_set(word_cont* to_check);
@@ -162,7 +163,11 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
    {
       return true;
    }
-
+   to_check->position=init_pos;
+   if(run_flowstate(to_check,line_arr))
+   {
+      return true;
+   }
    return false;
 }
 

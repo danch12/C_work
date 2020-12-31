@@ -1,0 +1,1 @@
+{ DO A FROM 1 TO 20 { IF A < 5 { FD 40 LT 97 } ELSE { SET B := A 10 * ; FD 40 LT B FD 30 } } }

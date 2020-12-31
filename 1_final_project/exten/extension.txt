@@ -30,7 +30,9 @@ For FUNCVAR it can be any combination of lowercase letters up to a length of 50,
 Additionally in the word struct for the extension I have added more features - added a pointer to parent that allows the function to use functions defined in the "main" bit of code. Good thing about doing it this way is it sort of starts to build in scope as it will check for local functions first then go to main functions. This also means we can define functions within functions within functions etc - not that you would usually want to but I quite like having the option. If I have time I want to be able to build recursive functions - first I want to do control flow though.
 
 
-Thought control flow would be another thing that comes in handy when coding. Maybe having double brackets around a statement could be useful - bit hackey though. Start simple and just have three comparators and if we have time then build it up. Additionally we could eventually have reverse polish comparisons but for now lets stick to varnums. Using the ANSI C grammar for inspiration - https://www.lysator.liu.se/c/ANSI-C-grammar-y.html .
+
+
+Thought control flow would be another thing that comes in handy when coding (bit of an understatement). Start simple and just have three comparators and if we have time then build it up. Additionally we could eventually have reverse polish comparisons but for now lets stick to varnums. Using the ANSI C grammar for inspiration - https://www.lysator.liu.se/c/ANSI-C-grammar-y.html .
 
 Important thing to consider is that even if we dont execute statements we still want to check for syntax errors. Also not sure why I do { <INSTRUCTLIST> rather than <MAIN> but it says so in the real formal grammar as well. Must be a reason for it.
 
