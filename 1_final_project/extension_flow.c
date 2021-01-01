@@ -5,7 +5,7 @@ bool run_flowstate(word_cont* to_check,line_cont* line_arr)
 {
 
    bool result;
-   if(do_comparison(to_check,&result))
+   if(do_comparison(to_check,&result,line_arr))
    {
       if(result==true)
       {
@@ -74,20 +74,20 @@ bool run_else(word_cont* to_check,line_cont* line_arr)
    return false;
 }
 
-bool do_comparison(word_cont* to_check,bool* result)
+bool do_comparison(word_cont* to_check,bool* result,line_cont* line_arr)
 {
    double vn_1, vn_2;
    comparator cmp;
    if(strcmp(to_check->words[to_check->position],"IF")==0)
    {
       to_check->position++;
-      if(get_varnum(to_check,&vn_1))
+      if(get_varnum(to_check,&vn_1,line_arr))
       {
          cmp=get_comparator(to_check);
          if(cmp!=inv_op)
          {
             to_check->position++;
-            if(get_varnum(to_check,&vn_2))
+            if(get_varnum(to_check,&vn_2,line_arr))
             {
                *result = do_comparison_helper(vn_1,vn_2,cmp);
                return true;

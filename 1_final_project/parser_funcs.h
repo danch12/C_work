@@ -36,7 +36,8 @@ everything apart from the moves
 */
 
 
-/*valid funcs return true if entry is valid*/
+/*valid funcs return true if entry is valid will also increase the
+position of to_check*/
 bool valid_num(word_cont* to_check);
 
 bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN]);

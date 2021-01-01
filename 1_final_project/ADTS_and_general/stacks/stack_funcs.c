@@ -14,7 +14,7 @@ stack* stack_init(void)
 nodeptr init_node(double d)
 {
    nodeptr n_node;
-   n_node=safe_calloc(1,sizeof(node));
+   n_node=(nodeptr)safe_calloc(1,sizeof(node));
    n_node->num=d;
    n_node->next=NULL;
    return n_node;

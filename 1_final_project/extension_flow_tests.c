@@ -451,19 +451,20 @@ int main(void)
    assert(do_comparison_helper(-10.0,-1.0,less));
 
    test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
    test_cont->position=0;
    strcpy(test_cont->words[0],"IF");
    strcpy(test_cont->words[1],"A");
    strcpy(test_cont->words[2],"==");
    strcpy(test_cont->words[3],"A");
 
-   assert(!do_comparison(test_cont,&test_bool));
+   assert(!do_comparison(test_cont,&test_bool,test_line_cont));
    test_cont->position=0;
    strcpy(test_cont->words[0],"IF");
    strcpy(test_cont->words[1],"10");
    strcpy(test_cont->words[2],"==");
    strcpy(test_cont->words[3],"10");
-   assert(do_comparison(test_cont,&test_bool));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(test_bool);
 
    test_cont->position=0;
@@ -471,7 +472,7 @@ int main(void)
    strcpy(test_cont->words[1],"10");
    strcpy(test_cont->words[2],"==");
    strcpy(test_cont->words[3],"1");
-   assert(do_comparison(test_cont,&test_bool));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(!test_bool);
 
    test_cont->position=0;
@@ -479,7 +480,7 @@ int main(void)
    strcpy(test_cont->words[1],"10");
    strcpy(test_cont->words[2],"==");
    strcpy(test_cont->words[3],"-10");
-   assert(do_comparison(test_cont,&test_bool));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(!test_bool);
 
    test_cont->position=0;
@@ -487,7 +488,7 @@ int main(void)
    strcpy(test_cont->words[1],"10");
    strcpy(test_cont->words[2],"==");
    strcpy(test_cont->words[3],"10.0001");
-   assert(do_comparison(test_cont,&test_bool));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(!test_bool);
 
    test_cont->position=0;
@@ -500,8 +501,8 @@ int main(void)
    strcpy(test_cont->words[6],"A");
    strcpy(test_cont->words[7],"==");
    strcpy(test_cont->words[8],"10");
-   assert(run_set(test_cont));
-   assert(do_comparison(test_cont,&test_bool));
+   assert(run_set(test_cont,test_line_cont));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(test_bool);
    free_word_cont(test_cont);
 
@@ -511,7 +512,7 @@ int main(void)
    strcpy(test_cont->words[1],"10");
    strcpy(test_cont->words[2],"<");
    strcpy(test_cont->words[3],"10.0001");
-   assert(do_comparison(test_cont,&test_bool));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(test_bool);
 
    test_cont->position=0;
@@ -519,7 +520,7 @@ int main(void)
    strcpy(test_cont->words[1],"10");
    strcpy(test_cont->words[2],"<");
    strcpy(test_cont->words[3],"10.000");
-   assert(do_comparison(test_cont,&test_bool));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(!test_bool);
 
    test_cont->position=0;
@@ -527,7 +528,7 @@ int main(void)
    strcpy(test_cont->words[1],"10");
    strcpy(test_cont->words[2],"<");
    strcpy(test_cont->words[3],"9.000");
-   assert(do_comparison(test_cont,&test_bool));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(!test_bool);
 
    test_cont->position=0;
@@ -535,7 +536,7 @@ int main(void)
    strcpy(test_cont->words[1],"-10");
    strcpy(test_cont->words[2],"<");
    strcpy(test_cont->words[3],"-9");
-   assert(do_comparison(test_cont,&test_bool));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(test_bool);
 
 
@@ -549,8 +550,8 @@ int main(void)
    strcpy(test_cont->words[6],"A");
    strcpy(test_cont->words[7],"<");
    strcpy(test_cont->words[8],"10");
-   assert(run_set(test_cont));
-   assert(do_comparison(test_cont,&test_bool));
+   assert(run_set(test_cont,test_line_cont));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(test_bool);
    free_word_cont(test_cont);
 
@@ -560,7 +561,7 @@ int main(void)
    strcpy(test_cont->words[1],"10");
    strcpy(test_cont->words[2],">");
    strcpy(test_cont->words[3],"10.0001");
-   assert(do_comparison(test_cont,&test_bool));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(!test_bool);
 
    test_cont->position=0;
@@ -568,7 +569,7 @@ int main(void)
    strcpy(test_cont->words[1],"15");
    strcpy(test_cont->words[2],">");
    strcpy(test_cont->words[3],"10.0001");
-   assert(do_comparison(test_cont,&test_bool));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(test_bool);
 
    test_cont->position=0;
@@ -576,7 +577,7 @@ int main(void)
    strcpy(test_cont->words[1],"-15");
    strcpy(test_cont->words[2],">");
    strcpy(test_cont->words[3],"-16");
-   assert(do_comparison(test_cont,&test_bool));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(test_bool);
 
    test_cont->position=0;
@@ -589,8 +590,8 @@ int main(void)
    strcpy(test_cont->words[6],"A");
    strcpy(test_cont->words[7],">");
    strcpy(test_cont->words[8],"10");
-   assert(run_set(test_cont));
-   assert(do_comparison(test_cont,&test_bool));
+   assert(run_set(test_cont,test_line_cont));
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(test_bool);
    free_word_cont(test_cont);
 
@@ -600,23 +601,23 @@ int main(void)
    strcpy(test_cont->words[1],"a");
    strcpy(test_cont->words[2],">");
    strcpy(test_cont->words[3],"10.0001");
-   assert(!do_comparison(test_cont,&test_bool));
+   assert(!do_comparison(test_cont,&test_bool,test_line_cont));
 
    test_cont->position=0;
    strcpy(test_cont->words[0],"IF");
    strcpy(test_cont->words[1],"A");
    strcpy(test_cont->words[2],"=");
    strcpy(test_cont->words[3],"10.0001");
-   assert(!do_comparison(test_cont,&test_bool));
+   assert(!do_comparison(test_cont,&test_bool,test_line_cont));
 
    test_cont->position=0;
    strcpy(test_cont->words[0],"IF");
    strcpy(test_cont->words[1],"A");
    strcpy(test_cont->words[2],"");
    strcpy(test_cont->words[3],"10.0001");
-   assert(!do_comparison(test_cont,&test_bool));
+   assert(!do_comparison(test_cont,&test_bool,test_line_cont));
    free_word_cont(test_cont);
-
+   free_line_cont(test_line_cont);
    test_line_cont=init_line_cont();
    test_cont=init_word_cont();
 

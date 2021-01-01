@@ -13,9 +13,13 @@ Used a hash map for holding the functions as wanted to use real identifiers for 
 Grammar for functions
 
 <INSTRUCTION> ::= <FD> | <LT> |
-<RT> | <DO> | <SET> | <SETFUNC> | <RUNFUNC>
+<RT> | <DO> | <SET> | <SETFUNC> | <RUNFUNC> | <RETURN> 
 
 <SETFUNC> := "SETFUNC" <FUNCVAR> "{" <ARGSSET> "{" <INSTRUCTLIST>
+
+<VARNUM> := number| <VAR> | <RUNFUNC>
+
+<RETURN> := "RETURN" <VARNUM>
 
 <ARGSSET> := <VAR><ARGSSET> | "}"
 

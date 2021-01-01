@@ -3,7 +3,7 @@
 #include "specific.h"
 #include "parser_funcs.h"
 
-
+/*
 #define PI 3.14159265359
 #define DEGTORAD 180
 #define DEGREES 360
@@ -17,7 +17,7 @@
 
 typedef enum direction {left, right,invalid} direction;
 typedef enum op {plus, minus,mult,divide,invalid_op} op;
-
+*/
 
 
 
@@ -60,22 +60,15 @@ bool move_forward(word_cont* to_check,line_cont* l_arr);
 and we return a op instead of bool*/
 op get_op(word_cont* to_check);
 bool do_operation(word_cont* to_check);
-bool polish_num(word_cont* to_check);
-bool finish_polish(word_cont* to_check,double* result);
-bool run_polish(word_cont* to_check,double* num);
 
-bool run_set(word_cont* to_check);
+bool finish_polish(word_cont* to_check,double* result);
+
 /*pass position back through var_p
 *we see vars as A- Z but really they could be 0-25*/
 bool get_var_pos(word_cont* to_check,int* var_p);
 bool valid_variable(word_cont* to_check);
 bool get_var(word_cont* to_check,double* num);
-bool get_varnum(word_cont* to_check,double* num);
 
 
-/*need to check for syntax errors even if loop not carried out*/
-bool run_do(word_cont* to_check,line_cont* line_arr);
-bool do_helper(word_cont* to_check,int* var_pos,\
-            double* start,double* end);
 
  #endif

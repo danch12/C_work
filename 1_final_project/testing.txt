@@ -21,7 +21,7 @@ For the black box testing in regards to the interpreting stage I did a similar t
 Also not sure if this is the correct place to say this but I put functions that are specific to each part of the project into their own specific.c and specific.h along with struct definitions. This means that we can pretty much run any of the testing files with any version of the specific.c/h files. Pick'n'Mix testing.
 
 
-Lastly for the extension I followed pretty much the same ideas as the interpreter - although I split up the extension into two parts, one for functions and one for control flow. This meant that I was able to test each part easily without worrying about their interactions first. Then I have another test file that tests both of them together. 
+Lastly for the extension I followed pretty much the same ideas as the interpreter - although I split up the extension into two parts, one for functions and one for control flow. This meant that I was able to test each part easily without worrying about their interactions first. 
 
 
 As an aside testing is a bit annoying with this because you have to check both your c code and your turtle code to spot the errors. Bit long.

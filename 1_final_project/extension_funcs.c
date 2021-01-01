@@ -20,6 +20,7 @@ word_cont* init_func_cont(void)
    n_cont->stackptr=stack_init();
    n_cont->n_args=0;
    n_cont->err_message[0]='\0';
+   n_cont->return_val=NULL;
    return n_cont;
 }
 
@@ -108,7 +109,6 @@ bool get_funcvar(word_cont* to_check,word_cont** to_get)
          to_check->position++;
          return true;
       }
-
       temp=to_check->parent;
       /*if not found look at parents functions*/
       while(temp)
@@ -122,10 +122,7 @@ bool get_funcvar(word_cont* to_check,word_cont** to_get)
          }
          temp=temp->parent;
       }
-
       strcpy(to_check->err_message,"function name not found, has it been set?");
-
-
    }
    return false;
 }
@@ -138,7 +135,6 @@ bool get_func_info(word_cont* to_check,word_cont* n_func)
    initial_pos=to_check->position;
    if(valid_instructlist(to_check))
    {
-
       to_check->position=initial_pos;
       if(copy_over(to_check,n_func))
       {
@@ -236,14 +232,11 @@ bool run_funcset(word_cont* to_check)
    n_func->parent=to_check;
    if(strcmp(to_check->words[to_check->position],"SETFUNC")==0)
    {
-
       to_check->position++;
       if(set_funcvar(to_check,func_name))
       {
-
          if(strcmp(to_check->words[to_check->position],"{")==0)
          {
-
             to_check->position++;
             if(get_argset(to_check,n_func))
             {
@@ -338,11 +331,11 @@ bool get_arg(word_cont* to_check,word_cont* n_func)
 
 
 bool place_arg(word_cont* to_check,word_cont* n_func,\
-               int position)
+               int position,line_cont* line_arr)
 {
    double to_place;
    int func_var;
-   if(get_varnum(to_check,&to_place))
+   if(get_varnum(to_check,&to_place,line_arr))
    {
       func_var= n_func->arg_placer[position];
       if(func_var==UNUSED)
@@ -359,7 +352,8 @@ bool place_arg(word_cont* to_check,word_cont* n_func,\
 }
 
 
-bool place_all_args(word_cont* to_check,word_cont* n_func,int pos)
+bool place_all_args(word_cont* to_check,word_cont* n_func,\
+                  int pos,line_cont* line_arr)
 {
 
    if(strcmp(to_check->words[to_check->position],"}")==0)
@@ -373,9 +367,9 @@ bool place_all_args(word_cont* to_check,word_cont* n_func,int pos)
       to_check->position++;
       return true;
    }
-   if(place_arg(to_check,n_func,pos))
+   if(place_arg(to_check,n_func,pos,line_arr))
    {
-      if(place_all_args(to_check,n_func,pos+1))
+      if(place_all_args(to_check,n_func,pos+1,line_arr))
       {
          return true;
       }
@@ -393,7 +387,7 @@ bool run_funcrun(word_cont* to_check,line_cont* line_arr)
       if(strcmp(to_check->words[to_check->position],"{")==0)
       {
          to_check->position++;
-         if(place_all_args(to_check,to_run,START))
+         if(place_all_args(to_check,to_run,START,line_arr))
          {
             if(run_instruction_list(to_run,line_arr))
             {
@@ -406,6 +400,9 @@ bool run_funcrun(word_cont* to_check,line_cont* line_arr)
    }
    return false;
 }
+
+
+
 
 
 bool valid_argsrun(word_cont* to_check)
@@ -463,4 +460,63 @@ void reset_func(word_cont* func)
          func->var_array[i]=NULL;
       }
    }
+}
+
+
+bool valid_return(word_cont* to_check)
+{
+   if(strcmp(to_check->words[to_check->position],"RETURN")==0)
+   {
+      to_check->position++;
+      if(valid_varnum(to_check))
+      {
+         return true;
+      }
+   }
+   return false;
+}
+
+
+bool run_return(word_cont* to_check,line_cont* line_arr)
+{
+   double* to_return;
+   to_return = (double*)safe_calloc(1,sizeof(double));
+   if(strcmp(to_check->words[to_check->position],"RETURN")==0)
+   {
+      to_check->position++;
+      if(get_varnum(to_check,to_return,line_arr))
+      {
+         to_check->return_val=to_return;
+         
+         return true;
+      }
+   }
+   free(to_return);
+   return false;
+}
+
+
+bool get_func_val(word_cont* to_check,line_cont* line_arr,\
+                     double* num)
+{
+   word_cont* func;
+   /*while we have the func name we can just search for it
+   to have a copy will return NULL if its not found
+   and fail the if */
+   func=assoc_lookup(to_check->func_map,\
+      to_check->words[to_check->position]);
+   if(run_funcrun(to_check,line_arr))
+   {
+      if(func->return_val)
+      {
+         *num= *func->return_val;
+         free(func->return_val);
+         func->return_val=NULL;
+         return true;
+      }
+      /*if return val is null*/
+      strcpy(to_check->err_message,"Function has no return value\n");
+   }
+   return false;
+
 }
