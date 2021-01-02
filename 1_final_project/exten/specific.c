@@ -14,6 +14,8 @@ bool valid_funcrun(word_cont* to_check);
 bool valid_funcset(word_cont* to_check);
 bool valid_flowstate(word_cont* to_check);
 bool valid_return(word_cont* to_check);
+bool valid_var(word_cont* to_check);
+bool valid_num(word_cont* to_check);
 bool finish_polish(word_cont* to_check,double* result);
 bool get_var_pos(word_cont* to_check,int* var_p);
 bool get_var(word_cont* to_check,double* num);
@@ -206,6 +208,26 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
    return false;
 }
 
+bool valid_varnum(word_cont* to_check)
+{
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
+   if(valid_num(to_check))
+   {
+      return true;
+   }
+   if(valid_var(to_check))
+   {
+      return true;
+   }
+   if(valid_funcrun(to_check))
+   {
+      return true;
+   }
+   return false;
+}
 
 
 

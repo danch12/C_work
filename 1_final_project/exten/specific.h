@@ -80,7 +80,7 @@ word_cont* read_in_file(char* filename);
 bool free_word_cont(word_cont* to_free);
 bool valid_instruct(word_cont* to_check);
 
-
+bool valid_varnum(word_cont* to_check);
 bool get_varnum(word_cont* to_check,double* num,line_cont* line_arr);
 bool run_set(word_cont* to_check,line_cont* line_arr);
 bool run_instruction(word_cont* to_check,line_cont* line_arr);

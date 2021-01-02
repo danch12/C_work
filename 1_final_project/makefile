@@ -66,6 +66,9 @@ exten_flow_san: extension_flow_tests.c extension_flow.c extension_flow.h extensi
 exten_flow_fast: extension_flow_tests.c extension_flow.c extension_flow.h extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
 	$(CC) extension_flow_tests.c  extension_flow.c extension_funcs.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_flow_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
 
+exten_func_flow_san: test_flow_func.c extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
+	$(CC) test_flow_func.c extension_funcs.c extension_flow.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_func_flow_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
+
 extension: extension.c extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h
 	$(CC) extension.c extension_funcs.c extension_flow.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) ADTS_and_general/neillsdl2.c -o extension $(CFLAGSSDL) $(INCEXTEN) $(LIDLIBSSDL)
 

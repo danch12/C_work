@@ -66,7 +66,7 @@ bool valid_instruct(word_cont* to_check);
 
 bool get_rotation(word_cont* to_check,line_cont* line_arr);
 bool move_forward(word_cont* to_check,line_cont* l_arr);
-
+bool valid_varnum(word_cont* to_check);
 bool get_varnum(word_cont* to_check,double* num);
 bool run_set(word_cont* to_check);
 bool polish_num(word_cont* to_check);

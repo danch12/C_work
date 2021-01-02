@@ -1270,6 +1270,7 @@ int main(void)
 
 
    /*building in returns*/
+   
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"RETURN");
    strcpy(test_cont->words[1],"A");
@@ -1524,7 +1525,7 @@ int main(void)
    free_line_cont(test_line_cont);
 
 
-   
+
    return 0;
 }
 

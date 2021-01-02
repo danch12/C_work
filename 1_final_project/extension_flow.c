@@ -65,6 +65,7 @@ bool run_else(word_cont* to_check,line_cont* line_arr)
       if(strcmp(to_check->words[to_check->position],"{")==0)
       {
          to_check->position++;
+
          if(run_instruction_list(to_check,line_arr))
          {
             return true;
@@ -89,7 +90,9 @@ bool do_comparison(word_cont* to_check,bool* result,line_cont* line_arr)
             to_check->position++;
             if(get_varnum(to_check,&vn_2,line_arr))
             {
+
                *result = do_comparison_helper(vn_1,vn_2,cmp);
+
                return true;
             }
          }

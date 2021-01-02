@@ -26,8 +26,8 @@ bool get_var_pos(word_cont* to_check,int* var_p);
 bool get_var(word_cont* to_check,double* num);
 bool do_operation(word_cont* to_check);
 op get_op(word_cont* to_check);
-
-
+bool valid_var(word_cont* to_check);
+bool valid_num(word_cont* to_check);
 
 
 bool run_instruction(word_cont* to_check,line_cont* line_arr)
@@ -403,6 +403,24 @@ bool do_helper(word_cont* to_check,int* var_pos,\
             }
          }
       }
+   }
+   return false;
+}
+
+
+bool valid_varnum(word_cont* to_check)
+{
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
+   if(valid_num(to_check))
+   {
+      return true;
+   }
+   if(valid_var(to_check))
+   {
+      return true;
    }
    return false;
 }

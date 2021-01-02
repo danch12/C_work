@@ -21,4 +21,5 @@ FILE* get_file_words(char* filename,int* lines);
 word_cont* read_in_file(char* filename);
 bool free_word_cont(word_cont* to_free);
 bool valid_instruct(word_cont* to_check);
+bool valid_varnum(word_cont* to_check);
 #endif
