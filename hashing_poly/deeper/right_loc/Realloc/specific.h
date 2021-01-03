@@ -35,8 +35,6 @@ typedef struct assoc
    unsigned int size;
    /*needed for double hashing*/
    int lower_prime;
-
-
 }assoc;
 
 #endif

@@ -675,12 +675,6 @@ void* _safe_calloc(size_t nitems, size_t size)
 assoc* assoc_init(int keysize)
 {
    assoc* n_assoc;
-   /*static bool tested=false;
-   if(!tested)
-   {
-      tested=true;
-      test();
-   }*/
    assert(keysize>=0);
    n_assoc=_safe_calloc(1,sizeof(assoc));
    n_assoc->capacity=INITSIZE;
@@ -982,14 +976,6 @@ bool _same_key(const void* key1,const void* key2,int bytesize)
       if(bytesize==0)
       {
          if(strcmp(key1,key2)==0)
-         {
-            return true;
-         }
-         return false;
-      }
-      else
-      {
-         if(memcmp(key1,key2,bytesize)==0)
          {
             return true;
          }

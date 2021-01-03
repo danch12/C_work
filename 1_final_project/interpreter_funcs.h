@@ -3,21 +3,7 @@
 #include "specific.h"
 #include "parser_funcs.h"
 
-/*
-#define PI 3.14159265359
-#define DEGTORAD 180
-#define DEGREES 360
-#define ORIGIN 0
 
-
-#define INITSIZE 16
-#define SCALEFACTOR 2
-#define LETTER_TO_NUM 65
-
-
-typedef enum direction {left, right,invalid} direction;
-typedef enum op {plus, minus,mult,divide,invalid_op} op;
-*/
 
 
 

@@ -69,13 +69,16 @@ exten_flow_fast: extension_flow_tests.c extension_flow.c extension_flow.h extens
 exten_func_flow_san: test_flow_func.c extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
 	$(CC) test_flow_func.c extension_funcs.c extension_flow.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_func_flow_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
+exten_func_flow_fast: test_flow_func.c extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
+	$(CC) test_flow_func.c extension_funcs.c extension_flow.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_func_flow_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
+
 extension: extension.c extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h
 	$(CC) extension.c extension_funcs.c extension_flow.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) ADTS_and_general/neillsdl2.c -o extension $(CFLAGSSDL) $(INCEXTEN) $(LIDLIBSSDL)
 
 
 
 
-run_tests: test_interp_san test_interp_fast hash_map_san hash_map_fast test_stacks_san test_stacks_fast test_parser_san test_parser_fast exten_func_fast exten_func_san exten_flow_san exten_flow_fast
+run_tests: test_interp_san test_interp_fast hash_map_san hash_map_fast test_stacks_san test_stacks_fast test_parser_san test_parser_fast exten_func_fast exten_func_san exten_flow_san exten_flow_fast exten_func_flow_san exten_func_flow_fast
 	./parser_test_fast
 	./parser_test_san
 	./test_stacks_fast
@@ -88,6 +91,8 @@ run_tests: test_interp_san test_interp_fast hash_map_san hash_map_fast test_stac
 	./exten_func_san
 	./exten_flow_fast
 	./exten_flow_san
+	./exten_func_flow_san
+	./exten_func_flow_fast
 
 #runs a series of invalid files and stores error message in p_errors.txt the | true stops the makefile from terminating after seeing an error
 run_parser_err: parser_fast
@@ -140,4 +145,4 @@ run_extension_err:extension
 
 
 clean:
-	rm -f parser_test_fast parser_test_san test_stacks_fast test_stacks_san  parser_san test_interp_san test_interp_fast hash_map_san hash_map_fast interp extension exten_test_fast exten_test_san parser_fast
+	rm -f parser_test_fast parser_test_san test_stacks_fast test_stacks_san  parser_san test_interp_san test_interp_fast hash_map_san hash_map_fast interp extension exten_test_fast exten_test_san parser_fast exten_func_flow_san exten_func_flow_fast
