@@ -24,6 +24,75 @@ word_cont* init_func_cont(void)
    return n_cont;
 }
 
+void copy_words_over(word_cont* target,word_cont* to_copy)
+{
+   int i;
+   target->words=(char**)safe_calloc(target->capacity,sizeof(char*));
+
+   i=0;
+   while((to_copy->words[i])&&(strlen(to_copy->words[i])>0))
+   {
+      target->words[i]=(char*)safe_calloc(strlen(to_copy->words[i])+1,sizeof(char));
+      strcpy(target->words[i],to_copy->words[i]);
+      i++;
+   }
+}
+
+word_cont* deep_copy_func(word_cont* to_copy)
+{
+   word_cont* new_copy;
+   int i;
+   if(to_copy)
+   {
+      new_copy=(word_cont*)safe_calloc(1,sizeof(word_cont));
+      new_copy->capacity=to_copy->capacity;
+      copy_words_over(new_copy,to_copy);
+      new_copy->position=0;
+      for(i=0;i<NUMVARS;i++)
+      {
+         if(to_copy->var_array[i])
+         {
+            new_copy->var_array[i]=(double*)safe_calloc(1,sizeof(double));
+            *new_copy->var_array[i]=*to_copy->var_array[i];
+         }
+         new_copy->arg_placer[i]=to_copy->arg_placer[i];
+      }
+      /*can still use the same func_map to call from*/
+      new_copy->func_map=to_copy->func_map;
+      new_copy->stackptr=stack_init();
+      new_copy->n_args=to_copy->n_args;
+      new_copy->parent=to_copy->parent;
+      new_copy->return_val=NULL;
+      return new_copy;
+   }
+
+   return NULL;
+}
+
+
+void free_copy(word_cont* to_free)
+{
+   int i;
+   if(to_free)
+   {
+      for(i=0;i<to_free->capacity;i++)
+      {
+         free(to_free->words[i]);
+      }
+      for(i=0;i<NUMVARS;i++)
+      {
+         if(to_free->var_array[i])
+         {
+            free(to_free->var_array[i]);
+         }
+      }
+      free(to_free->words);
+      free(to_free->return_val);
+      stack_free(to_free->stackptr);
+      free(to_free);
+   }
+
+}
 
 
 bool valid_funcvar(word_cont* to_check)
@@ -49,7 +118,7 @@ bool valid_funcvar(word_cont* to_check)
    }
    return true;
 }
-
+/*funcvar is the name of the function*/
 bool set_funcvar(word_cont* to_check,char func_name[MAXFUNCLEN])
 {
    if(valid_funcvar(to_check))
@@ -136,20 +205,19 @@ bool get_func_info(word_cont* to_check,word_cont* n_func)
    if(valid_instructlist(to_check))
    {
       to_check->position=initial_pos;
-      if(copy_over(to_check,n_func))
+      if(copy_over_orig(to_check,n_func))
       {
          n_func->position=0;
          return true;
       }
-      n_func->position=0;
-      return true;
+
    }
    return false;
 }
 
 /*there are better ways to balance brackets out there
 but this will be adequate*/
-bool copy_over(word_cont* to_check,word_cont* n_func)
+bool copy_over_orig(word_cont* to_check,word_cont* n_func)
 {
 
    int left_brackets,right_brackets;
@@ -377,10 +445,11 @@ bool place_all_args(word_cont* to_check,word_cont* n_func,\
    return false;
 }
 
-
-bool run_funcrun(word_cont* to_check,line_cont* line_arr)
+bool run_funcrun(word_cont* to_check,\
+               line_cont* line_arr,double** return_val)
 {
    word_cont* to_run;
+   word_cont* copy;
    to_run=NULL;
    if(get_funcvar(to_check,&to_run))
    {
@@ -389,20 +458,26 @@ bool run_funcrun(word_cont* to_check,line_cont* line_arr)
          to_check->position++;
          if(place_all_args(to_check,to_run,START,line_arr))
          {
-            if(run_instruction_list(to_run,line_arr))
+            copy=deep_copy_func(to_run);
+
+            if(run_instruction_list(copy,line_arr))
             {
-               /*set back to beginning*/
+               if(copy->return_val)
+               {
+                  *return_val=(double*)safe_calloc(1,sizeof(double));
+                  **return_val= *copy->return_val;
+               }
+               free_copy(copy);
                reset_func(to_run);
                return true;
             }
+            free_copy(copy);
          }
       }
+
    }
    return false;
 }
-
-
-
 
 
 bool valid_argsrun(word_cont* to_check)
@@ -487,7 +562,7 @@ bool run_return(word_cont* to_check,line_cont* line_arr)
       if(get_varnum(to_check,to_return,line_arr))
       {
          to_check->return_val=to_return;
-         
+
          return true;
       }
    }
@@ -499,19 +574,16 @@ bool run_return(word_cont* to_check,line_cont* line_arr)
 bool get_func_val(word_cont* to_check,line_cont* line_arr,\
                      double* num)
 {
-   word_cont* func;
-   /*while we have the func name we can just search for it
-   to have a copy will return NULL if its not found
-   and fail the if */
-   func=assoc_lookup(to_check->func_map,\
-      to_check->words[to_check->position]);
-   if(run_funcrun(to_check,line_arr))
+   double* r_val;
+   r_val=NULL;
+
+   if(run_funcrun(to_check,line_arr,&r_val))
    {
-      if(func->return_val)
+
+      if(r_val)
       {
-         *num= *func->return_val;
-         free(func->return_val);
-         func->return_val=NULL;
+         *num= *r_val;
+         free(r_val);
          return true;
       }
       /*if return val is null*/

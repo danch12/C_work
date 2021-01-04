@@ -7,6 +7,7 @@
 
 #include "../ADTS_and_general/general.h"
 #include "../ADTS_and_general/stacks/stack_funcs.h"
+#include "../ADTS_and_general/stacks/function_stack_funcs.h"
 #include "../ADTS_and_general/hash_map/hash_funcs.h"
 
 #define MAXLEN 1000

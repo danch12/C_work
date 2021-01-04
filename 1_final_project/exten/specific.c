@@ -3,7 +3,7 @@
 
 
 bool run_funcset(word_cont* to_check);
-bool run_funcrun(word_cont* to_check,line_cont* line_arr);
+bool run_funcrun(word_cont* to_check,line_cont* line_arr,double** return_val);
 bool run_flowstate(word_cont* to_check,line_cont* line_arr);
 bool run_return(word_cont* to_check,line_cont* line_arr);
 
@@ -81,6 +81,7 @@ bool free_word_cont(word_cont* to_free)
       free(to_free->words);
       free(to_free->return_val);
       stack_free(to_free->stackptr);
+
       deep_free_assoc(to_free->func_map);
       free(to_free);
    }
@@ -120,10 +121,12 @@ word_cont* read_in_file(char* filename)
    {
       n_cont->var_array[i]=NULL;
    }
+
    n_cont->func_map=assoc_init();
    n_cont->n_args=UNUSED;
    n_cont->parent=NULL;
    n_cont->return_val=NULL;
+
    return n_cont;
 }
 
@@ -152,6 +155,8 @@ commands*/
 bool run_instruction(word_cont* to_check,line_cont* line_arr)
 {
    int init_pos;
+   double* placeholder;
+   placeholder=NULL;
    init_pos=to_check->position;
    if(init_pos>=to_check->capacity)
    {
@@ -190,7 +195,7 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
       return true;
    }
    to_check->position=init_pos;
-   if(run_funcrun(to_check,line_arr))
+   if(run_funcrun(to_check,line_arr,&placeholder))
    {
       return true;
    }
@@ -301,8 +306,10 @@ bool get_varnum(word_cont* to_check,double* num,line_cont* line_arr)
    {
       return true;
    }
+
    if(get_func_val(to_check,line_arr,num))
    {
+
       return true;
    }
    return false;

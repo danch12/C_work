@@ -4,7 +4,7 @@
 #include "specific.h"
 #include "parser_funcs.h"
 #include "interpreter_funcs.h"
-
+#include "../ADTS_and_general/stacks/stack_funcs.h"
 #include "../ADTS_and_general/hash_map/hash_funcs.h"
 #include "extension_flow.h"
 
@@ -27,7 +27,7 @@ bool get_arg(word_cont* to_check,word_cont* n_func);
 bool get_func_info(word_cont* to_check,word_cont* n_func);
 bool valid_funcset(word_cont* to_check);
 bool run_funcset(word_cont* to_check);
-bool copy_over(word_cont* to_check,word_cont* n_func);
+bool copy_over_orig(word_cont* to_check,word_cont* n_func);
 
 
 bool get_funcvar(word_cont* to_check,word_cont** to_get);
@@ -38,11 +38,13 @@ bool place_all_args(word_cont* to_check,word_cont* n_func,\
 void reset_func(word_cont* func);
 bool valid_argsrun(word_cont* to_check);
 bool valid_funcrun(word_cont* to_check);
-bool run_funcrun(word_cont* to_check,line_cont* line_arr);
+bool run_funcrun(word_cont* to_check,\
+               line_cont* line_arr,double** return_val);
 bool run_return(word_cont* to_check,line_cont* line_arr);
 bool valid_return(word_cont* to_check);
 word_cont* init_func_cont(void);
 bool free_word_cont(word_cont* to_free);
 void resize(word_cont* n_func);
-
+word_cont* deep_copy_func(word_cont* to_copy);
+void free_copy(word_cont* to_free);
  #endif

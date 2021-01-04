@@ -31,14 +31,19 @@ Grammar for functions
 
 For FUNCVAR it can be any combination of lowercase letters up to a length of 50, sorry I couldn't format it properly. Thought it would be a good idea to have them lowercase so they wouldn't interfere with any reserved words.
 
-Additionally in the word struct for the extension I have added more features - added a pointer to parent that allows the function to use functions defined in the "main" bit of code. Good thing about doing it this way is it sort of starts to build in scope as it will check for local functions first then go to main functions. This also means we can define functions within functions within functions etc - not that you would usually want to but I quite like having the option. If I have time I want to be able to build recursive functions - first I want to do control flow though.
+Additionally in the word struct for the extension I have added more features - added a pointer to parent that allows the function to use functions defined in the "main" bit of code. Good thing about doing it this way is it sort of starts to build in scope as it will check for local functions first then go to main functions. This also means we can define functions within functions within functions etc - not that you would usually want to but I quite like having the option. 
+If I have time I want to be able to build recursive functions- will have to use a stack and put a copy of each function onto the stack and return them one by one - first I want to do control flow though.
+
+Ok im going to try do recursion now. Created a new version of the stack ADT as of now but in the future could potentially edit my existing reverse polish code to use void pointers and then both bits could be done with the same stack functions but as of now thought it would be simpler to use different things so we can mess around with the stack functions if need be and it won't affect the reverse polish code. Another design decision that I made - similar to hash maps actually was to use a void pointer rather than including the word cont because I was worried about dealing with a load of different files that all sort of rely on each other. This has the downside of making a couple of the functions slightly harder to use as we have to deal with void** when doing pop operations and void** isn't typeless. But its not that big of a deal-could even create a function for dealing with those actually.
+ Basically when we call a function we put it onto the stack and then if there's any more functions in that function we put those on the stack as well. Then we pop them off in order and run them. Important to note that we should put a copy of the function on the stack not the original. So we treat the functions in the hash map as sort of templates for the function. Also important that we dont free functions immediately after calling as we will need to check if we need to use the return value of the completed function so will have to be careful of memory leaks. 
+Also makes sense that only the main word_container has a function stack otherwise would be sort of pointless to have a stack. 
+
+Wait a minute do I even need a stack? Why don't I just use C's stack to my own purposes? 
 
 
+Thought control flow would be another thing that comes in handy when coding. Start simple and just have three comparators and if we have time then build it up. Additionally we could eventually have reverse polish comparisons but for now lets stick to varnums. Using the ANSI C grammar for inspiration - https://www.lysator.liu.se/c/ANSI-C-grammar-y.html .
 
-
-Thought control flow would be another thing that comes in handy when coding (bit of an understatement). Start simple and just have three comparators and if we have time then build it up. Additionally we could eventually have reverse polish comparisons but for now lets stick to varnums. Using the ANSI C grammar for inspiration - https://www.lysator.liu.se/c/ANSI-C-grammar-y.html .
-
-Important thing to consider is that even if we dont execute statements we still want to check for syntax errors. Also not sure why I do { <INSTRUCTLIST> rather than <MAIN> but it says so in the real formal grammar as well. Must be a reason for it.
+Important thing to consider is that even if we don't execute statements we still want to check for syntax errors.
 
 Formal grammar - 
 

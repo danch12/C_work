@@ -13,6 +13,8 @@ GENERALFULL = ADTS_and_general/general.c ADTS_and_general/general.h
 GENERALRUN = ADTS_and_general/general.c
 STACKSFULL = ADTS_and_general/stacks/stack_funcs.c ADTS_and_general/stacks/stack_funcs.h
 STACKSRUN = ADTS_and_general/stacks/stack_funcs.c
+FUNCTIONSTACKSFULL = ADTS_and_general/stacks/function_stack_funcs.h ADTS_and_general/stacks/function_stack_funcs.c
+FUNCTIONSTACKSRUN = ADTS_and_general/stacks/function_stack_funcs.c
 HASHFULL = ADTS_and_general/hash_map/hash_funcs.c ADTS_and_general/hash_map/hash_funcs.h
 HASHRUN = ADTS_and_general/hash_map/hash_funcs.c
 INTERPFULL = interpreter_funcs.c  interpreter_funcs.h
@@ -31,6 +33,12 @@ test_stacks_fast: ADTS_and_general/stacks/stack_tests.c $(STACKSFULL) $(GENERALF
 
 test_stacks_san: ADTS_and_general/stacks/stack_tests.c $(STACKSFULL) $(GENERALFULL)
 	 $(CC) ADTS_and_general/stacks/stack_tests.c $(STACKSRUN) $(GENERALRUN) -o test_stacks_san $(CFLAGSSAN) $(LIDLIBS)
+
+test_function_stacks_san: ADTS_and_general/stacks/function_stack_tests.c $(FUNCTIONSTACKSFULL) $(GENERALFULL)
+	$(CC) ADTS_and_general/stacks/function_stack_tests.c $(FUNCTIONSTACKSRUN) $(GENERALRUN) -o test_function_stacks_san $(CFLAGSSAN) $(LIDLIBS)
+
+test_function_stacks_fast: ADTS_and_general/stacks/function_stack_tests.c $(FUNCTIONSTACKSFULL) $(GENERALFULL)
+	$(CC) ADTS_and_general/stacks/function_stack_tests.c $(FUNCTIONSTACKSRUN) $(GENERALRUN) -o test_function_stacks_fast $(CFLAGSFAST) $(LIDLIBS)
 
 hash_map_fast: ADTS_and_general/hash_map/hash_map_tests.c $(HASHFULL) $(GENERALFULL)
 	$(CC) ADTS_and_general/hash_map/hash_map_tests.c $(HASHRUN) $(GENERALRUN) -o hash_map_fast $(CFLAGSFAST) $(LIDLIBS)
@@ -54,8 +62,8 @@ test_interp_fast : interpreter_tests.c $(PARSEFULL) $(INTERPFULL) interpreter/sp
 interp: interpreter.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h  ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h  $(STACKSFULL) $(GENERALFULL)
 	$(CC) interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
-exten_func_san: extension_func_tests.c extension_funcs.c extension_flow.c extension_flow.h  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
-	$(CC) extension_func_tests.c extension_funcs.c extension_flow.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_func_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
+exten_func_san: extension_func_tests.c extension_funcs.c extension_flow.c extension_flow.h  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(FUNCTIONSTACKSFULL)
+	$(CC) extension_func_tests.c extension_funcs.c extension_flow.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(FUNCTIONSTACKSRUN) -o exten_func_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
 exten_func_fast:extension_func_tests.c extension_funcs.c extension_flow.c extension_flow.h  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
 	$(CC) extension_func_tests.c extension_funcs.c extension_flow.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) -o exten_func_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
@@ -78,11 +86,13 @@ extension: extension.c extension_funcs.c  extension_funcs.h extension_flow.c ext
 
 
 
-run_tests: test_interp_san test_interp_fast hash_map_san hash_map_fast test_stacks_san test_stacks_fast test_parser_san test_parser_fast exten_func_fast exten_func_san exten_flow_san exten_flow_fast exten_func_flow_san exten_func_flow_fast
+run_tests: test_interp_san test_interp_fast hash_map_san hash_map_fast test_stacks_san test_stacks_fast test_parser_san test_parser_fast exten_func_fast exten_func_san exten_flow_san exten_flow_fast exten_func_flow_san exten_func_flow_fast test_function_stacks_san test_function_stacks_fast
 	./parser_test_fast
 	./parser_test_san
 	./test_stacks_fast
 	./test_stacks_san
+	./test_function_stacks_fast
+	./test_function_stacks_san
 	./hash_map_fast
 	./hash_map_san
 	./test_interp_san
@@ -93,6 +103,7 @@ run_tests: test_interp_san test_interp_fast hash_map_san hash_map_fast test_stac
 	./exten_flow_san
 	./exten_func_flow_san
 	./exten_func_flow_fast
+
 
 #runs a series of invalid files and stores error message in p_errors.txt the | true stops the makefile from terminating after seeing an error
 run_parser_err: parser_fast
