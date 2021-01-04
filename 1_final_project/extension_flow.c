@@ -5,6 +5,7 @@ bool run_flowstate(word_cont* to_check,line_cont* line_arr)
 {
 
    bool result;
+
    if(do_comparison(to_check,&result,line_arr))
    {
       if(result==true)

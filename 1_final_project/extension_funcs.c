@@ -47,7 +47,7 @@ word_cont* deep_copy_func(word_cont* to_copy)
       new_copy=(word_cont*)safe_calloc(1,sizeof(word_cont));
       new_copy->capacity=to_copy->capacity;
       copy_words_over(new_copy,to_copy);
-      new_copy->position=0;
+
       for(i=0;i<NUMVARS;i++)
       {
          if(to_copy->var_array[i])
@@ -63,6 +63,7 @@ word_cont* deep_copy_func(word_cont* to_copy)
       new_copy->n_args=to_copy->n_args;
       new_copy->parent=to_copy->parent;
       new_copy->return_val=NULL;
+      new_copy->position=0;
       return new_copy;
    }
 
@@ -459,7 +460,7 @@ bool run_funcrun(word_cont* to_check,\
          if(place_all_args(to_check,to_run,START,line_arr))
          {
             copy=deep_copy_func(to_run);
-
+         
             if(run_instruction_list(copy,line_arr))
             {
                if(copy->return_val)
