@@ -29,19 +29,13 @@ Grammar for functions
 
 <FUNCVAR> := Σ n=50{a-z}
 
-For FUNCVAR it can be any combination of lowercase letters up to a length of 50, sorry I couldn't format it properly. Thought it would be a good idea to have them lowercase so they wouldn't interfere with any reserved words.
+For FUNCVAR it can be any combination of lowercase letters up to a length of 50, sorry I didn't know how to say it properly with a formal grammar. Thought it would be a good idea to have them lowercase so they wouldn't interfere with any reserved words.
 
 Additionally in the word struct for the extension I have added more features - added a pointer to parent that allows the function to use functions defined in the "main" bit of code. Good thing about doing it this way is it sort of starts to build in scope as it will check for local functions first then go to main functions. This also means we can define functions within functions within functions etc - not that you would usually want to but I quite like having the option. 
-If I have time I want to be able to build recursive functions- will have to use a stack and put a copy of each function onto the stack and return them one by one - first I want to do control flow though.
 
-Ok im going to try do recursion now. Created a new version of the stack ADT as of now but in the future could potentially edit my existing reverse polish code to use void pointers and then both bits could be done with the same stack functions but as of now thought it would be simpler to use different things so we can mess around with the stack functions if need be and it won't affect the reverse polish code. Another design decision that I made - similar to hash maps actually was to use a void pointer rather than including the word cont because I was worried about dealing with a load of different files that all sort of rely on each other. This has the downside of making a couple of the functions slightly harder to use as we have to deal with void** when doing pop operations and void** isn't typeless. But its not that big of a deal-could even create a function for dealing with those actually.
- Basically when we call a function we put it onto the stack and then if there's any more functions in that function we put those on the stack as well. Then we pop them off in order and run them. Important to note that we should put a copy of the function on the stack not the original. So we treat the functions in the hash map as sort of templates for the function. Also important that we dont free functions immediately after calling as we will need to check if we need to use the return value of the completed function so will have to be careful of memory leaks. 
-Also makes sense that only the main word_container has a function stack otherwise would be sort of pointless to have a stack. 
+When I run the function I create a deep copy of the function with its arguments then just run it like it was the main bit of the code- this means that I can run as many copies of the function as I want- therefore allowing for recursion.
 
-Wait a minute do I even need a stack? Why don't I just use C's stack to my own purposes? 
-
-
-Thought control flow would be another thing that comes in handy when coding. Start simple and just have three comparators and if we have time then build it up. Additionally we could eventually have reverse polish comparisons but for now lets stick to varnums. Using the ANSI C grammar for inspiration - https://www.lysator.liu.se/c/ANSI-C-grammar-y.html .
+Thought control flow would be another thing that comes in handy when coding. At the moment we will just use varnums but we could eventually have reverse polish comparisons. Using the ANSI C grammar for inspiration - https://www.lysator.liu.se/c/ANSI-C-grammar-y.html .
 
 Important thing to consider is that even if we don't execute statements we still want to check for syntax errors.
 
@@ -53,9 +47,40 @@ Formal grammar -
 <FLOWSTATE> := "IF" <EXPRESSION>  "{" <INSTRUCTLIST> | 
 		"IF" <EXPRESSION>  "{" <INSTRUCTLIST> "ELSE" "{" <INSTRUCTLIST>
 
-<COMPARATOR> := "==" "<" ">" 
+<COMPARATOR> := "==" "<" ">" ">=" "<=" 
 
 <EXPRESSION> := <VARNUM> <COMPARATOR> <VARNUM>
 
+
+
+Now lets do arrays - reckon this would be fun. Eventually think it would be cool to read in files or something into them. Think then it would be quite useful. Thinking about what ADT would be best to implement it. Would seem like if we didn't want to worry about setting max sizes and stuff then a reallocing array could be cool - although maybe for flexibility a linked list could be best as it allows for easier removal and insertion within the array? Been looking at how lisp does its lists (https://softwareengineering.stackexchange.com/questions/91121/lisp-benefits-of-lists-as-code-over-arrays-as-code and http://www.eecs.qmul.ac.uk/~mmh/ADSOOF/linkedlists/Lecture9.pdf) for some inspiration as they use linked lists to implement arrays but probably will do stuff quite differently as I'm not going to need that much functionality. To be honest I doubt that im going to be creating massive arrays so I guess it doesnt matter too much about the implementation.
+Also tempted to give functions access to arrays in main - this means that we can do some cool stuff with recursion filling arrays and stuff. Also means that we dont have to worry about returning arrays because that would be a whole other kettle of fish. 
+
+
+ And then to store the various arrays we could use a hash map again. Can just use the same identifiers as functions -
+
+Formal Grammar -
+
+<INSTRUCTION> ::= <FD> | <LT> |
+<RT> | <DO> | <SET> | <SETFUNC> | <RUNFUNC> | <FLOWSTATE> | <INITARRAY> | <APPEND> | <REMOVEVAL> | <CHANGEVAL>
+
+<INITARRAY> := "INITARR" <ARRAYIDENTIFIER> 
+
+<APPEND>  :=  <ARRAYIDENTIFIER> "APPEND" <POLISH>
+
+
+<CHANGEVAL> :=  <ARRAYIDENTIFIER> "[" <VARNUM> "]" "=" <POLISH>
+
+<REMOVEVAL> := "DEL" <ARRAYIDENTIFIER> "[" <VARNUM> "]"
+
+<ACCESSVAL> :=  <ARRAYIDENTIFIER> "[" <VARNUM> "]"
+
+<VARNUM> := number| <VAR> | <RUNFUNC> | <ACCESSVAL>
+
+<ARRAYIDENTIFIER> := starts with a_ then any set of lower case letters with 50 max total letters - eg a_myarr - this means that technically a_ is also valid
+
+<FILETOARRAY> := <ARRAYIDENTIFIER> filepath 
+
+Filepath is just whatever path 
 
 

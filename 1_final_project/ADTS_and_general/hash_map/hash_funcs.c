@@ -361,45 +361,6 @@ void assoc_free(assoc* a)
 }
 
 
-
-/*
-void _free_func_cont(func_cont* to_free)
-{
-   int i;
-   if(to_free)
-   {
-      for(i=0;i<to_free->capacity;i++)
-      {
-
-         free(to_free->words[i]);
-      }
-      for(i=0;i<NUMVARS;i++)
-      {
-         if(to_free->var_array[i])
-         {
-            printf("here\n");
-            free(to_free->var_array[i]);
-         }
-      }
-      if(to_free->words)
-      {
-         free(to_free->words);
-      }
-      if(to_free->stackptr)
-      {
-         stack_free(to_free->stackptr);
-      }
-
-      free(to_free);
-   }
-
-}
-*/
-
-
-
-
-
 /*when resizing dont want to free all the values*/
 void _partial_free(assoc* a)
 {
@@ -515,6 +476,8 @@ bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point)
       {
          if(_same_key(a->arr[insertion_point]->key,kv->key))
          {
+
+            free(a->arr[insertion_point]->key);
             free(a->arr[insertion_point]);
             a->arr[insertion_point]=kv;
 

@@ -7,7 +7,7 @@
 
 #include "../ADTS_and_general/general.h"
 #include "../ADTS_and_general/stacks/stack_funcs.h"
-#include "../ADTS_and_general/stacks/function_stack_funcs.h"
+#include "../ADTS_and_general/arrays/array_funcs.h"
 #include "../ADTS_and_general/hash_map/hash_funcs.h"
 
 #define MAXLEN 1000
@@ -41,12 +41,14 @@ typedef struct word_container
 {
    int arg_placer[NUMVARS];
    int n_args;
+
    char** words;
    int position;
    int capacity;
    stack* stackptr;
    double* var_array[NUMVARS];
    char err_message[MAXERRLEN];
+   assoc* arr_map;
    assoc* func_map;
    struct word_container* parent;
    double* return_val;

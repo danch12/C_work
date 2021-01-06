@@ -110,6 +110,10 @@ bool valid_funcvar(word_cont* to_check)
    }
    while(to_check->words[to_check->position][i])
    {
+      if(i>=MAXFUNCLEN)
+      {
+         return false;
+      }
       if(!(to_check->words[to_check->position][i]>='a')||\
          !(to_check->words[to_check->position][i]<='z'))
       {
@@ -294,6 +298,7 @@ void resize(word_cont* n_func)
 bool run_funcset(word_cont* to_check)
 {
    word_cont* n_func;
+   word_cont* existing;
    char* func_name;
    func_name=(char*)safe_calloc(MAXFUNCLEN,sizeof(char));
    n_func=init_func_cont();
@@ -314,6 +319,12 @@ bool run_funcset(word_cont* to_check)
                   to_check->position++;
                   if(get_func_info(to_check,n_func))
                   {
+                     existing=assoc_lookup(to_check->func_map,func_name);
+                     if(existing)
+                     {
+
+                        free_word_cont(existing);
+                     }
                      assoc_insert(&to_check->func_map,func_name,\
                                  n_func);
                      return true;
@@ -412,6 +423,10 @@ bool place_arg(word_cont* to_check,word_cont* n_func,\
          strcpy(to_check->err_message,"too many arguments for function");
          return false;
       }
+      if(n_func->var_array[func_var])
+      {
+         free(n_func->var_array[func_var]);
+      }
       n_func->var_array[func_var]=(double*)safe_calloc(1,\
                                  sizeof(double));
       *n_func->var_array[func_var]=to_place;
@@ -460,18 +475,21 @@ bool run_funcrun(word_cont* to_check,\
          if(place_all_args(to_check,to_run,START,line_arr))
          {
             copy=deep_copy_func(to_run);
-         
+
             if(run_instruction_list(copy,line_arr))
             {
                if(copy->return_val)
                {
+
                   *return_val=(double*)safe_calloc(1,sizeof(double));
                   **return_val= *copy->return_val;
+
                }
                free_copy(copy);
                reset_func(to_run);
                return true;
             }
+
             free_copy(copy);
          }
       }
@@ -580,16 +598,18 @@ bool get_func_val(word_cont* to_check,line_cont* line_arr,\
 
    if(run_funcrun(to_check,line_arr,&r_val))
    {
-
       if(r_val)
       {
+      
          *num= *r_val;
          free(r_val);
          return true;
       }
       /*if return val is null*/
+
       strcpy(to_check->err_message,"Function has no return value\n");
    }
+   free(r_val);
    return false;
 
 }

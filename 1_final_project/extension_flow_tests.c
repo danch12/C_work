@@ -20,7 +20,10 @@ int main(void)
    assert(get_comparator(test_cont)==greater);
    strcpy(test_cont->words[0],"=");
    assert(get_comparator(test_cont)==inv_op);
-
+   strcpy(test_cont->words[0],"<=");
+   assert(get_comparator(test_cont)==less_equal);
+   strcpy(test_cont->words[0],">=");
+   assert(get_comparator(test_cont)==greater_equal);
    free_word_cont(test_cont);
 
    test_cont=init_word_cont();
@@ -32,6 +35,19 @@ int main(void)
    test_cont->position=0;
    strcpy(test_cont->words[0],"10");
    strcpy(test_cont->words[1],"==");
+   strcpy(test_cont->words[2],"10");
+   assert(valid_expression(test_cont));
+
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"10");
+   strcpy(test_cont->words[1],">=");
+   strcpy(test_cont->words[2],"10");
+   assert(valid_expression(test_cont));
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"10");
+   strcpy(test_cont->words[1],"<=");
    strcpy(test_cont->words[2],"10");
    assert(valid_expression(test_cont));
 
@@ -536,6 +552,55 @@ int main(void)
    strcpy(test_cont->words[1],"-10");
    strcpy(test_cont->words[2],"<");
    strcpy(test_cont->words[3],"-9");
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
+   assert(test_bool);
+
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"IF");
+   strcpy(test_cont->words[1],"-10");
+   strcpy(test_cont->words[2],"<=");
+   strcpy(test_cont->words[3],"-10");
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
+   assert(test_bool);
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"IF");
+   strcpy(test_cont->words[1],"-10");
+   strcpy(test_cont->words[2],"<=");
+   strcpy(test_cont->words[3],"-9");
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
+   assert(test_bool);
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"IF");
+   strcpy(test_cont->words[1],"-10");
+   strcpy(test_cont->words[2],"<=");
+   strcpy(test_cont->words[3],"-11");
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
+   assert(!test_bool);
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"IF");
+   strcpy(test_cont->words[1],"-10");
+   strcpy(test_cont->words[2],">=");
+   strcpy(test_cont->words[3],"-10");
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
+   assert(test_bool);
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"IF");
+   strcpy(test_cont->words[1],"-10");
+   strcpy(test_cont->words[2],">=");
+   strcpy(test_cont->words[3],"-9");
+   assert(do_comparison(test_cont,&test_bool,test_line_cont));
+   assert(!test_bool);
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"IF");
+   strcpy(test_cont->words[1],"-10");
+   strcpy(test_cont->words[2],">=");
+   strcpy(test_cont->words[3],"-11");
    assert(do_comparison(test_cont,&test_bool,test_line_cont));
    assert(test_bool);
 

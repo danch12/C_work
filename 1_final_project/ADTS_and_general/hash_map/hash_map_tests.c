@@ -1,11 +1,12 @@
 #include "hash_funcs.h"
-
+#define TESTCAP 15053
 #define WORDS 370119
 #define WORDLEN 50
 
-/*assigns a int to position member for easy
-testing without having to worry about properly
-creating function holder */
+/*using one of your tests for hash map as well!
+thought i might as well since they are
+available
+*/
 
 
 
@@ -31,7 +32,7 @@ int main(void)
      assert(assoc_count(a)==j);
       i[j] = j;
      if(fscanf(fp, "%s", strs[j])!=1)
-     { 
+     {
         fprintf(stderr,"Failed to scan in a word?");
         exit(EXIT_FAILURE);
      }

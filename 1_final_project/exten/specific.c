@@ -1,6 +1,6 @@
 #include "specific.h"
 
-
+typedef enum assoc_type {function, array} assoc_type;
 
 bool run_funcset(word_cont* to_check);
 bool run_funcrun(word_cont* to_check,line_cont* line_arr,double** return_val);
@@ -36,7 +36,7 @@ bool get_func_val(word_cont* to_check,line_cont* line_arr,\
                      double* num);
 
 
-void deep_free_assoc(assoc* a)
+void deep_free_assoc(assoc* a,assoc_type t)
 {
    unsigned int i;
    if(a)
@@ -48,8 +48,14 @@ void deep_free_assoc(assoc* a)
             free(a->arr[i]->key);
             if(a->arr[i]->value)
             {
-
-               free_word_cont(a->arr[i]->value);
+               if(t==function)
+               {
+                  free_word_cont(a->arr[i]->value);
+               }
+               if(t==array)
+               {
+                  free_arr(a->arr[i]->value);
+               }
             }
 
             free(a->arr[i]);
@@ -59,6 +65,9 @@ void deep_free_assoc(assoc* a)
       free(a);
    }
 }
+
+
+
 
 
 
@@ -81,8 +90,8 @@ bool free_word_cont(word_cont* to_free)
       free(to_free->words);
       free(to_free->return_val);
       stack_free(to_free->stackptr);
-
-      deep_free_assoc(to_free->func_map);
+      deep_free_assoc(to_free->arr_map,array);
+      deep_free_assoc(to_free->func_map,function);
       free(to_free);
    }
 
@@ -197,6 +206,10 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
    to_check->position=init_pos;
    if(run_funcrun(to_check,line_arr,&placeholder))
    {
+      if(placeholder)
+      {
+         free(placeholder);
+      }
       return true;
    }
    to_check->position=init_pos;

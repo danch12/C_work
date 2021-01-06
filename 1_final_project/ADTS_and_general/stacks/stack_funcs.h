@@ -31,7 +31,6 @@ typedef struct stack
 
 /*return void then cast when appropriate*/
 stack* stack_init(void);
-nodeptr init_node(double d);
 void stack_push(stack* s,double d);
 bool stack_pop(stack* s, double* new_d);
 bool stack_free(stack* s);

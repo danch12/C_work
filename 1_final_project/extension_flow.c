@@ -112,6 +112,10 @@ bool do_comparison_helper(double vn_1,double vn_2,comparator cmp)
       return vn_1<vn_2;
       case greater:
       return vn_1>vn_2;
+      case greater_equal:
+      return (vn_1>vn_2 || comp_doubles(vn_1,vn_2));
+      case less_equal:
+      return (vn_1<vn_2 || comp_doubles(vn_1,vn_2));
       default:
       fprintf(stderr,"error- comparator not recognised\n");
       exit(EXIT_FAILURE);
@@ -201,6 +205,14 @@ comparator get_comparator(word_cont* to_check)
    if(strcmp(to_check->words[to_check->position],">")==0)
    {
       return greater;
+   }
+   if(strcmp(to_check->words[to_check->position],">=")==0)
+   {
+      return greater_equal;
+   }
+   if(strcmp(to_check->words[to_check->position],"<=")==0)
+   {
+      return less_equal;
    }
    return inv_op;
 }
