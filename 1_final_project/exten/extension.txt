@@ -69,7 +69,7 @@ Formal Grammar -
 <APPEND>  :=  <ARRAYIDENTIFIER> "APPEND" <POLISH>
 
 
-<CHANGEVAL> :=  <ARRAYIDENTIFIER> "[" <VARNUM> "]" "=" <POLISH>
+<CHANGEVAL> :=  <ARRAYIDENTIFIER> "[" <VARNUM> "]" ":=" <POLISH>
 
 <REMOVEVAL> := "DEL" <ARRAYIDENTIFIER> "[" <VARNUM> "]"
 
@@ -78,6 +78,17 @@ Formal Grammar -
 <VARNUM> := number| <VAR> | <RUNFUNC> | <ACCESSVAL>
 
 <ARRAYIDENTIFIER> := starts with a_ then any set of lower case letters with 50 max total letters - eg a_myarr - this means that technically a_ is also valid
+
+For accessing the arrays the VARNUM has to be positive and not a decimal. Because we can get a varnum from a number of sources this will be checked at runtime.
+
+
+
+
+
+
+
+
+
 
 <FILETOARRAY> := <ARRAYIDENTIFIER> filepath 
 

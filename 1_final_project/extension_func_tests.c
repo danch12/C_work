@@ -949,7 +949,8 @@ int main(void)
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
 
-
+   /*testing redefining functions that theres
+   no memory leaks or whatever*/
    test_cont=init_word_cont();
    test_line_cont=init_line_cont();
    strcpy(test_cont->words[0],"{");

@@ -12,6 +12,11 @@ turt_arr* arr_init(void)
    return n_arr;
 }
 
+
+
+
+
+
 bool append_arr(double data,turt_arr* t_arr)
 {
    t_node* n_node;
@@ -129,6 +134,31 @@ bool remove_val(turt_arr* t_arr,int position)
    return false;
 
 }
+
+
+bool change_val_arr(double n_data,int position,\
+                  turt_arr* t_arr)
+{
+   t_node* temp;
+   if(t_arr)
+   {
+      if((position<0) || ((unsigned int)position>=t_arr->size))
+      {
+         return false;
+      }
+      temp=t_arr->head;
+      while(position>0)
+      {
+         temp=temp->next;
+         position--;
+      }
+      temp->data=n_data;
+      return true;
+   }
+   return false;
+}
+
+
 
 bool get_arr_val(turt_arr* t_arr,int position,double* val)
 {

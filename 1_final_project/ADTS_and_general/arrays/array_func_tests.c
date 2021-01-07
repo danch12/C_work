@@ -59,6 +59,12 @@ int main(void)
    assert(get_arr_val(test_arr,3,&test_d));
    assert(compare_doubles(test_d,7));
 
+
+   assert(change_val_arr(90,3,test_arr));
+   assert(get_arr_val(test_arr,3,&test_d));
+   assert(compare_doubles(test_d,90));
+
+   assert(!change_val_arr(90,1000,test_arr));
    assert(free_arr(test_arr));
 
 
@@ -80,7 +86,7 @@ int main(void)
    assert(!insert_arr(0,NULL,0));
    assert(!get_arr_val(NULL,0,&test_d));
    assert(!remove_val(NULL,0));
-
+   assert(!change_val_arr(1,3,NULL));
    return 0;
 }
 

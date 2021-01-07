@@ -277,7 +277,6 @@ void resize(word_cont* n_func)
    }
    temp=n_func->words;
    n_func->words=n_words;
-
    for(i=0;i<n_func->capacity;i++)
    {
       if(temp[i])
@@ -322,7 +321,6 @@ bool run_funcset(word_cont* to_check)
                      existing=assoc_lookup(to_check->func_map,func_name);
                      if(existing)
                      {
-
                         free_word_cont(existing);
                      }
                      assoc_insert(&to_check->func_map,func_name,\
@@ -480,17 +478,15 @@ bool run_funcrun(word_cont* to_check,\
             {
                if(copy->return_val)
                {
-
                   *return_val=(double*)safe_calloc(1,sizeof(double));
                   **return_val= *copy->return_val;
-
                }
                free_copy(copy);
                reset_func(to_run);
                return true;
             }
-
             free_copy(copy);
+            reset_func(to_run);
          }
       }
 
@@ -600,7 +596,7 @@ bool get_func_val(word_cont* to_check,line_cont* line_arr,\
    {
       if(r_val)
       {
-      
+
          *num= *r_val;
          free(r_val);
          return true;

@@ -17,9 +17,25 @@ bool get_arr_identifier(word_cont* to_check,\
                         char arr_name[MAXARRLEN]);
 bool valid_arr_identifier(word_cont* to_check);
 bool valid_init_arr(word_cont* to_check);
+/*store value into array*/
 void store_arr(word_cont* to_check,char arr_name[MAXARRLEN],\
                turt_arr* n_arr);
+
+/*guard aginst decimals being used as index*/
+bool get_valid_ind(word_cont* to_check,line_cont* line_arr,int* ind);
 bool run_init_arr(word_cont* to_check);
+bool valid_append(word_cont* to_check);
+bool run_append(word_cont* to_check,line_cont* line_arr);
+turt_arr* get_arr(word_cont* to_check,char arr_name[MAXARRLEN]);
+
+/*gets info and checks for validity*/
+bool change_helper(word_cont* to_check, line_cont* line_arr,\
+                  int* ind,double* num);
+
+bool run_change(word_cont* to_check,line_cont* line_arr);
+
+
+bool compare_doubles(double d_1, double d_2);
 word_cont* init_word_cont(void);
 
 int main(void)
@@ -111,10 +127,257 @@ int main(void)
    test_arr=NULL;
    test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
    assert(test_arr);
+   assert(test_cont->position==2);
 
    strcpy(test_cont->words[2],"INITARR");
    strcpy(test_cont->words[3],"a_myarragain");
    assert(run_init_arr(test_cont));
+   /*checking we can overwrite without memory leaks*/
+   strcpy(test_cont->words[4],"INITARR");
+   strcpy(test_cont->words[5],"a_myarragain");
+   assert(run_init_arr(test_cont));
+   test_arr=assoc_lookup(test_cont->arr_map,"a_myarragain");
+   assert(test_arr);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"");
+   strcpy(test_cont->words[2],"a_myarr");
+   assert(!run_init_arr(test_cont));
+   test_cont->position=0;
+
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"dhfn");
+   assert(!run_init_arr(test_cont));
+   test_cont->position=0;
+
+   strcpy(test_cont->words[0],"a_arr");
+   strcpy(test_cont->words[1],"INITARR");
+   assert(!run_init_arr(test_cont));
+   test_cont->position=0;
+
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"a_myarr");
+   strcpy(test_cont->words[1],"APPEND");
+   strcpy(test_cont->words[2],"23");
+   strcpy(test_cont->words[3],";");
+   assert(valid_append(test_cont));
+   assert(test_cont->position==4);
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"a_myarr");
+   strcpy(test_cont->words[1],"APPEND");
+   strcpy(test_cont->words[2],"A");
+   strcpy(test_cont->words[3],";");
+   assert(valid_append(test_cont));
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"a_myarr");
+   strcpy(test_cont->words[1],"APPEND");
+   strcpy(test_cont->words[2],"A");
+   strcpy(test_cont->words[3],"1");
+   strcpy(test_cont->words[4],"/");
+   strcpy(test_cont->words[5],";");
+   assert(valid_append(test_cont));
+
+
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"a_myarr");
+   strcpy(test_cont->words[1],"APPEND");
+   strcpy(test_cont->words[2],"A");
+   strcpy(test_cont->words[3],"B");
+   strcpy(test_cont->words[4],"/");
+   strcpy(test_cont->words[5],";");
+   assert(valid_append(test_cont));
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"a_myarr");
+   strcpy(test_cont->words[1],"APPEND");
+   strcpy(test_cont->words[2],"A");
+   strcpy(test_cont->words[3],"abc");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"}");
+   strcpy(test_cont->words[6],"/");
+   strcpy(test_cont->words[7],";");
+   assert(valid_append(test_cont));
+
+   /*valid but wont run*/
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"a_myarr");
+   strcpy(test_cont->words[1],"APPEND");
+   strcpy(test_cont->words[2],"/");
+   strcpy(test_cont->words[3],"abc");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"}");
+   strcpy(test_cont->words[6],"/");
+   strcpy(test_cont->words[7],";");
+   assert(valid_append(test_cont));
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"kancdj");
+   strcpy(test_cont->words[1],"APPEND");
+   strcpy(test_cont->words[2],"/");
+   strcpy(test_cont->words[3],"abc");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"}");
+   strcpy(test_cont->words[6],"/");
+   strcpy(test_cont->words[7],";");
+   assert(!valid_append(test_cont));
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"a_");
+   strcpy(test_cont->words[1],"append");
+   strcpy(test_cont->words[2],"/");
+   strcpy(test_cont->words[3],"abc");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"}");
+   strcpy(test_cont->words[6],"/");
+   strcpy(test_cont->words[7],";");
+   assert(!valid_append(test_cont));
+
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"a_");
+   strcpy(test_cont->words[1],"APPEND");
+   strcpy(test_cont->words[2],"");
+   strcpy(test_cont->words[3],"abc");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"}");
+   strcpy(test_cont->words[6],"/");
+   strcpy(test_cont->words[7],";");
+   assert(!valid_append(test_cont));
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"a_");
+   strcpy(test_cont->words[1],"append");
+   strcpy(test_cont->words[2],"FD");
+   strcpy(test_cont->words[3],"abc");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"}");
+   strcpy(test_cont->words[6],"/");
+   strcpy(test_cont->words[7],";");
+   assert(!valid_append(test_cont));
+
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"a_myarr");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"10");
+   strcpy(test_cont->words[5],"16");
+   strcpy(test_cont->words[6],"+");
+   strcpy(test_cont->words[7],";");
+   assert(run_init_arr(test_cont));
+   assert(run_append(test_cont,test_line_cont));
+   test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
+   assert(compare_doubles(test_arr->head->data,26));
+
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"10");
+   strcpy(test_cont->words[4],";");
+   strcpy(test_cont->words[5],"INITARR");
+   strcpy(test_cont->words[6],"a_myarr");
+   strcpy(test_cont->words[7],"a_myarr");
+   strcpy(test_cont->words[8],"APPEND");
+   strcpy(test_cont->words[9],"A");
+   strcpy(test_cont->words[10],"16");
+   strcpy(test_cont->words[11],"+");
+   strcpy(test_cont->words[12],";");
+   assert(run_set(test_cont,test_line_cont));
+   assert(run_init_arr(test_cont));
+   assert(run_append(test_cont,test_line_cont));
+   test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
+   assert(compare_doubles(test_arr->head->data,26));
+
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"a");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"}");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"RETURN");
+   strcpy(test_cont->words[6],"10");
+   strcpy(test_cont->words[7],"}");
+   strcpy(test_cont->words[8],"INITARR");
+   strcpy(test_cont->words[9],"a_myarr");
+   strcpy(test_cont->words[10],"a_myarr");
+   strcpy(test_cont->words[11],"APPEND");
+   strcpy(test_cont->words[12],"a");
+   strcpy(test_cont->words[13],"{");
+   strcpy(test_cont->words[14],"}");
+   strcpy(test_cont->words[15],"16");
+   strcpy(test_cont->words[16],"+");
+   strcpy(test_cont->words[17],";");
+   assert(run_funcset(test_cont));
+   assert(run_init_arr(test_cont));
+   assert(run_append(test_cont,test_line_cont));
+   test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
+   assert(compare_doubles(test_arr->head->data,26));
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"a_");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"10");
+   strcpy(test_cont->words[5],"16");
+   strcpy(test_cont->words[6],"+");
+   strcpy(test_cont->words[7],";");
+   assert(run_init_arr(test_cont));
+   assert(!run_append(test_cont,test_line_cont));
+   assert(strcmp(test_cont->err_message,"array not found - potentially not initalised yet")==0);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"a_myarr");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"A");
+   strcpy(test_cont->words[5],"16");
+   strcpy(test_cont->words[6],"+");
+   strcpy(test_cont->words[7],";");
+   assert(run_init_arr(test_cont));
+   assert(!run_append(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"a_myarr");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"1");
+   strcpy(test_cont->words[5],"16");
+   strcpy(test_cont->words[6],"12");
+   strcpy(test_cont->words[7],";");
+   assert(run_init_arr(test_cont));
+   assert(!run_append(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+
+   /*test get_valid_ind and valid_change and run_change*/
    return 0;
 }
 
@@ -138,25 +401,33 @@ bool run_init_arr(word_cont* to_check)
    char* arr_name;
    turt_arr* n_arr;
    arr_name=(char*)safe_calloc(MAXARRLEN,sizeof(char));
-   n_arr=arr_init();
    if(strcmp(to_check->words[to_check->position],"INITARR")==0)
    {
       to_check->position++;
       if(get_arr_identifier(to_check,arr_name))
       {
+         n_arr=arr_init();
          store_arr(to_check,arr_name,n_arr);
          return true;
       }
    }
+   free(arr_name);
    return false;
 }
 
 void store_arr(word_cont* to_check,char arr_name[MAXARRLEN],turt_arr* n_arr)
 {
    /*find mains hash map for arrays as arrays are global*/
+   turt_arr* existing;
+
    while(to_check->parent)
    {
       to_check=to_check->parent;
+   }
+   existing=assoc_lookup(to_check->arr_map,arr_name);
+   if(existing)
+   {
+      free_arr(existing);
    }
    assoc_insert(&to_check->arr_map,arr_name,n_arr);
 }
@@ -210,6 +481,171 @@ bool valid_arr_identifier(word_cont* to_check)
 }
 
 
+bool valid_append(word_cont* to_check)
+{
+   if(valid_arr_identifier(to_check))
+   {
+      to_check->position++;
+      if(strcmp(to_check->words[to_check->position],"APPEND")==0)
+      {
+         to_check->position++;
+         if(valid_polish(to_check))
+         {
+            return true;
+         }
+      }
+   }
+   return false;
+}
+
+
+bool run_append(word_cont* to_check,line_cont* line_arr)
+{
+   char arr_name[MAXARRLEN];
+   turt_arr* arr;
+   double num;
+   if(get_arr_identifier(to_check,arr_name))
+   {
+      if(strcmp(to_check->words[to_check->position],"APPEND")==0)
+      {
+         to_check->position++;
+         /*returns null if not found*/
+         arr=get_arr(to_check,arr_name);
+         if(run_polish(to_check,&num,line_arr))
+         {
+            /*returns false if null passed in*/
+            if(!append_arr(num,arr))
+            {
+               strcpy(to_check->err_message,"array not found - potentially not initalised yet");
+               return false;
+            }
+            return true;
+         }
+      }
+   }
+   return false;
+}
+
+
+bool valid_change(word_cont* to_check)
+{
+   if(valid_arr_identifier(to_check))
+   {
+      to_check->position++;
+      if(strcmp(to_check->words[to_check->position],"[")==0)
+      {
+         to_check->position++;
+         if(valid_varnum(to_check)))
+         {
+            if(strcmp(to_check->words[to_check->position],"]")==0)
+            {
+               to_check->position++;
+               if(strcmp(to_check->words[to_check->position],":=")==0)
+               {
+                  to_check->position++;
+                  if(valid_polish(to_check))
+                  {
+                     return true;
+                  }
+               }
+            }
+
+         }
+      }
+   }
+   return false;
+}
+
+
+bool run_change(word_cont* to_check,line_cont* line_arr)
+{
+   char arr_name[MAXARRLEN];
+   turt_arr* arr;
+   double num;
+   int ind;
+   if(get_arr_identifier(to_check,arr_name))
+   {
+      if(change_helper(to_check,line_arr,&ind,&num))
+      {
+         arr=get_arr(to_check,arr_name);
+         if(!arr)
+         {
+            strcpy(to_check->err_message,"array not found - potentially not initalised yet");
+            return false;
+         }
+         if(change_val_arr(num,ind,arr))
+         {
+            return true;
+         }
+         strcpy(to_check->err_message,"potentially trying to change a position greater than the size of array");
+
+      }
+   }
+   return false;
+}
+/*gets info and checks for validity*/
+bool change_helper(word_cont* to_check, line_cont* line_arr,\
+                  int* ind,double* num)
+{
+   if(strcmp(to_check->words[to_check->position],"[")==0)
+   {
+      to_check->position++;
+      {
+         if(get_valid_ind(to_check,line_arr,ind))
+         {
+            if(strcmp(to_check->words[to_check->position],"]")==0)
+            {
+               to_check->position++;
+               if(strcmp(to_check->words[to_check->position],":=")==0)
+               {
+                  to_check->position++;
+                  if(run_polish(to_check,num,line_arr))
+                  {
+                     return true;
+                  }
+               }
+            }
+         }
+      }
+   }
+   return false;
+}
+
+/*guard aginst decimals being used as index*/
+bool get_valid_ind(word_cont* to_check,line_cont* line_arr,int* ind)
+{
+   double num;
+   int i_num;
+   if(get_varnum(to_check,&num,line_arr))
+   {
+      if(num<0)
+      {
+         strcpy(to_check->err_message,"negative indexes not allowed");
+         return false;
+      }
+      i_num=num;
+      if(!((num-(double)i_num)<EPSILON))
+      {
+         strcpy(to_check->err_message,"decimals not allowed");
+         return false;
+      }
+      *ind=*i_num;
+      return true;
+   }
+   return false;
+}
+
+
+turt_arr* get_arr(word_cont* to_check,char arr_name[MAXARRLEN])
+{
+   while(to_check->parent)
+   {
+      to_check=to_check->parent;
+   }
+   return assoc_lookup(to_check->arr_map,arr_name);
+}
+
+
 
 word_cont* init_word_cont(void)
 {
@@ -234,4 +670,17 @@ word_cont* init_word_cont(void)
    n_cont->func_map=assoc_init();
    n_cont->arr_map=assoc_init();
    return n_cont;
+}
+
+
+
+bool compare_doubles(double d_1, double d_2)
+{
+   double temp;
+   temp= d_1 - d_2;
+   if(temp<EPSILON && temp > -EPSILON)
+   {
+      return true;
+   }
+   return false;
 }
