@@ -31,7 +31,7 @@ turt_arr* get_arr(word_cont* to_check,char arr_name[MAXARRLEN]);
 /*gets info and checks for validity*/
 bool change_helper(word_cont* to_check, line_cont* line_arr,\
                   int* ind,double* num);
-
+bool valid_change(word_cont* to_check);
 bool run_change(word_cont* to_check,line_cont* line_arr);
 
 
@@ -44,7 +44,7 @@ int main(void)
    line_cont* test_line_cont;
    char test_name[MAXARRLEN];
    turt_arr* test_arr;
-
+   int test_int;
    test_cont = init_word_cont();
    strcpy(test_cont->words[0],"a_myarr");
    assert(valid_arr_identifier(test_cont));
@@ -377,7 +377,76 @@ int main(void)
    assert(!run_append(test_cont,test_line_cont));
    free_word_cont(test_cont);
 
-   /*test get_valid_ind and valid_change and run_change*/
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"1.1");
+   assert(!get_valid_ind(test_cont,test_line_cont,&test_int));
+   test_cont->position=0;
+
+
+   strcpy(test_cont->words[0],"-1");
+   assert(!get_valid_ind(test_cont,test_line_cont,&test_int));
+   test_cont->position=0;
+
+
+   strcpy(test_cont->words[0],"1");
+   assert(get_valid_ind(test_cont,test_line_cont,&test_int));
+   test_cont->position=0;
+   assert(test_int==1);
+   strcpy(test_cont->words[0],"0");
+   assert(get_valid_ind(test_cont,test_line_cont,&test_int));
+   test_cont->position=0;
+   assert(test_int==0);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"a_bc");
+   strcpy(test_cont->words[1],"[");
+   strcpy(test_cont->words[2],"1");
+   strcpy(test_cont->words[3],"]");
+   strcpy(test_cont->words[4],":=");
+   strcpy(test_cont->words[5],"10");
+   strcpy(test_cont->words[6],";");
+   assert(valid_change(test_cont));
+   test_cont->position=0;
+   strcpy(test_cont->words[5],"A");
+   assert(valid_change(test_cont));
+   test_cont->position=0;
+   strcpy(test_cont->words[5],"1.1");
+   assert(valid_change(test_cont));
+   test_cont->position=0;
+   strcpy(test_cont->words[5],"1");
+   strcpy(test_cont->words[6],"1");
+   strcpy(test_cont->words[7],"2");
+   strcpy(test_cont->words[8],";");
+   assert(valid_change(test_cont));
+
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"a_myarr");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"1");
+   strcpy(test_cont->words[5],";");
+   strcpy(test_cont->words[6],"a_myarr");
+   strcpy(test_cont->words[7],"[");
+   strcpy(test_cont->words[8],"0");
+   strcpy(test_cont->words[9],"]");
+   strcpy(test_cont->words[10],":=");
+   strcpy(test_cont->words[11],"10");
+   strcpy(test_cont->words[12],";");
+   assert(run_init_arr(test_cont));
+   assert(run_append(test_cont,test_line_cont));
+   assert(run_change(test_cont,test_line_cont));
+   assert(test_cont->position==13);
+   test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
+   assert(compare_doubles(test_arr->head->data,10));
+
+
+   /*test  and run_change*/
    return 0;
 }
 
@@ -535,7 +604,7 @@ bool valid_change(word_cont* to_check)
       if(strcmp(to_check->words[to_check->position],"[")==0)
       {
          to_check->position++;
-         if(valid_varnum(to_check)))
+         if(valid_varnum(to_check))
          {
             if(strcmp(to_check->words[to_check->position],"]")==0)
             {
@@ -626,10 +695,10 @@ bool get_valid_ind(word_cont* to_check,line_cont* line_arr,int* ind)
       i_num=num;
       if(!((num-(double)i_num)<EPSILON))
       {
-         strcpy(to_check->err_message,"decimals not allowed");
+         strcpy(to_check->err_message,"decimal indexes not allowed");
          return false;
       }
-      *ind=*i_num;
+      *ind=i_num;
       return true;
    }
    return false;

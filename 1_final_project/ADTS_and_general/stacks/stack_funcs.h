@@ -10,7 +10,8 @@
 #include "../general.h"
 
 #define MAXELELEN 50
-
+/*i used your stacks code as a starting (and sometimes ending)
+point for my stacks code*/
 
 typedef struct node
 {

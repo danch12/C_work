@@ -9,7 +9,8 @@
 #include <math.h>
 #include "../general.h"
 
-
+/*not sure if we get penalised for plagerising ourselves
+but a lot of this code for the hashmaps is from the previous project*/
 
 /*make value void so we dont have to have a cascade
 of includes that rely on one another */
