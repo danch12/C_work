@@ -101,6 +101,9 @@ exten_func_fast:extension_func_tests.c extension_funcs.c extension_flow.c extens
 u_exten_func_san:unity_tests/Test_extension_funcs.c src/unity.c src/unity.h extension_funcs.c extension_flow.c extension_flow.h  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
 	$(CC) unity_tests/Test_extension_funcs.c src/unity.c extension_funcs.c extension_flow.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_exten_func_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
+u_exten_func_fast:unity_tests/Test_extension_funcs.c src/unity.c src/unity.h extension_funcs.c extension_flow.c extension_flow.h  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
+	$(CC) unity_tests/Test_extension_funcs.c src/unity.c extension_funcs.c extension_flow.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_exten_func_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
+
 exten_flow_san: extension_flow_tests.c extension_flow.c extension_flow.h extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
 	$(CC) extension_flow_tests.c  extension_flow.c extension_funcs.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o exten_flow_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
