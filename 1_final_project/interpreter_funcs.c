@@ -271,6 +271,7 @@ op get_op(word_cont* to_check)
    }
    return invalid_op;
 }
+
 /* we need to be careful that we dont pop
 a number off and leave it off - im not sure in
 what cases this would happen but its easy to safe guard

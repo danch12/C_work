@@ -48,23 +48,6 @@ bool valid_var(word_cont* to_check)
    }
    return false;
 }
-/*
-bool valid_varnum(word_cont* to_check)
-{
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
-   if(valid_num(to_check))
-   {
-      return true;
-   }
-   if(valid_var(to_check))
-   {
-      return true;
-   }
-   return false;
-}*/
 
 
 bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN])

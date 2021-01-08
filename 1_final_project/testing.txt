@@ -1,3 +1,7 @@
+Before I get into the nitty gritty of my thinking behind how I tested each function. I am using unity to test all my files and following their layout for how to test stuff. This means that functions are defined before main which goes against the house style guidelines but thought it would be ok in this instance. The source code for the unity tests is in the folder src.
+
+
+
 Basic Idea for testing parsing section was to start with the commands that do not rely on the other commands eg VAR, OP etc. and then build the commands which use purely those and so on. Additionally I tried to first test each command by itself in its own struct before adding in other commands- so created a new struct to test POLISH, then a new struct for SET and so on. Was important to test the position that the functions move the struct to as well as this will be basis for how we move to next command.Using variables that haven't been set is not picked up in the parsing stage but will be in the interpreting stage.
 
 For my black box testing of parser.c I have added in two commands to my makefile - run_parser_err which runs a series of invalid files and feeds the error messages into p_error.txt and run_parser_val which runs a series of valid files.
@@ -24,6 +28,6 @@ Also not sure if this is the correct place to say this but I put functions that 
 
 Lastly for the extension I followed pretty much the same ideas as the interpreter - although I split up the extension into two parts, one for functions and one for control flow. This meant that I was able to test each part easily without worrying about their interactions first. 
 
-One thing I didn't test for throughout the files is testing to see how the functions handle a NULL word container - this is because there is no situation where I'm going to be giving the functions NULLs so seemed a bit pointless. Like at the start of every run a create a word container and a line container so I know that the functions will receive non null values. I could have potentially included guards against NULL values but because of the above reasons it just sort of bloats the code a bit for not that much gain.
+One thing I didn't test for throughout the files is testing to see how the functions handle a NULL word container - this is because there is no situation where I'm going to be giving the functions NULLs so seemed a bit pointless. Like at the start of every run we create a word container and a line container so I know that the functions will receive non null values. I could have potentially included guards against NULL values but because of the above reasons it just sort of bloats the code a bit for not that much gain.
 
 

@@ -361,7 +361,16 @@ bool move_forward(word_cont* to_check,line_cont* l_arr)
    return false;
 }
 
+double wrap_around(double i, double i_max)
+{
 
+   i = fmod(i,i_max);
+   if(i<0)
+   {
+      return  i+i_max;
+   }
+   return i;
+}
 
 bool get_rotation(word_cont* to_check,line_cont* line_arr)
 {
@@ -383,7 +392,8 @@ bool get_rotation(word_cont* to_check,line_cont* line_arr)
       {
          temp= (DEGREES-num)+line_arr->pending_line->rotation;
       }
-      temp=fabs(fmod(temp,DEGREES));
+      temp=wrap_around(temp,DEGREES);
+
       line_arr->pending_line->rotation=temp;
       return true;
    }

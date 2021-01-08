@@ -445,7 +445,8 @@ int main(void)
    test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
    assert(compare_doubles(test_arr->head->data,10));
 
-
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
    /*test  and run_change*/
    return 0;
 }
