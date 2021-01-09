@@ -14,9 +14,6 @@ turt_arr* arr_init(void)
 
 
 
-
-
-
 bool append_arr(double data,turt_arr* t_arr)
 {
    t_node* n_node;

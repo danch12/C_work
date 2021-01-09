@@ -35,6 +35,16 @@ bool run_instruction_list(word_cont* to_check,\
 bool get_func_val(word_cont* to_check,line_cont* line_arr,\
                      double* num);
 
+bool valid_init_arr(word_cont* to_check);
+bool valid_append(word_cont* to_check);
+bool valid_change(word_cont* to_check);
+bool valid_delete_arr_val(word_cont* to_check);
+bool valid_access_val(word_cont* to_check);
+bool run_access_val(word_cont* to_check,line_cont* line_arr,double* num);
+bool run_init_arr(word_cont* to_check);
+bool run_append(word_cont* to_check,line_cont* line_arr);
+bool run_delete_arr_val(word_cont* to_check,line_cont* line_arr);
+bool run_change(word_cont* to_check,line_cont* line_arr);
 
 void deep_free_assoc(assoc* a,assoc_type t)
 {
@@ -159,6 +169,32 @@ FILE* get_file_words(char* filename,int* lines)
 }
 
 
+bool run_list_instruct(word_cont* to_check,line_cont* line_arr,\
+                        int init_pos)
+{
+   if(run_init_arr(to_check))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
+   if(run_append(to_check,line_arr))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
+   if(run_change(to_check,line_arr))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
+   if(run_delete_arr_val(to_check,line_arr))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
+   return false;
+}
+
 /*if we have already seen a return then we do not execute any more
 commands*/
 bool run_instruction(word_cont* to_check,line_cont* line_arr)
@@ -204,6 +240,7 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
       return true;
    }
    to_check->position=init_pos;
+   /*not using return value here */
    if(run_funcrun(to_check,line_arr,&placeholder))
    {
       if(placeholder)
@@ -222,9 +259,13 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
    {
       return true;
    }
-
+   if(run_list_instruct(to_check,line_arr,init_pos))
+   {
+      return true;
+   }
    return false;
 }
+
 
 bool valid_varnum(word_cont* to_check)
 {
@@ -244,10 +285,37 @@ bool valid_varnum(word_cont* to_check)
    {
       return true;
    }
+   if(valid_access_val(to_check))
+   {
+      return true;
+   }
    return false;
 }
 
-
+bool valid_list_instruct(word_cont* to_check,int init_pos)
+{
+   if(valid_init_arr(to_check))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
+   if(valid_append(to_check))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
+   if(valid_change(to_check))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
+   if(valid_delete_arr_val(to_check))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
+   return false;
+}
 
 bool valid_instruct(word_cont* to_check)
 {
@@ -300,6 +368,10 @@ bool valid_instruct(word_cont* to_check)
    {
       return true;
    }
+   if(valid_list_instruct(to_check,init_pos))
+   {
+      return true;
+   }
    return false;
 }
 
@@ -323,6 +395,10 @@ bool get_varnum(word_cont* to_check,double* num,line_cont* line_arr)
    if(get_func_val(to_check,line_arr,num))
    {
 
+      return true;
+   }
+   if(run_access_val(to_check,line_arr,num))
+   {
       return true;
    }
    return false;

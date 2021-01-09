@@ -22,17 +22,7 @@ INTERPRUN = interpreter_funcs.c
 PARSEFULL = parser_funcs.c parser_funcs.h
 PARSERUN = parser_funcs.c
 
-test_parser_fast:  parser_tests.c $(PARSEFULL) parse/specific.h parse/specific.c $(GENERALFULL)
-	$(CC) $(PARSERUN) parser_tests.c parse/specific.c $(GENERALRUN)  -o parser_test_fast $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
 
-test_parser_san: parser_tests.c $(PARSEFULL) parse/specific.h parse/specific.c $(GENERALFULL)
-	$(CC) $(PARSERUN) parser_tests.c parse/specific.c $(GENERALRUN)  -o parser_test_san $(CFLAGSSAN) $(INCPARSE) $(LIDLIBS)
-
-test_stacks_fast: ADTS_and_general/stacks/stack_tests.c $(STACKSFULL) $(GENERALFULL)
-	$(CC) ADTS_and_general/stacks/stack_tests.c $(STACKSRUN) $(GENERALRUN)  -o test_stacks_fast $(CFLAGSFAST) $(LIDLIBS)
-
-test_stacks_san: ADTS_and_general/stacks/stack_tests.c $(STACKSFULL) $(GENERALFULL)
-	$(CC) ADTS_and_general/stacks/stack_tests.c $(STACKSRUN) $(GENERALRUN) -o test_stacks_san $(CFLAGSSAN) $(LIDLIBS)
 
 u_stacks_san: unity_tests/Test_stacks.c  src/unity.c  src/unity.h $(STACKSFULL) $(GENERALFULL)
 	$(CC) unity_tests/Test_stacks.c src/unity.c $(STACKSRUN) $(GENERALRUN) -o u_stacks_san $(CFLAGSSAN) $(LIDLIBS)
@@ -40,23 +30,12 @@ u_stacks_san: unity_tests/Test_stacks.c  src/unity.c  src/unity.h $(STACKSFULL) 
 u_stacks_fast: unity_tests/Test_stacks.c  src/unity.c  src/unity.h $(STACKSFULL) $(GENERALFULL)
 	$(CC) unity_tests/Test_stacks.c src/unity.c $(STACKSRUN) $(GENERALRUN) -o u_stacks_fast $(CFLAGSFAST) $(LIDLIBS)
 
-hash_map_fast: ADTS_and_general/hash_map/hash_map_tests.c $(HASHFULL) $(GENERALFULL)
-	$(CC) ADTS_and_general/hash_map/hash_map_tests.c $(HASHRUN) $(GENERALRUN) -o hash_map_fast $(CFLAGSFAST) $(LIDLIBS)
-
-hash_map_san: ADTS_and_general/hash_map/hash_map_tests.c $(HASHFULL) $(GENERALFULL)
-	$(CC) ADTS_and_general/hash_map/hash_map_tests.c $(HASHRUN) $(GENERALRUN) -o hash_map_san $(CFLAGSSAN) $(LIDLIBS)
 
 u_hash_map_san: unity_tests/Test_hashmap.c src/unity.c src/unity.h $(HASHFULL) $(GENERALFULL)
 	$(CC) unity_tests/Test_hashmap.c src/unity.c $(HASHRUN) $(GENERALRUN) -o u_hash_map_san $(CFLAGSSAN) $(LIDLIBS)
 
 u_hash_map_fast: unity_tests/Test_hashmap.c src/unity.c src/unity.h $(HASHFULL) $(GENERALFULL)
 	$(CC) unity_tests/Test_hashmap.c src/unity.c $(HASHRUN) $(GENERALRUN) -o u_hash_map_fast $(CFLAGSFAST) $(LIDLIBS)
-
-arrays_san: ADTS_and_general/arrays/array_func_tests.c $(ARRFULL) $(GENERALFULL)
-	$(CC) ADTS_and_general/arrays/array_func_tests.c $(ARRRUN) $(GENERALRUN) -o arrays_san $(CFLAGSSAN) $(LIDLIBS)
-
-arrays_fast: ADTS_and_general/arrays/array_func_tests.c $(ARRFULL) $(GENERALFULL)
-	$(CC) ADTS_and_general/arrays/array_func_tests.c $(ARRRUN) $(GENERALRUN) -o arrays_fast $(CFLAGSFAST) $(LIDLIBS)
 
 u_arrays_san: unity_tests/Test_arrays.c src/unity.c src/unity.h $(ARRFULL) $(GENERALFULL)
 	$(CC) unity_tests/Test_arrays.c  src/unity.c $(ARRRUN) $(GENERALRUN) -o u_arrays_san $(CFLAGSSAN) $(LIDLIBS)
@@ -77,26 +56,14 @@ parser_fast: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specifi
 	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser_fast $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
 
 
-test_interp_san : interpreter_tests.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL)
-	$(CC) interpreter_tests.c interpreter/specific.c  $(PARSERUN) $(INTERPRUN) $(STACKSRUN) $(GENERALRUN) -o test_interp_san $(CFLAGSSAN) $(INCINTERP) $(LIDLIBS)
-
-test_interp_fast : interpreter_tests.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL)
-	$(CC) interpreter_tests.c interpreter/specific.c  $(PARSERUN) $(INTERPRUN) $(STACKSRUN) $(GENERALRUN)  -o test_interp_fast $(CFLAGSFAST) $(INCINTERP) $(LIDLIBS)
-
 u_test_interp_san: unity_tests/Test_interp.c src/unity.c src/unity.h $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL)
 		$(CC) unity_tests/Test_interp.c src/unity.c interpreter/specific.c  $(PARSERUN) $(INTERPRUN) $(STACKSRUN) $(GENERALRUN) -o u_test_interp_san $(CFLAGSSAN) $(INCINTERP) $(LIDLIBS)
 
 u_test_interp_fast: unity_tests/Test_interp.c src/unity.c src/unity.h $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL)
 		$(CC) unity_tests/Test_interp.c src/unity.c interpreter/specific.c  $(PARSERUN) $(INTERPRUN) $(STACKSRUN) $(GENERALRUN) -o u_test_interp_fast $(CFLAGSFAST) $(INCINTERP) $(LIDLIBS)
 
-interp: interpreter.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h  ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h  $(STACKSFULL) $(GENERALFULL)
-	$(CC) interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
-exten_func_san: extension_func_tests.c extension_funcs.c extension_flow.c extension_flow.h  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
-	$(CC) extension_func_tests.c extension_funcs.c extension_flow.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o exten_func_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
-exten_func_fast:extension_func_tests.c extension_funcs.c extension_flow.c extension_flow.h  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
-	$(CC) extension_func_tests.c extension_funcs.c extension_flow.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o exten_func_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
 
 u_exten_func_san:unity_tests/Test_extension_funcs.c src/unity.c src/unity.h extension_funcs.c extension_flow.c extension_flow.h  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
 	$(CC) unity_tests/Test_extension_funcs.c src/unity.c extension_funcs.c extension_flow.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_exten_func_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
@@ -104,27 +71,30 @@ u_exten_func_san:unity_tests/Test_extension_funcs.c src/unity.c src/unity.h exte
 u_exten_func_fast:unity_tests/Test_extension_funcs.c src/unity.c src/unity.h extension_funcs.c extension_flow.c extension_flow.h  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
 	$(CC) unity_tests/Test_extension_funcs.c src/unity.c extension_funcs.c extension_flow.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_exten_func_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
 
-exten_flow_san: extension_flow_tests.c extension_flow.c extension_flow.h extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
-	$(CC) extension_flow_tests.c  extension_flow.c extension_funcs.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o exten_flow_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
-exten_flow_fast: extension_flow_tests.c extension_flow.c extension_flow.h extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
-	$(CC) extension_flow_tests.c  extension_flow.c extension_funcs.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o exten_flow_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
+u_exten_flow_san: unity_tests/Test_flow.c src/unity.c src/unity.h extension_flow.c extension_flow.h extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
+	$(CC) unity_tests/Test_flow.c src/unity.c extension_flow.c extension_funcs.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_exten_flow_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
-exten_func_flow_san: test_flow_func.c extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
-	$(CC) test_flow_func.c extension_funcs.c extension_flow.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o exten_func_flow_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
+u_exten_flow_fast: unity_tests/Test_flow.c src/unity.c src/unity.h extension_flow.c extension_flow.h extension_funcs.c  extension_funcs.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
+	$(CC) unity_tests/Test_flow.c src/unity.c extension_flow.c extension_funcs.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_exten_flow_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
 
-exten_func_flow_fast: test_flow_func.c extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)  $(ARRFULL)
-	$(CC) test_flow_func.c extension_funcs.c extension_flow.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o exten_func_flow_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
+u_exten_func_flow_san: unity_tests/Test_func_flow.c src/unity.c src/unity.h extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
+	$(CC) unity_tests/Test_func_flow.c src/unity.c extension_funcs.c extension_flow.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_exten_func_flow_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
+
+u_exten_func_flow_fast: unity_tests/Test_func_flow.c src/unity.c src/unity.h extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
+	$(CC) unity_tests/Test_func_flow.c src/unity.c extension_funcs.c extension_flow.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_exten_func_flow_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
 
 exten_arr_san: extension_arrays.c  exten/specific.c exten/specific.h  extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
 	$(CC) extension_arrays.c  exten/specific.c extension_funcs.c extension_flow.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) -o exten_arr_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
-
+u_exten_arr_san: unity_tests/Test_extension_arrays.c src/unity.c src/unity.h  extension_arrays.c  exten/specific.c exten/specific.h  extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
+	$(CC) unity_tests/Test_extension_arrays.c src/unity.c extension_arrays.c  exten/specific.c extension_funcs.c extension_flow.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) -o u_exten_arr_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
 extension: extension.c extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h
 	$(CC) extension.c extension_funcs.c extension_flow.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) ADTS_and_general/neillsdl2.c -o extension $(CFLAGSSDL) $(INCEXTEN) $(LIDLIBSSDL)
 
-
+interp: interpreter.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h  ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h  $(STACKSFULL) $(GENERALFULL)
+	$(CC) interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
 
 run_tests: test_interp_san test_interp_fast hash_map_san hash_map_fast test_stacks_san test_stacks_fast test_parser_san test_parser_fast exten_func_fast exten_func_san exten_flow_san exten_flow_fast exten_func_flow_san exten_func_flow_fast arrays_san arrays_fast
