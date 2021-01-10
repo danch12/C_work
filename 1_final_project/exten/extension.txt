@@ -62,7 +62,7 @@ Also tempted to make arrays global - means that we dont have to worry about retu
 Formal Grammar -
 
 <INSTRUCTION> ::= <FD> | <LT> |
-<RT> | <DO> | <SET> | <SETFUNC> | <RUNFUNC> | <FLOWSTATE> | <INITARRAY> | <APPEND> | <REMOVEVAL> | <CHANGEVAL>
+<RT> | <DO> | <SET> | <SETFUNC> | <RUNFUNC> | <FLOWSTATE> | <INITARRAY> | <APPEND> | <REMOVEVAL> | <CHANGEVAL> | <FILETOARRAY>
 
 <INITARRAY> := "INITARR" <ARRAYIDENTIFIER> 
 
@@ -82,15 +82,6 @@ Formal Grammar -
 For accessing the arrays the VARNUM has to be positive and not a decimal. This is tested at the interpreting stage and not parsing stage so sometimes will slip through the cracks if for example its in a loop that has not executed. Would have liked to do it at parsing stage but cant tell what the return value of a function would be without actually running the function for instance.
 
 
-
-
-
-
-
-
-
 <FILETOARRAY> := <ARRAYIDENTIFIER> filepath 
 
-Filepath is just whatever path 
-
-
+Filepath is the path from the turtle file to the file you want to read in -was going to make it absolute but that would make it hard to move testing to other computers etc. because of this I am going to make it the path from the turtle file as it seems a bit weird to make it the path from the interpreter. Because on windows the slashes go the other way (annoying) had to play around a little bit with things.

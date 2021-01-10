@@ -1505,6 +1505,7 @@ void test_do_arr(void)
 {
    word_cont* test_cont;
    line_cont* test_line_cont;
+   turt_arr* test_arr;
    test_cont = init_word_cont();
    test_line_cont= init_line_cont();
    strcpy(test_cont->words[0],"INITARR");
@@ -1531,11 +1532,313 @@ void test_do_arr(void)
    TEST_ASSERT_TRUE(run_init_arr(test_cont));
    TEST_ASSERT_TRUE(run_append(test_cont,test_line_cont));
    TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==6);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"a_myarr");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"5");
+   strcpy(test_cont->words[5],";");
+   strcpy(test_cont->words[6],"a_myarr");
+   strcpy(test_cont->words[7],"APPEND");
+   strcpy(test_cont->words[8],"10");
+   strcpy(test_cont->words[9],";");
+
+   strcpy(test_cont->words[10],"DO");
+   strcpy(test_cont->words[11],"A");
+   strcpy(test_cont->words[12],"FROM");
+   strcpy(test_cont->words[13],"a_myarr");
+   strcpy(test_cont->words[14],"[");
+   strcpy(test_cont->words[15],"0");
+   strcpy(test_cont->words[16],"]");
+   strcpy(test_cont->words[17],"TO");
+   strcpy(test_cont->words[18],"a_myarr");
+   strcpy(test_cont->words[19],"[");
+   strcpy(test_cont->words[20],"1");
+   strcpy(test_cont->words[21],"]");
+   strcpy(test_cont->words[22],"{");
+   strcpy(test_cont->words[23],"FD");
+   strcpy(test_cont->words[24],"10");
+   strcpy(test_cont->words[25],"}");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_append(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_append(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==6);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"DO");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"FROM");
+   strcpy(test_cont->words[5],"0");
+   strcpy(test_cont->words[6],"TO");
+   strcpy(test_cont->words[7],"100");
+   strcpy(test_cont->words[8],"{");
+   strcpy(test_cont->words[9],"a_myarr");
+
+   strcpy(test_cont->words[10],"APPEND");
+   strcpy(test_cont->words[11],"A");
+   strcpy(test_cont->words[12],";");
+   strcpy(test_cont->words[13],"}");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
+   TEST_ASSERT_TRUE(test_arr->size==101);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"DO");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],"FROM");
+   strcpy(test_cont->words[3],"0");
+   strcpy(test_cont->words[4],"TO");
+   strcpy(test_cont->words[5],"100");
+   strcpy(test_cont->words[6],"{");
+   strcpy(test_cont->words[7],"INITARR");
+
+   strcpy(test_cont->words[8],"a_myarr");
+   strcpy(test_cont->words[9],"a_myarr");
+   strcpy(test_cont->words[10],"APPEND");
+   strcpy(test_cont->words[11],"A");
+   strcpy(test_cont->words[12],";");
+   strcpy(test_cont->words[13],"}");
+
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   /*once you set the bounds for a loop cant change
+   so we prevent infinite loops and weird behaviour
+   when values in a list are deleted*/
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"a_myarr");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"10");
+   strcpy(test_cont->words[5],";");
+   strcpy(test_cont->words[6],"DO");
+   strcpy(test_cont->words[7],"A");
+   strcpy(test_cont->words[8],"FROM");
+   strcpy(test_cont->words[9],"5");
+   strcpy(test_cont->words[10],"TO");
+   strcpy(test_cont->words[11],"a_myarr");
+   strcpy(test_cont->words[12],"[");
+   strcpy(test_cont->words[13],"0");
+   strcpy(test_cont->words[14],"]");
+   strcpy(test_cont->words[15],"{");
+   strcpy(test_cont->words[16],"FD");
+   strcpy(test_cont->words[17],"10");
+   strcpy(test_cont->words[18],"a_myarr");
+   strcpy(test_cont->words[19],"[");
+   strcpy(test_cont->words[20],"0");
+   strcpy(test_cont->words[21],"]");
+   strcpy(test_cont->words[22],":=");
+   strcpy(test_cont->words[23],"1");
+   strcpy(test_cont->words[24],";");
+   strcpy(test_cont->words[25],"}");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_append(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==6);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"a_myarr");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"10");
+   strcpy(test_cont->words[5],";");
+   strcpy(test_cont->words[6],"DO");
+   strcpy(test_cont->words[7],"A");
+   strcpy(test_cont->words[8],"FROM");
+   strcpy(test_cont->words[9],"5");
+   strcpy(test_cont->words[10],"TO");
+   strcpy(test_cont->words[11],"a_myarr");
+   strcpy(test_cont->words[12],"[");
+   strcpy(test_cont->words[13],"0");
+   strcpy(test_cont->words[14],"]");
+   strcpy(test_cont->words[15],"{");
+   strcpy(test_cont->words[16],"FD");
+   strcpy(test_cont->words[17],"10");
+   strcpy(test_cont->words[18],"DEL");
+   strcpy(test_cont->words[19],"a_myarr");
+   strcpy(test_cont->words[20],"[");
+   strcpy(test_cont->words[21],"0");
+   strcpy(test_cont->words[22],"]");
+   strcpy(test_cont->words[23],"}");
+
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_append(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"DO");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],"FROM");
+   strcpy(test_cont->words[3],"5");
+   strcpy(test_cont->words[4],"TO");
+   strcpy(test_cont->words[5],"4");
+
+   strcpy(test_cont->words[6],"{");
+   strcpy(test_cont->words[7],"FD");
+   strcpy(test_cont->words[8],"10");
+   strcpy(test_cont->words[9],"DEL");
+   strcpy(test_cont->words[10],"a_myarr");
+   strcpy(test_cont->words[11],"[");
+   strcpy(test_cont->words[12],"0");
+   strcpy(test_cont->words[13],"]");
+   strcpy(test_cont->words[14],"}");
+
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"DO");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],"FROM");
+   strcpy(test_cont->words[3],"5");
+   strcpy(test_cont->words[4],"TO");
+   strcpy(test_cont->words[5],"a_myarr");
+   strcpy(test_cont->words[6],"[");
+   strcpy(test_cont->words[7],"0");
+   strcpy(test_cont->words[8],"]");
+   strcpy(test_cont->words[9],"{");
+   strcpy(test_cont->words[10],"FD");
+   strcpy(test_cont->words[11],"10");
+   strcpy(test_cont->words[12],"}");
+   TEST_ASSERT_FALSE(run_do(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"DO");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],"FROM");
+   strcpy(test_cont->words[3],"5");
+   strcpy(test_cont->words[4],"TO");
+   strcpy(test_cont->words[5],"6");
+   strcpy(test_cont->words[6],"{");
+   strcpy(test_cont->words[7],"FD");
+   strcpy(test_cont->words[8],"a_myarr");
+   strcpy(test_cont->words[9],"[");
+   strcpy(test_cont->words[10],"0");
+   strcpy(test_cont->words[11],"]");
+   strcpy(test_cont->words[12],"}");
+   TEST_ASSERT_FALSE(run_do(test_cont,test_line_cont));
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
 }
 
-/*need to test how these all work with if set and do*/
+
+void test_set_arr(void)
+{
+   word_cont* test_cont;
+   line_cont* test_line_cont;
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"a_myarr");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"10");
+   strcpy(test_cont->words[5],";");
+   strcpy(test_cont->words[6],"SET");
+   strcpy(test_cont->words[7],"A");
+   strcpy(test_cont->words[8],":=");
+   strcpy(test_cont->words[9],"a_myarr");
+   strcpy(test_cont->words[10],"[");
+   strcpy(test_cont->words[11],"0");
+   strcpy(test_cont->words[12],"]");
+   strcpy(test_cont->words[13],";");
+   strcpy(test_cont->words[14],"FD");
+   strcpy(test_cont->words[15],"A");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_append(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_set(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_instruction(test_cont,test_line_cont));
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->y,10);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"a_myarr");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"10");
+   strcpy(test_cont->words[5],";");
+   strcpy(test_cont->words[6],"SET");
+   strcpy(test_cont->words[7],"A");
+   strcpy(test_cont->words[8],":=");
+   strcpy(test_cont->words[9],"a_myarr");
+   strcpy(test_cont->words[10],"[");
+   strcpy(test_cont->words[11],"0");
+   strcpy(test_cont->words[12],"]");
+   strcpy(test_cont->words[13],"10");
+   strcpy(test_cont->words[14],"*");
+   strcpy(test_cont->words[15],";");
+   strcpy(test_cont->words[16],"FD");
+   strcpy(test_cont->words[17],"A");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_append(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_set(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_instruction(test_cont,test_line_cont));
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->y,100);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont = init_word_cont();
+   test_line_cont= init_line_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"a_myarr");
+   strcpy(test_cont->words[4],"[");
+   strcpy(test_cont->words[5],"0");
+   strcpy(test_cont->words[6],"]");
+   strcpy(test_cont->words[7],"10");
+   strcpy(test_cont->words[8],"*");
+   strcpy(test_cont->words[9],";");
+   strcpy(test_cont->words[10],"FD");
+   strcpy(test_cont->words[11],"A");
+   TEST_ASSERT_FALSE(run_set(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"array not found - potentially not initalised yet")==0);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+   test_cont = init_word_cont();
+   add_path("/hello/my/name/is/dan.txt",test_cont);
+}
+
+
 int main(void)
 {
    UNITY_BEGIN();
@@ -1547,6 +1850,7 @@ int main(void)
    RUN_TEST(test_delete);
    RUN_TEST(test_access);
    RUN_TEST(test_do_arr);
+   RUN_TEST(test_set_arr);
    return UNITY_END();
 }
 

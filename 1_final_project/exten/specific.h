@@ -52,6 +52,7 @@ typedef struct word_container
    assoc* func_map;
    struct word_container* parent;
    double* return_val;
+   char* path;
 }word_cont;
 
 typedef struct coord
@@ -96,5 +97,5 @@ bool do_helper(word_cont* to_check,int* var_pos,\
 bool polish_num(word_cont* to_check,line_cont* line_arr);
 /*num is going to be passed in by set function*/
 bool run_polish(word_cont* to_check,double* num,line_cont* line_arr);
-
+bool add_path(char* filename,word_cont* n_cont);
 #endif
