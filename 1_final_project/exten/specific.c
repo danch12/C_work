@@ -1,12 +1,10 @@
 #include "specific.h"
-
+/*
 #ifdef _WIN32
-   #define SLASH '\\'
-#elif defined(_WIN64)
    #define SLASH '\\'
 #else
    #define SLASH '/'
-#endif
+#endif*/
 
 typedef enum assoc_type {function, array} assoc_type;
 
@@ -107,7 +105,7 @@ bool free_word_cont(word_cont* to_free)
       }
       free(to_free->words);
       free(to_free->return_val);
-      free(to_free->path);
+      
       stack_free(to_free->stackptr);
       deep_free_assoc(to_free->arr_map,array);
       deep_free_assoc(to_free->func_map,function);
@@ -158,20 +156,23 @@ word_cont* read_in_file(char* filename)
    return n_cont;
 }
 
-
+/*
 bool add_path(char* filename,word_cont* n_cont)
 {
    char *last_slash;
    char *parent;
    last_slash = NULL;
    parent = NULL;
+
    last_slash = strrchr(filename, SLASH);
 
    parent = strndup(filename, strlen(filename) - strlen(last_slash)+1);
    n_cont->path= (char*)safe_calloc(strlen(parent)+1,sizeof(char));
    strcpy(n_cont->path,parent);
+   free(parent);
+
    return true;
-}
+}*/
 
 
 FILE* get_file_words(char* filename,int* lines)

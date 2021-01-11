@@ -14,6 +14,8 @@
 
 #define MAXARRLEN 50
 
+
+
 bool get_arr_identifier(word_cont* to_check,\
                         char arr_name[MAXARRLEN]);
 bool valid_arr_identifier(word_cont* to_check);
@@ -48,4 +50,11 @@ bool valid_access_val(word_cont* to_check);
 bool run_access_val(word_cont* to_check,line_cont* line_arr,double* num);
 bool access_helper(word_cont* to_check,line_cont* line_arr,\
                   char arr_name[MAXARRLEN],int* ind);
+
+bool valid_filepath(word_cont* to_check);
+bool valid_file_to_array(word_cont* to_check);
+char* get_full_path(word_cont* to_check);
+bool load_in(word_cont* to_check,turt_arr* arr,char* filepath);
+bool run_file_to_array(word_cont* to_check);
+
 #endif

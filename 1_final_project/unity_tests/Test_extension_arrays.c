@@ -1762,6 +1762,7 @@ void test_set_arr(void)
 {
    word_cont* test_cont;
    line_cont* test_line_cont;
+
    test_cont = init_word_cont();
    test_line_cont= init_line_cont();
    strcpy(test_cont->words[0],"INITARR");
@@ -1834,8 +1835,175 @@ void test_set_arr(void)
    TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"array not found - potentially not initalised yet")==0);
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
+
+}
+
+void test_paths(void)
+{
+   word_cont* test_cont;
+   char* test_p;
+   turt_arr* test_arr;
+
+
+
+
    test_cont = init_word_cont();
-   add_path("/hello/my/name/is/dan.txt",test_cont);
+   strcpy(test_cont->words[0],"hfihffdj.txt");
+   TEST_ASSERT_TRUE(valid_filepath(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"hfihffdj.t.xt");
+   TEST_ASSERT_FALSE(valid_filepath(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"hfihffdjtxt");
+   TEST_ASSERT_FALSE(valid_filepath(test_cont));
+   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"not valid file path, make sure it's a txt file")==0);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"hfih___ffdj.txt");
+   TEST_ASSERT_TRUE(valid_filepath(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"/hfih/___ffdj.txt");
+   TEST_ASSERT_TRUE(valid_filepath(test_cont));
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LOAD");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"/hfih/___ffdj.txt");
+   TEST_ASSERT_TRUE(valid_file_to_array(test_cont));
+   TEST_ASSERT_TRUE(test_cont->position==3);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LOAD");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"/hfih/ffdj.txt");
+   TEST_ASSERT_TRUE(valid_file_to_array(test_cont));
+   TEST_ASSERT_TRUE(test_cont->position==3);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LOAD");
+   strcpy(test_cont->words[1],"a_");
+   strcpy(test_cont->words[2],"/hfih/ffdj.txt");
+   TEST_ASSERT_TRUE(valid_file_to_array(test_cont));
+   TEST_ASSERT_TRUE(test_cont->position==3);
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LOAD");
+   strcpy(test_cont->words[1],"a_");
+   strcpy(test_cont->words[2],"/hfih/ffdj.xt");
+   TEST_ASSERT_FALSE(valid_file_to_array(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LOAD");
+   strcpy(test_cont->words[1],"a_");
+   strcpy(test_cont->words[2],"/hfih/ffdjtxt");
+   TEST_ASSERT_FALSE(valid_file_to_array(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LOAD");
+   strcpy(test_cont->words[1],"a");
+   strcpy(test_cont->words[2],"/hfih/ffdj.txt");
+   TEST_ASSERT_FALSE(valid_file_to_array(test_cont));
+   free_word_cont(test_cont);
+
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"../../file.txt");
+   test_p=get_full_path(test_cont);
+   TEST_ASSERT_TRUE(strcmp(test_p,"../../file.txt")==0);
+   free_word_cont(test_cont);
+   free(test_p);
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"   file.txt");
+   test_p=get_full_path(test_cont);
+   TEST_ASSERT_TRUE(strcmp(test_p,"   file.txt")==0);
+   free_word_cont(test_cont);
+   free(test_p);
+
+
+   test_cont = init_word_cont();
+   test_arr=arr_init();
+   TEST_ASSERT_TRUE(load_in(test_cont,test_arr,"test_files/test_sizes/7words.txt"));
+   TEST_ASSERT_TRUE(test_arr->size==7);
+   TEST_ASSERT_EQUAL_DOUBLE(test_arr->head->data,1);
+   TEST_ASSERT_EQUAL_DOUBLE(test_arr->head->next->data,2);
+   free_arr(test_arr);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   test_arr=arr_init();
+   TEST_ASSERT_TRUE(load_in(test_cont,test_arr,"test_files/test_sizes/blank.txt"));
+   TEST_ASSERT_TRUE(test_arr->size==0);
+
+   free_arr(test_arr);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   test_arr=arr_init();
+   TEST_ASSERT_TRUE(load_in(test_cont,test_arr,"test_files/test_sizes/random_nums.txt"));
+   TEST_ASSERT_TRUE(test_arr->size==4);
+   TEST_ASSERT_EQUAL_DOUBLE(test_arr->head->data,40.3454);
+   TEST_ASSERT_EQUAL_DOUBLE(test_arr->head->next->data,306.111);
+   free_arr(test_arr);
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   test_arr=arr_init();
+   TEST_ASSERT_FALSE(load_in(test_cont,test_arr,"test_files/test_sizes/not_a_file.txt"));
+   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"error while opening file- does it exist?")==0);
+   free_arr(test_arr);
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   test_arr=arr_init();
+   TEST_ASSERT_FALSE(load_in(test_cont,test_arr,"test_files/test_sizes/not_a_file.txt"));
+   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"error while opening file- does it exist?")==0);
+   free_arr(test_arr);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   test_arr=arr_init();
+   TEST_ASSERT_FALSE(load_in(test_cont,test_arr,"test_files/test_sizes/random_letters.txt"));
+   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"error reading data in file")==0);
+   free_arr(test_arr);
+   free_word_cont(test_cont);
+
+
+
+   test_cont = init_word_cont();
+
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"LOAD");
+   strcpy(test_cont->words[3],"a_myarr");
+   strcpy(test_cont->words[4],"test_files/test_sizes/random_nums.txt");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_file_to_array(test_cont));
+   TEST_ASSERT_TRUE(test_cont->position==5);
+   test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
+   TEST_ASSERT_TRUE(test_arr->size==4);
+   TEST_ASSERT_EQUAL_DOUBLE(test_arr->head->data,40.3454);
+   TEST_ASSERT_EQUAL_DOUBLE(test_arr->head->next->data,306.111);
+   free_word_cont(test_cont);
 }
 
 
@@ -1851,6 +2019,7 @@ int main(void)
    RUN_TEST(test_access);
    RUN_TEST(test_do_arr);
    RUN_TEST(test_set_arr);
+   RUN_TEST(test_paths);
    return UNITY_END();
 }
 

@@ -52,7 +52,7 @@ typedef struct word_container
    assoc* func_map;
    struct word_container* parent;
    double* return_val;
-   char* path;
+
 }word_cont;
 
 typedef struct coord

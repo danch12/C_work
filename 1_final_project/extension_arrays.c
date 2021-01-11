@@ -11,8 +11,6 @@
 
 
 
-
-
 bool valid_init_arr(word_cont* to_check)
 {
    if(strcmp(to_check->words[to_check->position],"INITARR")==0)
@@ -408,6 +406,117 @@ bool access_helper(word_cont* to_check,line_cont* line_arr,\
       }
    }
    return false;
+}
+
+/*https://en.wikipedia.org/wiki/Filename  going off this stuff it
+looks like almost everything is valid - but will need to check
+that we are using txt files so can check for that*/
+bool valid_filepath(word_cont* to_check)
+{
+   char *last_dot;
+   last_dot = NULL;
+   /*find position of last dot*/
+   last_dot = strrchr(to_check->words[to_check->position], '.');
+   if(last_dot)
+   {
+      if(strcmp(last_dot,".txt")==0)
+      {
+         return true;
+      }
+   }
+   strcpy(to_check->err_message,"not valid file path, make sure it's a txt file");
+   return false;
+}
+
+
+bool valid_file_to_array(word_cont* to_check)
+{
+   if(strcmp(to_check->words[to_check->position],"LOAD")==0)
+   {
+      to_check->position++;
+      if(valid_arr_identifier(to_check))
+      {
+         to_check->position++;
+         if(valid_filepath(to_check))
+         {
+            to_check->position++;
+            return true;
+         }
+      }
+   }
+
+   return false;
+}
+
+
+bool run_file_to_array(word_cont* to_check)
+{
+   char arr_name[MAXARRLEN];
+   turt_arr* arr;
+
+   if(strcmp(to_check->words[to_check->position],"LOAD")==0)
+   {
+      to_check->position++;
+      if(get_arr_identifier(to_check,arr_name))
+      {
+         if(valid_filepath(to_check))
+         {
+
+            arr=get_arr(to_check,arr_name);
+            if(!arr)
+            {
+               strcpy(to_check->err_message,"array not found - potentially not initalised yet");
+               return false;
+            }
+            if(load_in(to_check,arr,to_check->words[to_check->position]))
+            {
+               to_check->position++;
+               return true;
+            }
+         }
+      }
+   }
+
+
+   return false;
+}
+
+
+bool load_in(word_cont* to_check,turt_arr* arr,char* filepath)
+{
+   FILE* fp;
+   double num;
+   char buffer[MAXLEN];
+   fp= fopen(filepath,"r");
+   if(fp==NULL)
+   {
+      strcpy(to_check->err_message,"error while opening file- does it exist?");
+      return false;
+   }
+
+   while(fscanf(fp,"%s",buffer)==1)
+   {
+      if(sscanf(buffer,"%lf",&num)!=1)
+      {
+         strcpy(to_check->err_message,"error reading data in file");
+         return false;
+      }
+      append_arr(num,arr);
+   }
+
+   fclose(fp);
+   return true;
+}
+
+char* get_full_path(word_cont* to_check)
+{
+   char* p;
+
+
+   p=(char*)safe_calloc(strlen(to_check->words[to_check->position])+1,\
+                           sizeof(char));
+   strcpy(p,to_check->words[to_check->position]);
+   return p;
 }
 
 
