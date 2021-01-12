@@ -7,6 +7,7 @@
 #include "../ADTS_and_general/stacks/stack_funcs.h"
 #include "../ADTS_and_general/hash_map/hash_funcs.h"
 #include "extension_flow.h"
+#include "extension_arrays.h"
 
 
 #define MAXFUNCLEN 50

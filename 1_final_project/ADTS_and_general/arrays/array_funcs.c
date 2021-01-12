@@ -195,3 +195,15 @@ bool free_arr(turt_arr* to_free)
    }
    return true;
 }
+
+
+
+bool arr_len(turt_arr* t_arr,int* num)
+{
+   if(t_arr)
+   {
+      *num =t_arr->size;
+      return true;
+   }
+   return false;
+}

@@ -33,5 +33,5 @@ bool insert_arr(double data,turt_arr* t_arr,int position);
 bool append_arr(double data,turt_arr* t_arr);
 bool change_val_arr(double n_data,int position,\
                   turt_arr* t_arr);
-
+bool arr_len(turt_arr* t_arr,int* num);
 #endif

@@ -616,51 +616,51 @@ void test_file_reading(void)
    TEST_ASSERT_TRUE(strcmp(test_str,"W2{}5678jnjffnvndkdke10")==0);
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/parser/valid/using_variables.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/using_variables.ttl");
    concat_word_cont(test_cont,test_str);
    TEST_ASSERT_TRUE(strcmp(test_str,"{DOAFROM1TO100{SETC:=A1.5*;FDCRT62}}")==0);
    TEST_ASSERT_TRUE(valid_main(test_cont));
    free_word_cont(test_cont);
 
 
-   test_cont=read_in_file("test_files/test_turtles/parser/valid/adding_loops.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/adding_loops.ttl");
    concat_word_cont(test_cont,test_str);
    TEST_ASSERT_TRUE(strcmp(test_str,"{DOAFROM1TO8{FD30LT45}}")==0);
 
    TEST_ASSERT_TRUE(valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/parser/valid/nested_loops.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/nested_loops.ttl");
    concat_word_cont(test_cont,test_str);
    TEST_ASSERT_TRUE(strcmp(test_str,"{DOAFROM1TO50{FDART30DOBFROM1TO8{SETC:=A5/;FDCRT45}}}")==0);
    TEST_ASSERT_TRUE(valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/parser/valid/more_do.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/more_do.ttl");
    concat_word_cont(test_cont,test_str);
    TEST_ASSERT_TRUE(strcmp(test_str,"{DOAFROM1TOC{FD50}}")==0);
    TEST_ASSERT_TRUE(valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/parser/valid/polish.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/polish.ttl");
    concat_word_cont(test_cont,test_str);
    TEST_ASSERT_TRUE(strcmp(test_str,"{SETA:=++34;}")==0);
    TEST_ASSERT_TRUE(valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/parser/valid/polish_2.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/polish_2.ttl");
    concat_word_cont(test_cont,test_str);
    TEST_ASSERT_TRUE(strcmp(test_str,"{SETA:=B+33+;}")==0);
    TEST_ASSERT_TRUE(valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/parser/invalid/bad_spacing.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/invalid/bad_spacing.ttl");
    concat_word_cont(test_cont,test_str);
    TEST_ASSERT_TRUE(strcmp(test_str,"{DOAFROM1TO50{FD40}}")==0);
    TEST_ASSERT_TRUE(!valid_main(test_cont));
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/parser/invalid/missing_bracket.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/invalid/missing_bracket.ttl");
    concat_word_cont(test_cont,test_str);
    TEST_ASSERT_TRUE(strcmp(test_str,"FD50LT30}")==0);
    TEST_ASSERT_TRUE(!valid_main(test_cont));

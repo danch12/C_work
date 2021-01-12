@@ -51,6 +51,11 @@ bool run_init_arr(word_cont* to_check);
 bool run_append(word_cont* to_check,line_cont* line_arr);
 bool run_delete_arr_val(word_cont* to_check,line_cont* line_arr);
 bool run_change(word_cont* to_check,line_cont* line_arr);
+bool run_len(word_cont* to_check,double* num);
+bool valid_len(word_cont* to_check);
+bool run_file_to_array(word_cont* to_check);
+bool valid_file_to_array(word_cont* to_check);
+
 
 void deep_free_assoc(assoc* a,assoc_type t)
 {
@@ -105,7 +110,7 @@ bool free_word_cont(word_cont* to_free)
       }
       free(to_free->words);
       free(to_free->return_val);
-      
+
       stack_free(to_free->stackptr);
       deep_free_assoc(to_free->arr_map,array);
       deep_free_assoc(to_free->func_map,function);
@@ -216,6 +221,11 @@ bool run_list_instruct(word_cont* to_check,line_cont* line_arr,\
       return true;
    }
    to_check->position=init_pos;
+   if(run_file_to_array(to_check))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
    return false;
 }
 
@@ -313,6 +323,10 @@ bool valid_varnum(word_cont* to_check)
    {
       return true;
    }
+   if(valid_len(to_check))
+   {
+      return true;
+   }
    return false;
 }
 
@@ -338,6 +352,16 @@ bool valid_list_instruct(word_cont* to_check,int init_pos)
       return true;
    }
    to_check->position=init_pos;
+   if(valid_file_to_array(to_check))
+   {
+      return true;
+   }
+   to_check->position=init_pos;
+   if(valid_file_to_array(to_check))
+   {
+      return true;
+   }
+
    return false;
 }
 
@@ -422,6 +446,10 @@ bool get_varnum(word_cont* to_check,double* num,line_cont* line_arr)
       return true;
    }
    if(run_access_val(to_check,line_arr,num))
+   {
+      return true;
+   }
+   if(run_len(to_check,num))
    {
       return true;
    }
@@ -510,7 +538,6 @@ bool run_do(word_cont* to_check,line_cont* line_arr)
    if(do_helper(to_check,&var_pos,&start,&end,line_arr))
    {
       beg_loop=to_check->position;
-
       for(i=start;i<=end;i++)
       {
          if(!to_check->var_array[var_pos])

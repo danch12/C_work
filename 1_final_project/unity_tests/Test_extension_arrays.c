@@ -2004,8 +2004,329 @@ void test_paths(void)
    TEST_ASSERT_EQUAL_DOUBLE(test_arr->head->data,40.3454);
    TEST_ASSERT_EQUAL_DOUBLE(test_arr->head->next->data,306.111);
    free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"LOAD");
+   strcpy(test_cont->words[3],"a_myarr");
+   strcpy(test_cont->words[4],"test_files/test_sizes/7words.txt");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_file_to_array(test_cont));
+   TEST_ASSERT_TRUE(test_cont->position==5);
+   test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
+   TEST_ASSERT_TRUE(test_arr->size==7);
+   TEST_ASSERT_EQUAL_DOUBLE(test_arr->head->data,1);
+   TEST_ASSERT_EQUAL_DOUBLE(test_arr->head->next->data,2);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"LOAD");
+   strcpy(test_cont->words[3],"a_myarr");
+   strcpy(test_cont->words[4],"test_files/test_sizes/blank.txt");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_file_to_array(test_cont));
+   TEST_ASSERT_TRUE(test_cont->position==5);
+   test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
+   TEST_ASSERT_TRUE(test_arr->size==0);
+   free_word_cont(test_cont);
+
+
+
+   test_cont = init_word_cont();
+
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"LOAD");
+   strcpy(test_cont->words[3],"a_myarr");
+   strcpy(test_cont->words[4],"test_files/test_sizes/notafile.txt");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_FALSE(run_file_to_array(test_cont));
+   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"error while opening file- does it exist?")==0);
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"LOAD");
+   strcpy(test_cont->words[3],"a_myarr");
+   strcpy(test_cont->words[4],"test_files/test_sizes/random_letters.txt");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_FALSE(run_file_to_array(test_cont));
+   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"error reading data in file")==0);
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LOAD");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"test_files/test_sizes/random_letters.txt");
+
+   TEST_ASSERT_FALSE(run_file_to_array(test_cont));
+   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"array not found - potentially not initalised yet")==0);
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"LOAD");
+   strcpy(test_cont->words[3],"a_myarr");
+   strcpy(test_cont->words[4],"test_files/test_sizes/random_letters.dan");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_FALSE(run_file_to_array(test_cont));
+   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"not valid file path, make sure it's a txt file")==0);
+   free_word_cont(test_cont);
+
 }
 
+
+
+void test_len(void)
+{
+   word_cont* test_cont;
+   double test_double;
+   double** func_pointer;
+   line_cont* test_line_cont;
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LEN");
+   strcpy(test_cont->words[1],"a_myarr");
+   TEST_ASSERT_TRUE(valid_len(test_cont));
+   TEST_ASSERT_TRUE(test_cont->position==2);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LEN");
+   strcpy(test_cont->words[1],"");
+   TEST_ASSERT_FALSE(valid_len(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LEN");
+   strcpy(test_cont->words[1],"///a_arr");
+   TEST_ASSERT_FALSE(valid_len(test_cont));
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LENYES");
+   strcpy(test_cont->words[1],"///a_arr");
+   TEST_ASSERT_FALSE(valid_len(test_cont));
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"LEN");
+   strcpy(test_cont->words[3],"a_myarr");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_len(test_cont,&test_double));
+   TEST_ASSERT_EQUAL_DOUBLE(test_double,0);
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"a_myarr");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"10");
+   strcpy(test_cont->words[5],";");
+   strcpy(test_cont->words[6],"LEN");
+
+   strcpy(test_cont->words[7],"a_myarr");
+   strcpy(test_cont->words[8],"a_myarr");
+   strcpy(test_cont->words[9],"APPEND");
+   strcpy(test_cont->words[10],"12");
+   strcpy(test_cont->words[11],";");
+   strcpy(test_cont->words[12],"LEN");
+   strcpy(test_cont->words[13],"a_myarr");
+   strcpy(test_cont->words[14],"DEL");
+   strcpy(test_cont->words[15],"a_myarr");
+   strcpy(test_cont->words[16],"[");
+   strcpy(test_cont->words[17],"0");
+   strcpy(test_cont->words[18],"]");
+   strcpy(test_cont->words[19],"LEN");
+   strcpy(test_cont->words[20],"a_myarr");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_append(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_len(test_cont,&test_double));
+   TEST_ASSERT_EQUAL_DOUBLE(test_double,1);
+   TEST_ASSERT_TRUE(test_cont->position==8);
+
+   TEST_ASSERT_TRUE(run_append(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_len(test_cont,&test_double));
+   TEST_ASSERT_EQUAL_DOUBLE(test_double,2);
+
+   TEST_ASSERT_TRUE(run_delete_arr_val(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_len(test_cont,&test_double));
+   TEST_ASSERT_EQUAL_DOUBLE(test_double,1);
+   TEST_ASSERT_TRUE(test_cont->position==21);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"LEN");
+   strcpy(test_cont->words[1],"a_myarr");
+   TEST_ASSERT_FALSE(run_len(test_cont,&test_double));
+   free_word_cont(test_cont);
+
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"LEN");
+   strcpy(test_cont->words[3],"a_rm");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_FALSE(run_len(test_cont,&test_double));
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"L EN");
+   strcpy(test_cont->words[3],"a_rm");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_FALSE(run_len(test_cont,&test_double));
+   free_word_cont(test_cont);
+
+   test_cont = init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"SET");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],":=");
+   strcpy(test_cont->words[5],"LEN");
+   strcpy(test_cont->words[6],"a_myarr");
+   strcpy(test_cont->words[7],"1");
+   strcpy(test_cont->words[8],"+");
+   strcpy(test_cont->words[9],";");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_set(test_cont,test_line_cont));
+   TEST_ASSERT_EQUAL_DOUBLE(*test_cont->var_array[0],1);
+
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont = init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"DO");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"FROM");
+   strcpy(test_cont->words[5],"LEN");
+   strcpy(test_cont->words[6],"a_myarr");
+   strcpy(test_cont->words[7],"TO");
+   strcpy(test_cont->words[8],"10");
+   strcpy(test_cont->words[9],"{");
+   strcpy(test_cont->words[10],"FD");
+   strcpy(test_cont->words[11],"LEN");
+   strcpy(test_cont->words[12],"a_myarr");
+   strcpy(test_cont->words[13],"}");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==11);
+
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont = init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"DO");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"FROM");
+   strcpy(test_cont->words[5],"LEN");
+   strcpy(test_cont->words[6],"a_myarr");
+   strcpy(test_cont->words[7],"TO");
+   strcpy(test_cont->words[8],"10");
+   strcpy(test_cont->words[9],"{");
+   strcpy(test_cont->words[10],"FD");
+   strcpy(test_cont->words[11],"LEN");
+   strcpy(test_cont->words[12],"a_myarr");
+   strcpy(test_cont->words[13],"}");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==11);
+
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+
+
+   test_cont = init_word_cont();
+   test_line_cont=init_line_cont();
+   func_pointer=NULL;
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"SETFUNC");
+   strcpy(test_cont->words[3],"abc");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"A");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"{");
+   strcpy(test_cont->words[8],"FD");
+   strcpy(test_cont->words[9],"A");
+   strcpy(test_cont->words[10],"}");
+   strcpy(test_cont->words[11],"a_myarr");
+   strcpy(test_cont->words[12],"APPEND");
+   strcpy(test_cont->words[13],"10");
+   strcpy(test_cont->words[14],";");
+   strcpy(test_cont->words[15],"abc");
+   strcpy(test_cont->words[16],"{");
+   strcpy(test_cont->words[17],"LEN");
+   strcpy(test_cont->words[18],"a_myarr");
+   strcpy(test_cont->words[19],"}");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_funcset(test_cont));
+   TEST_ASSERT_TRUE(run_append(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_funcrun(test_cont,test_line_cont,func_pointer));
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->y,1);
+
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont = init_word_cont();
+   test_line_cont=init_line_cont();
+   func_pointer=NULL;
+   strcpy(test_cont->words[0],"INITARR");
+   strcpy(test_cont->words[1],"a_myarr");
+   strcpy(test_cont->words[2],"IF");
+   strcpy(test_cont->words[3],"LEN");
+   strcpy(test_cont->words[4],"a_myarr");
+   strcpy(test_cont->words[5],">");
+   strcpy(test_cont->words[6],"0");
+   strcpy(test_cont->words[7],"{");
+   strcpy(test_cont->words[8],"FD");
+   strcpy(test_cont->words[9],"1");
+   strcpy(test_cont->words[10],"}");
+   strcpy(test_cont->words[11],"ELSE");
+   strcpy(test_cont->words[12],"{");
+   strcpy(test_cont->words[13],"a_myarr");
+   strcpy(test_cont->words[14],"APPEND");
+   strcpy(test_cont->words[15],"10");
+   strcpy(test_cont->words[16],";");
+   strcpy(test_cont->words[17],"}");
+   TEST_ASSERT_TRUE(run_init_arr(test_cont));
+   TEST_ASSERT_TRUE(run_flowstate(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==0);
+
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+}
 
 int main(void)
 {
@@ -2020,6 +2341,7 @@ int main(void)
    RUN_TEST(test_do_arr);
    RUN_TEST(test_set_arr);
    RUN_TEST(test_paths);
+   RUN_TEST(test_len);
    return UNITY_END();
 }
 

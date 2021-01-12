@@ -70,11 +70,13 @@ void test_get_val(void)
    turt_arr* test_arr;
    double test_d;
    int i;
+   int y;
    test_arr=arr_init();
-
+   y=0;
    for(i=0;i<10000;i++)
    {
-      TEST_ASSERT_TRUE(test_arr->size==(unsigned int)i);
+      TEST_ASSERT_TRUE(arr_len(test_arr,&y));
+      TEST_ASSERT_TRUE(y==i);
       TEST_ASSERT_TRUE(append_arr(i,test_arr));
    }
    for(i=0;i<10000;i++)

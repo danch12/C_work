@@ -91,7 +91,7 @@ Because we do not know what length this could be we need another instruction as 
 
 <LEN> "LEN" <ARRAYIDENTIFIER>
 
-Len returns the length of an array.
+
 
 
 

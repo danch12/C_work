@@ -1410,7 +1410,7 @@ void test_main_full(void)
 
 
 
-   test_cont=read_in_file("test_files/test_turtles/parser/valid/adding_loops.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/adding_loops.ttl");
 
    test_line_cont=init_line_cont();
    TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
@@ -1420,7 +1420,7 @@ void test_main_full(void)
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
 
-   test_cont=read_in_file("test_files/test_turtles/parser/valid/nested_loops.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/nested_loops.ttl");
    test_line_cont=init_line_cont();
 
    TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
@@ -1429,14 +1429,14 @@ void test_main_full(void)
    free_word_cont(test_cont);
 
 
-   test_cont=read_in_file("test_files/test_turtles/parser/valid/polish.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/polish.ttl");
    test_line_cont=init_line_cont();
    TEST_ASSERT_TRUE(!run_main(test_cont,test_line_cont));
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
 
 
-   test_cont=read_in_file("test_files/test_turtles/parser/valid/polish_2.txt");
+   test_cont=read_in_file("test_files/test_turtles/parser/valid/polish_2.ttl");
    test_line_cont=init_line_cont();
    TEST_ASSERT_TRUE(!run_main(test_cont,test_line_cont));
    TEST_ASSERT_TRUE(strcmp("potentially haven't set variable before calling it",test_cont->err_message)==0);
@@ -1444,7 +1444,7 @@ void test_main_full(void)
    free_word_cont(test_cont);
 
 
-   test_cont=read_in_file("test_files/test_turtles/interpreter/invalid/too_many_nums.txt");
+   test_cont=read_in_file("test_files/test_turtles/interpreter/invalid/too_many_nums.ttl");
    test_line_cont=init_line_cont();
    TEST_ASSERT_TRUE(!run_main(test_cont,test_line_cont));
    TEST_ASSERT_TRUE(strcmp("more than one number left on stack at end of expr",test_cont->err_message)==0);
@@ -1452,7 +1452,7 @@ void test_main_full(void)
    free_word_cont(test_cont);
 
 
-   test_cont=read_in_file("test_files/test_turtles/interpreter/invalid/no_nums.txt");
+   test_cont=read_in_file("test_files/test_turtles/interpreter/invalid/no_nums.ttl");
    test_line_cont=init_line_cont();
    TEST_ASSERT_TRUE(!run_main(test_cont,test_line_cont));
    TEST_ASSERT_TRUE(strcmp("no numbers on the stack at end of expr",test_cont->err_message)==0);

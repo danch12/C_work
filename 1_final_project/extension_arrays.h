@@ -57,4 +57,7 @@ char* get_full_path(word_cont* to_check);
 bool load_in(word_cont* to_check,turt_arr* arr,char* filepath);
 bool run_file_to_array(word_cont* to_check);
 
+bool valid_len(word_cont* to_check);
+bool run_len(word_cont* to_check,double* num);
+
 #endif

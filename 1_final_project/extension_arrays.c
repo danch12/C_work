@@ -428,6 +428,42 @@ bool valid_filepath(word_cont* to_check)
    return false;
 }
 
+bool valid_len(word_cont* to_check)
+{
+   if(strcmp(to_check->words[to_check->position],"LEN")==0)
+   {
+      to_check->position++;
+      if(valid_arr_identifier(to_check))
+      {
+         to_check->position++;
+         return true;
+      }
+   }
+   return false;
+}
+
+bool run_len(word_cont* to_check,double* num)
+{
+   char arr_name[MAXARRLEN];
+   turt_arr* arr;
+   int size;
+   if(strcmp(to_check->words[to_check->position],"LEN")==0)
+   {
+      to_check->position++;
+      if(get_arr_identifier(to_check,arr_name))
+      {
+         arr=get_arr(to_check,arr_name);
+         if(!arr_len(arr,&size))
+         {
+            strcpy(to_check->err_message,"array not found\n");
+            return false;
+         }
+         *num =(double)size;
+         return true;
+      }
+   }
+   return false;
+}
 
 bool valid_file_to_array(word_cont* to_check)
 {
@@ -447,6 +483,8 @@ bool valid_file_to_array(word_cont* to_check)
 
    return false;
 }
+
+
 
 
 bool run_file_to_array(word_cont* to_check)
