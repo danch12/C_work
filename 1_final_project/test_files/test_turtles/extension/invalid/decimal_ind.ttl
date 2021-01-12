@@ -1,0 +1,3 @@
+{ INITARR a_arr 
+a_arr APPEND 10 ; 
+a_arr [ 1.1 ] := 3 ; } 

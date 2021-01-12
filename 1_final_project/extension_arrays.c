@@ -70,6 +70,11 @@ bool get_arr_identifier(word_cont* to_check,char arr_name[MAXARRLEN])
       to_check->position++;
       return true;
    }
+   /*this error message would cannabalize a lot of other ones*/
+   if(strlen(to_check->err_message)==0)
+   {
+      strcpy(to_check->err_message,"invalid array name - they have to start with a_");
+   }
    return false;
 }
 
@@ -135,6 +140,7 @@ bool run_append(word_cont* to_check,line_cont* line_arr)
    double num;
    if(get_arr_identifier(to_check,arr_name))
    {
+
       if(strcmp(to_check->words[to_check->position],"APPEND")==0)
       {
          to_check->position++;
@@ -194,10 +200,12 @@ bool run_change(word_cont* to_check,line_cont* line_arr)
    int ind;
    if(change_helper(to_check,line_arr,&ind,&num,arr_name))
    {
+
       arr=get_arr(to_check,arr_name);
       if(!arr)
       {
-         strcpy(to_check->err_message,"array not found - potentially not initalised yet");
+
+         strcpy(to_check->err_message,"array not found - potentially not initalised yet.");
          return false;
       }
       if(change_val_arr(num,ind,arr))

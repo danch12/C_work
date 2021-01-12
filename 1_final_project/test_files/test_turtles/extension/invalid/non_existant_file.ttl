@@ -1,0 +1,1 @@
+{ INITARR a_arr LOAD a_arr ./filetonowhere.txt }

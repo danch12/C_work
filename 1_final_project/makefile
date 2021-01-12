@@ -93,8 +93,8 @@ parser_san: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific
 parser: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
 	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
 
-extension: extension.c extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h
-	$(CC) extension.c extension_funcs.c extension_flow.c exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) ADTS_and_general/neillsdl2.c -o extension $(CFLAGSSDL) $(INCEXTEN) $(LIDLIBSSDL)
+extension: extension.c extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h extension_arrays.c extension_arrays.h $(ARRFULL)
+	$(CC) extension.c extension_funcs.c extension_flow.c exten/specific.c extension_arrays.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) ADTS_and_general/neillsdl2.c -o extension $(CFLAGSSDL) $(INCEXTEN) $(LIDLIBSSDL)
 
 interp: interpreter.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h  ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h  $(STACKSFULL) $(GENERALFULL)
 	$(CC) interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
@@ -168,8 +168,22 @@ run_extension_err:extension
 	./extension test_files/test_turtles/extension/invalid/unknown_func.ttl 2>> ext_errors.txt | true
 	echo "test_files/test_turtles/extension/invalid/same_var.ttl" >> ext_errors.txt
 	./extension test_files/test_turtles/extension/invalid/same_var.ttl 2>> ext_errors.txt | true
-
-
+	echo "./extension test_files/test_turtles/extension/invalid/unknown_array.ttl" >> ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/unknown_array.ttl 2>> ext_errors.txt | true
+	echo "./extension test_files/test_turtles/extension/invalid/invalid_array_name.ttl" >> ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/invalid_array_name.ttl 2>> ext_errors.txt | true
+	echo "./extension test_files/test_turtles/extension/invalid/too_big.ttl" >> ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/too_big.ttl 2>> ext_errors.txt | true
+	echo "./extension test_files/test_turtles/extension/invalid/negative_ind.ttl" >> ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/negative_ind.ttl 2>> ext_errors.txt | true
+	echo "./extension test_files/test_turtles/extension/invalid/decimal_ind.ttl" >> ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/decimal_ind.ttl 2>> ext_errors.txt | true
+	echo "./extension test_files/test_turtles/extension/invalid/invalid_file.ttl" >> ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/invalid_file.ttl 2>> ext_errors.txt | true
+	echo "./extension test_files/test_turtles/extension/invalid/wrong_format_file.ttl" >> ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/wrong_format_file.ttl 2>> ext_errors.txt | true
+	echo "./extension test_files/test_turtles/extension/invalid/non_existant_file.ttl" >> ext_errors.txt
+	./extension test_files/test_turtles/extension/invalid/non_existant_file.ttl 2>> ext_errors.txt | true
 
 clean:
 	rm -f u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_san u_arrays_fast u_parse_san u_parse_fast u_test_interp_san u_test_interp_fast u_exten_func_san u_exten_func_fast u_exten_flow_san u_exten_flow_fast u_exten_arr_san u_exten_arr_fast u_exten_interactions_san u_exten_interactions_fast

@@ -1,0 +1,1 @@
+{ INITARR a_arr a_arr [ 10 ] := 2 ; }

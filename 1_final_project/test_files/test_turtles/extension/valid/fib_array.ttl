@@ -1,0 +1,32 @@
+{ INITARR a_arr LOAD a_arr ./test_files/test_sizes/more_nums.txt 
+ SETFUNC fib { A } 
+{ 
+   IF A == 0 
+   { 
+     RETURN 0 
+   } 
+    ELSE 
+   { 
+     IF A == 1 
+     { 
+      RETURN 1
+     }
+     ELSE 
+     { 
+      FD A RT A
+      SET C := A 1 - ; 
+      SET D := A 2 - ; 
+      SET B := fib { C } fib { D } + ; 
+      RETURN B 
+     }
+   }
+}
+
+SET B := LEN a_arr 1 - ;
+DO A FROM 0 TO B
+{
+fib { a_arr [ A ] } 
+FD 100
+RT 90 
+}
+}

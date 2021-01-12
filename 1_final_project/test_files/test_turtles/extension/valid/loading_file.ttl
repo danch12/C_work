@@ -1,0 +1,4 @@
+{ INITARR a_arr LOAD a_arr ./test_files/test_sizes/random_nums.txt 
+SET B := LEN a_arr 1 - ;
+DO A FROM 0 TO B
+{ FD a_arr [ A ] LT a_arr [ A ] } }
