@@ -39,7 +39,7 @@ clean:
 	rm -f  basic_fast basic_san extension_fast extension_san basic_common_test_fast basic_common_test_san ext_common_test_san ext_common_test_fast
 
 run_common_test:test_basic_fast test_basic_san test_ext_fast test_ext_san
-	./basic_common_test_fast
+	./basic_common_test_fast 
 	./basic_common_test_san
 	./ext_common_test_fast
 	./ext_common_test_san

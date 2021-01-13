@@ -1922,20 +1922,6 @@ void test_paths(void)
 
 
 
-   test_cont = init_word_cont();
-   strcpy(test_cont->words[0],"../../file.txt");
-   test_p=get_full_path(test_cont);
-   TEST_ASSERT_TRUE(strcmp(test_p,"../../file.txt")==0);
-   free_word_cont(test_cont);
-   free(test_p);
-
-
-   test_cont = init_word_cont();
-   strcpy(test_cont->words[0],"   file.txt");
-   test_p=get_full_path(test_cont);
-   TEST_ASSERT_TRUE(strcmp(test_p,"   file.txt")==0);
-   free_word_cont(test_cont);
-   free(test_p);
 
 
    test_cont = init_word_cont();
