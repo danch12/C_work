@@ -24,6 +24,7 @@ PARSERUN = parser_funcs.c
 
 
 
+
 u_stacks_san: unity_tests/Test_stacks.c  src/unity.c  src/unity.h $(STACKSFULL) $(GENERALFULL)
 	$(CC) unity_tests/Test_stacks.c src/unity.c $(STACKSRUN) $(GENERALRUN) -o u_stacks_san $(CFLAGSSAN) $(LIDLIBS)
 
@@ -93,10 +94,10 @@ parser_san: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific
 parser: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
 	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
 
-extension: extension.c extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h extension_arrays.c extension_arrays.h $(ARRFULL)
+extension: extension.c extension_master.h extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h extension_arrays.c extension_arrays.h $(ARRFULL)
 	$(CC) extension.c extension_funcs.c extension_flow.c exten/specific.c extension_arrays.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) ADTS_and_general/neillsdl2.c -o extension $(CFLAGSSDL) $(INCEXTEN) $(LIDLIBSSDL)
 
-interp: interpreter.c $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h  ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h  $(STACKSFULL) $(GENERALFULL)
+interp: interpreter.c interpreter_master.h $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h  ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h  $(STACKSFULL) $(GENERALFULL)
 	$(CC) interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
 

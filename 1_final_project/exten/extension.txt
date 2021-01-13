@@ -53,12 +53,11 @@ Formal grammar -
 
 
 
-Now lets do arrays - reckon this would be fun. Eventually think it would be cool to read in files or something into them. Think then it would be quite useful. Thinking about what ADT would be best to implement it. Would seem like if we didn't want to worry about setting max sizes and stuff then a reallocing array could be cool - although maybe for flexibility a linked list could be best as it allows for easier removal and insertion within the array? Been looking at how lisp does its lists (https://softwareengineering.stackexchange.com/questions/91121/lisp-benefits-of-lists-as-code-over-arrays-as-code and http://www.eecs.qmul.ac.uk/~mmh/ADSOOF/linkedlists/Lecture9.pdf) for some inspiration as they use linked lists to implement arrays but probably will do stuff quite differently as I'm not going to need that much functionality. To be honest I doubt that im going to be creating massive arrays so I guess it doesn't matter too much about the implementation.
+Now lets do arrays - reckon this would be fun. Eventually think it would be cool to read in files or something into them. Think then it would be quite useful. Thinking about what ADT would be best to implement it. Would seem like if we didn't want to worry about setting max sizes and stuff then a reallocing array could be cool - although maybe for flexibility a linked list could be best as it allows for easier removal and insertion within the array? Been looking at how lisp does its lists (https://softwareengineering.stackexchange.com/questions/91121/lisp-benefits-of-lists-as-code-over-arrays-as-code and http://www.eecs.qmul.ac.uk/~mmh/ADSOOF/linkedlists/Lecture9.pdf) for some inspiration as they use linked lists to implement arrays but probably will do stuff quite differently as I'm not going to need that much functionality and the syntax is a bit weird. To be honest I doubt that im going to be creating massive arrays so I guess it doesn't matter too much about the implementation.
 Also tempted to make arrays global - means that we dont have to worry about returning arrays because that would be a whole other kettle of fish. 
 
 
- And then to store the various arrays we could use a hash map again. Can just use the same identifiers as functions -
-
+ And then to store the various arrays we could use a hash map again. 
 Formal Grammar -
 
 <INSTRUCTION> ::= <FD> | <LT> |
@@ -84,10 +83,8 @@ For accessing the arrays the VARNUM has to be positive and not a decimal. This i
 
 <FILETOARRAY> := "LOAD" <ARRAYIDENTIFIER> filepath 
 
-Filepath is the path from the executable file to the file you want to read in -was going to make it absolute but that would make it hard to move testing to other computers etc. If you change where the makefile puts the executable
-
-Because we do not know what length this could be we need another instruction as well for it to be useful.
-
+Filepath is the path from the executable file to the file you want to read in -was going to make it absolute but that would make it hard to move testing to other computers etc. 
+Because we do not know what length arrays this could result in we need another instruction as well for it to be useful.
 
 <LEN> "LEN" <ARRAYIDENTIFIER>
 

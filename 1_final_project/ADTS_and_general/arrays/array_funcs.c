@@ -87,6 +87,16 @@ t_node* init_t_node(double data)
 }
 
 
+void remove_head(turt_arr* t_arr)
+{
+   t_node* temp;
+   temp=t_arr->head;
+   /*if size if 1 this will set head to NULL*/
+   t_arr->head= t_arr->head->next;
+   free(temp);
+   t_arr->size--;
+}
+
 /*zero indexed */
 bool remove_val(turt_arr* t_arr,int position)
 {
@@ -100,11 +110,7 @@ bool remove_val(turt_arr* t_arr,int position)
       }
       if(position==0)
       {
-         temp=t_arr->head;
-         /*if size if 1 this will set head to NULL*/
-         t_arr->head= t_arr->head->next;
-         free(temp);
-         t_arr->size--;
+         remove_head(t_arr);
       }
       else
       {
@@ -131,6 +137,7 @@ bool remove_val(turt_arr* t_arr,int position)
    return false;
 
 }
+
 
 
 bool change_val_arr(double n_data,int position,\

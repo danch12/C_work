@@ -11,8 +11,7 @@
 #include "ADTS_and_general/general.h"
 
 #include "specific.h"
-#define NUMINSTRUCTIONS 3
-#define MAXLEN 1000
+
 #define MAXERRLEN 100
 #define NUMVARS 26
 

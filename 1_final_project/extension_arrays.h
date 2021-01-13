@@ -53,7 +53,7 @@ bool access_helper(word_cont* to_check,line_cont* line_arr,\
 
 bool valid_filepath(word_cont* to_check);
 bool valid_file_to_array(word_cont* to_check);
-char* get_full_path(word_cont* to_check);
+
 bool load_in(word_cont* to_check,turt_arr* arr,char* filepath);
 bool run_file_to_array(word_cont* to_check);
 

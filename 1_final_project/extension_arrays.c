@@ -554,20 +554,11 @@ bool load_in(word_cont* to_check,turt_arr* arr,char* filepath)
    return true;
 }
 
-char* get_full_path(word_cont* to_check)
-{
-   char* p;
-
-
-   p=(char*)safe_calloc(strlen(to_check->words[to_check->position])+1,\
-                           sizeof(char));
-   strcpy(p,to_check->words[to_check->position]);
-   return p;
-}
 
 
 turt_arr* get_arr(word_cont* to_check,char arr_name[MAXARRLEN])
 {
+   /*find "main" word_cont*/
    while(to_check->parent)
    {
       to_check=to_check->parent;
