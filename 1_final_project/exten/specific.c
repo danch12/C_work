@@ -1,7 +1,6 @@
 #include "specific.h"
 
 
-typedef enum assoc_type {function, array} assoc_type;
 
 bool run_funcset(word_cont* to_check);
 bool run_funcrun(word_cont* to_check,line_cont* line_arr,double** return_val);
@@ -142,7 +141,7 @@ word_cont* read_in_file(char* filename)
    }
    fclose(fp);
 
-   n_cont->stackptr=stack_init();
+   n_cont->stackptr=stack_init(sizeof(double));
    for(i=0;i<NUMVARS;i++)
    {
       n_cont->var_array[i]=NULL;
@@ -693,7 +692,7 @@ bool polish_num(word_cont* to_check,line_cont* line_arr)
    double num;
    if(get_varnum(to_check,&num,line_arr))
    {
-      stack_push(to_check->stackptr,num);
+      stack_push(to_check->stackptr,&num);
       return true;
    }
    return false;

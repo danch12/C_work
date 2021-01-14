@@ -11,7 +11,7 @@
 #define NUMVARS 26
 #define MAXERRLEN 100
 #define INSTRUCTLEN 3
-#define NUMINSTRUCTIONS 3
+
 #define INITSIZE 16
 #define SCALEFACTOR 2
 #define LETTER_TO_NUM 65

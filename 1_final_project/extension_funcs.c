@@ -17,7 +17,7 @@ word_cont* init_func_cont(void)
       n_cont->arg_placer[i]=UNUSED;
    }
    n_cont->func_map=assoc_init();
-   n_cont->stackptr=stack_init();
+   n_cont->stackptr=stack_init(sizeof(double));
    n_cont->n_args=0;
    n_cont->err_message[0]='\0';
    n_cont->return_val=NULL;
@@ -59,7 +59,7 @@ word_cont* deep_copy_func(word_cont* to_copy)
       }
       /*can still use the same func_map to call from*/
       new_copy->func_map=to_copy->func_map;
-      new_copy->stackptr=stack_init();
+      new_copy->stackptr=stack_init(sizeof(double));
       new_copy->n_args=to_copy->n_args;
       new_copy->parent=to_copy->parent;
       new_copy->return_val=NULL;

@@ -82,39 +82,70 @@ FILE* get_file_words(char* filename,int* lines)
    return fp;
 }
 
+opcode get_opcode(word_cont* to_check)
+{
+   if(strcmp(to_check->words[to_check->position],"FD")==0)
+   {
+      return fd;
+   }
+   if((strcmp(to_check->words[to_check->position],"LT")==0)||\
+      (strcmp(to_check->words[to_check->position],"RT")==0))
+   {
+      return rot;
+   }
+   if(strcmp(to_check->words[to_check->position],"DO")==0)
+   {
+      return do_loop;
+   }
+   if(strcmp(to_check->words[to_check->position],"SET")==0)
+   {
+      return set;
+   }
+   return inv_opcode;
+}
+
+
 
 
 bool valid_instruct(word_cont* to_check)
 {
-   int i;
+   opcode current_op;
    int init_pos;
-   char instructions[NUMINSTRUCTIONS][INSTRUCTLEN]= {"FD", "LT","RT"};
    init_pos=to_check->position;
-   if(init_pos>=to_check->capacity)
+   current_op=get_opcode(to_check);
+   switch(current_op)
    {
-      return false;
-   }
-   for(i=0;i<NUMINSTRUCTIONS;i++)
-   {
-      if(valid_mv(to_check,instructions[i]))
+      case fd:
+      if(valid_mv(to_check,"FD"))
       {
          return true;
       }
-      else
+      break;
+      case rot:
+      if(valid_mv(to_check,"LT"))
       {
-         to_check->position=init_pos;
+         return true;
       }
+      to_check->position=init_pos;
+      if(valid_mv(to_check,"RT"))
+      {
+         return true;
+      }
+      break;
+      case do_loop:
+      if(valid_do(to_check))
+      {
+         return true;
+      }
+      break;
+      case set:
+      if(valid_set(to_check))
+      {
+         return true;
+      }
+      break;
+      default:
+      return false;
    }
-   if(valid_set(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-
-   if(valid_do(to_check))
-   {
-      return true;
-   }
-
    return false;
 }

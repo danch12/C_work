@@ -18,7 +18,7 @@ typedef struct node
    /*can store it as a number
    because we dont actually put
    operators on the stack*/
-	double num;
+	void* data;
   struct node* next;
 }node;
 
@@ -28,14 +28,15 @@ typedef struct stack
 {
   nodeptr start;
   int size;
+  size_t data_size;
 }stack;
 
 /*return void then cast when appropriate*/
-stack* stack_init(void);
-void stack_push(stack* s,double d);
-bool stack_pop(stack* s, double* new_d);
+stack* stack_init(size_t datasize);
+void stack_push(stack* s,void* d);
+bool stack_pop(stack* s, void** new_d);
 bool stack_free(stack* s);
 void stack_tostr(stack* s, char* str);
-bool stack_peek(stack* s, double* new_d);
+bool stack_peek(stack* s, void** new_d);
 
 #endif

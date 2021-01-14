@@ -1,5 +1,5 @@
 #include "specific.h"
-
+/*just the headers of functions that are defined in other places*/
 bool get_rotation(word_cont* to_check,line_cont* line_arr);
 bool move_forward(word_cont* to_check,line_cont* l_arr);
 bool run_set(word_cont* to_check);
@@ -9,15 +9,14 @@ bool valid_set(word_cont* to_check);
 bool valid_do(word_cont* to_check);
 
 
-/*just the headers of functions that are defined in other places*/
+
 line* finish_line(line* prev_line,coord* endpoint);
 coord* init_coords(double x, double y);
 bool rotate(double degrees,coord* to_rotate, coord* rotation_point);
 bool get_num(word_cont* to_check,double* num);
 bool run_instruction_list(word_cont* to_check,\
                         line_cont* line_arr);
-bool get_func_val(word_cont* to_check,line_cont* line_arr,\
-                     double* num);
+
 void store_line(line_cont* l_arr, line* to_add);
 direction direction_helper(word_cont* to_check);
 bool valid_instructlist(word_cont* to_check);
@@ -149,7 +148,7 @@ word_cont* read_in_file(char* filename)
    }
    fclose(fp);
 
-   n_cont->stackptr=stack_init();
+   n_cont->stackptr=stack_init(sizeof(double));
    for(i=0;i<NUMVARS;i++)
    {
       n_cont->var_array[i]=NULL;
@@ -176,40 +175,47 @@ FILE* get_file_words(char* filename,int* lines)
    return fp;
 }
 
-
-
 bool valid_instruct(word_cont* to_check)
 {
-   int i;
+   opcode current_op;
    int init_pos;
-   char instructions[NUMINSTRUCTIONS][INSTRUCTLEN]= {"FD", "LT","RT"};
    init_pos=to_check->position;
-   if(init_pos>=to_check->capacity)
+   current_op=get_opcode(to_check);
+   switch(current_op)
    {
-      return false;
-   }
-   for(i=0;i<NUMINSTRUCTIONS;i++)
-   {
-      if(valid_mv(to_check,instructions[i]))
+      case fd:
+      if(valid_mv(to_check,"FD"))
       {
          return true;
       }
-      else
+      break;
+      case rot:
+      if(valid_mv(to_check,"LT"))
       {
-         to_check->position=init_pos;
+         return true;
       }
+      to_check->position=init_pos;
+      if(valid_mv(to_check,"RT"))
+      {
+         return true;
+      }
+      break;
+      case do_loop:
+      if(valid_do(to_check))
+      {
+         return true;
+      }
+      break;
+      case set:
+      if(valid_set(to_check))
+      {
+         return true;
+      }
+      break;
+      default:
+      strcpy(to_check->err_message,"invalid opcode used");
+      return false;
    }
-   if(valid_set(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-
-   if(valid_do(to_check))
-   {
-      return true;
-   }
-
    return false;
 }
 
@@ -218,7 +224,7 @@ bool polish_num(word_cont* to_check)
    double num;
    if(get_varnum(to_check,&num))
    {
-      stack_push(to_check->stackptr,num);
+      stack_push(to_check->stackptr,&num);
       return true;
    }
    return false;

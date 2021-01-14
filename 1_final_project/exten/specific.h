@@ -25,7 +25,7 @@
 #define DEGREES 360
 #define ORIGIN 0
 
-
+typedef enum assoc_type {function, array} assoc_type;
 typedef enum direction {left, right,invalid} direction;
 typedef enum op {plus, minus,mult,divide,invalid_op} op;
 typedef enum opcode {fd,rot,do_loop,set,set_func,return_val,run_func,flowstate,initarr,append,change,del,load,inv_opcode} opcode;

@@ -1334,6 +1334,40 @@ void test_main_no_returns(void)
    TEST_ASSERT_TRUE(!run_main(test_cont,test_line_cont));
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+
+   strcpy(test_cont->words[5],"{");
+
+   strcpy(test_cont->words[6],"SETFUNC");
+   strcpy(test_cont->words[7],"xyz");
+   strcpy(test_cont->words[8],"{");
+   strcpy(test_cont->words[9],"}");
+   strcpy(test_cont->words[10],"{");
+
+   strcpy(test_cont->words[11],"FD");
+   strcpy(test_cont->words[12],"10");
+
+   strcpy(test_cont->words[13],"}");
+
+   strcpy(test_cont->words[14],"}");
+
+   strcpy(test_cont->words[15],"xyz");
+
+   strcpy(test_cont->words[16],"{");
+   strcpy(test_cont->words[17],"}");
+
+   strcpy(test_cont->words[18],"}");
+   TEST_ASSERT_TRUE(!run_instruction_list(test_cont,test_line_cont));
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
 }
 
 
@@ -1876,6 +1910,7 @@ void test_instructlist_returns(void)
    free_line_cont(test_line_cont);
 
 
+
 }
 
 
@@ -1918,7 +1953,7 @@ word_cont* init_word_cont(void)
    }
    n_cont->position=0;
 
-   n_cont->stackptr=stack_init();
+   n_cont->stackptr=stack_init(sizeof(double));
    for(i=0;i<NUMVARS;i++)
    {
       n_cont->var_array[i]=NULL;

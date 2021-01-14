@@ -477,7 +477,7 @@ void test_basic_instruct_list(void)
    strcpy(test_cont->words[1],"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa90");
    TEST_ASSERT_FALSE(run_instruction_list(test_cont,test_line_cont));
    strcpy(test_cont->words[1],"90");
-
+   free_word_cont(test_cont);
    free_line_cont(test_line_cont);
 }
 
@@ -582,7 +582,8 @@ void test_basic_main(void)
 
    TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,341);
-
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
 }
 
 
@@ -605,12 +606,12 @@ void test_polish(void)
 
    TEST_ASSERT_TRUE(polish_num(test_cont));
    TEST_ASSERT_TRUE(test_cont->position==1);
-   TEST_ASSERT_EQUAL_DOUBLE(test_cont->stackptr->start->num,29);
+   TEST_ASSERT_EQUAL_DOUBLE(*(double*)test_cont->stackptr->start->data,29);
    TEST_ASSERT_TRUE(test_cont->stackptr->size==1);
    strcpy(test_cont->words[1],"90");
    TEST_ASSERT_TRUE(polish_num(test_cont));
-   TEST_ASSERT_EQUAL_DOUBLE(test_cont->stackptr->start->num,90);
-   TEST_ASSERT_EQUAL_DOUBLE(test_cont->stackptr->start->next->num,29);
+   TEST_ASSERT_EQUAL_DOUBLE(*(double*)test_cont->stackptr->start->data,90);
+   TEST_ASSERT_EQUAL_DOUBLE(*(double*)test_cont->stackptr->start->next->data,29);
    TEST_ASSERT_TRUE(test_cont->stackptr->size==2);
 
 
@@ -628,7 +629,7 @@ void test_polish(void)
 
    strcpy(test_cont->words[2],"+");
    TEST_ASSERT_TRUE(do_operation(test_cont));
-   TEST_ASSERT_EQUAL_DOUBLE(test_cont->stackptr->start->num,119);
+   TEST_ASSERT_EQUAL_DOUBLE(*(double*)test_cont->stackptr->start->data,119);
    TEST_ASSERT_TRUE(!test_cont->stackptr->start->next);
    TEST_ASSERT_TRUE(test_cont->stackptr->size==1);
    TEST_ASSERT_TRUE(test_cont->position==3);
@@ -637,13 +638,13 @@ void test_polish(void)
    TEST_ASSERT_TRUE(polish_num(test_cont));
    strcpy(test_cont->words[4],"-");
    TEST_ASSERT_TRUE(do_operation(test_cont));
-   TEST_ASSERT_EQUAL_DOUBLE(test_cont->stackptr->start->num,117.9);
+   TEST_ASSERT_EQUAL_DOUBLE(*(double*)test_cont->stackptr->start->data,117.9);
 
    strcpy(test_cont->words[5],"2");
    TEST_ASSERT_TRUE(polish_num(test_cont));
    strcpy(test_cont->words[6],"/");
    TEST_ASSERT_TRUE(do_operation(test_cont));
-   TEST_ASSERT_EQUAL_DOUBLE(test_cont->stackptr->start->num,58.95);
+   TEST_ASSERT_EQUAL_DOUBLE(*(double*)test_cont->stackptr->start->data,58.95);
    strcpy(test_cont->words[7],"*");
    TEST_ASSERT_TRUE(!do_operation(test_cont));
 
@@ -1501,7 +1502,7 @@ word_cont* init_word_cont(void)
    }
    n_cont->position=0;
 
-   n_cont->stackptr=stack_init();
+   n_cont->stackptr=stack_init(sizeof(double));
    for(i=0;i<NUMVARS;i++)
    {
       n_cont->var_array[i]=NULL;

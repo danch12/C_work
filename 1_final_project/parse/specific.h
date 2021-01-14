@@ -17,6 +17,9 @@ typedef struct word_container
    int capacity;
 }word_cont;
 
+typedef enum opcode {fd,rot,do_loop,set,inv_opcode} opcode;
+
+
 FILE* get_file_words(char* filename,int* lines);
 word_cont* read_in_file(char* filename);
 bool free_word_cont(word_cont* to_free);

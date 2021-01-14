@@ -1,46 +1,51 @@
 #include "stack_funcs.h"
 
 /*these funcs are very
-similar to your stack funcs*/
-stack* stack_init(void)
+similar to your stack funcs with
+a couple of extra bits added on*/
+stack* stack_init(size_t datasize)
 {
   stack* s;
   s=(stack*) safe_calloc(1,sizeof(stack));
   s->size=0;
+  s->data_size=datasize;
   return s;
 }
 
-
-nodeptr init_node(double d)
+/*using memcpy makes life so much easier
+because you dont have to worry about the
+value in the stack changing*/
+nodeptr init_node(void* d,size_t datasize)
 {
    nodeptr n_node;
    n_node=(nodeptr)safe_calloc(1,sizeof(node));
-   n_node->num=d;
+   n_node->data=(void*)safe_calloc(1,sizeof(datasize));
+   memcpy(n_node->data,d,datasize);
    n_node->next=NULL;
    return n_node;
 
 }
 
-void stack_push(stack* s,double d)
+void stack_push(stack* s,void* d)
 {
    nodeptr n_node;
-  if(s)
-  {
-    n_node= init_node(d);
+   if(s)
+   {
+    n_node= init_node(d,s->data_size);
     n_node->next=s->start;
     s->start=n_node;
     s->size++;
-  }
+   }
 }
 
-bool stack_pop(stack* s, double* new_d)
+bool stack_pop(stack* s, void** new_d)
 {
    nodeptr temp;
    if(s&&s->start)
    {
       temp=s->start;
       s->start=s->start->next;
-      *new_d=temp->num;
+      *new_d=temp->data;
       free(temp);
       s->size--;
       return true;
@@ -49,13 +54,13 @@ bool stack_pop(stack* s, double* new_d)
 }
 
 
-bool stack_peek(stack* s, double* new_d)
+bool stack_peek(stack* s, void** new_d)
 {
    if(s)
    {
       if(s->start)
       {
-         *new_d= s->start->num;
+         *new_d= s->start->data;
          return true;
       }
    }
@@ -72,6 +77,10 @@ bool stack_free(stack* s)
       while(to_free)
       {
          temp=to_free->next;
+         if(to_free->data)
+         {
+            free(to_free->data);
+         }
          free(to_free);
          to_free=temp;
       }
@@ -91,7 +100,7 @@ void stack_tostr(stack* s, char* str)
       current=s->start;
       while(current)
       {
-          sprintf(temp, "%f", current->num);
+          sprintf(temp, "%f", *(double*)current->data);
           strcat(str, temp);
           strcat(str, "|");
           current=current->next;

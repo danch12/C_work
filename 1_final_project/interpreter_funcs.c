@@ -279,7 +279,10 @@ against*/
 bool do_operation(word_cont* to_check)
 {
    op operator;
-   double result, num1, num2;
+   double result;
+   void* num1, *num2;
+   num1=NULL;
+   num2=NULL;
    operator=get_op(to_check);
 
    if(operator==invalid_op)
@@ -298,26 +301,28 @@ bool do_operation(word_cont* to_check)
    switch(operator)
    {
       case plus:
-      result= num1 + num2;
+      result= *(double*)num1 + *(double*)num2;
       break;
 
       case minus:
-      result= num1 - num2;
+      result= *(double*)num1 - *(double*)num2;
       break;
 
       case mult:
-      result= num1 * num2;
+      result= *(double*)num1 * *(double*)num2;
       break;
 
       case divide:
-      result =  num1 / num2;
+      result =  *(double*)num1 / *(double*)num2;
       break;
 
       default:
-      fprintf(stderr,"unexpected operator\n");
+      fprintf(stderr,"unexpected operator not caught by first check\n");
       exit(EXIT_FAILURE);
    }
-   stack_push(to_check->stackptr,result);
+   free(num1);
+   free(num2);
+   stack_push(to_check->stackptr,&result);
    to_check->position++;
    return true;
 }
@@ -326,17 +331,28 @@ bool do_operation(word_cont* to_check)
 bool finish_polish(word_cont* to_check,double* result)
 {
    /*if no number something wrong*/
-   if(!stack_pop(to_check->stackptr,result))
+   void* ptr_result;
+   void* leftover;
+   ptr_result=NULL;
+   leftover=NULL;
+   if(!stack_pop(to_check->stackptr,&ptr_result))
    {
+
       strcpy(to_check->err_message,"no numbers on the stack at end of expr");
       return false;
    }
    /*if numbers left over then something is wrong*/
-   if(stack_peek(to_check->stackptr,result))
+   if(stack_peek(to_check->stackptr,&leftover))
    {
+      if(ptr_result)
+      {
+         free(ptr_result);
+      }
       strcpy(to_check->err_message,"more than one number left on stack at end of expr");
       return false;
    }
+   *result = *(double*)ptr_result;
+   free(ptr_result);
    return true;
 
 }

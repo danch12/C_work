@@ -617,7 +617,7 @@ word_cont* init_word_cont(void)
    }
    n_cont->position=0;
 
-   n_cont->stackptr=stack_init();
+   n_cont->stackptr=stack_init(sizeof(double));
    for(i=0;i<NUMVARS;i++)
    {
       n_cont->var_array[i]=NULL;

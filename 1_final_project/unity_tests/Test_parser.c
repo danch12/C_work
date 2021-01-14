@@ -168,7 +168,7 @@ void test_valid_move_instruct(void)
    strcpy(test_cont->words[1],"}");
    TEST_ASSERT_TRUE(!valid_instructlist(test_cont));
    strcpy(test_cont->words[1],"2654");
-
+   test_cont->position=0;
    strcpy(test_cont->words[0],"}");
    TEST_ASSERT_TRUE(valid_instructlist(test_cont));
    strcpy(test_cont->words[0],"FD");
