@@ -304,8 +304,8 @@ void test_func_arr_interaction(void)
    strcpy(test_cont->words[14],"A");
 
    strcpy(test_cont->words[15],"{");
-   strcpy(test_cont->words[16],"a_myarr");
-   strcpy(test_cont->words[17],"APPEND");
+   strcpy(test_cont->words[16],"APPEND");
+   strcpy(test_cont->words[17],"a_myarr");
    strcpy(test_cont->words[18],"B");
    strcpy(test_cont->words[19],";");
 
@@ -345,8 +345,8 @@ void test_func_arr_interaction(void)
    strcpy(test_cont->words[14],"A");
 
    strcpy(test_cont->words[15],"{");
-   strcpy(test_cont->words[16],"a_myarr");
-   strcpy(test_cont->words[17],"APPEND");
+   strcpy(test_cont->words[16],"APPEND");
+   strcpy(test_cont->words[17],"a_myarr");
    strcpy(test_cont->words[18],"B");
    strcpy(test_cont->words[19],";");
 
@@ -386,8 +386,8 @@ void test_func_arr_interaction(void)
    strcpy(test_cont->words[13],"10");
    strcpy(test_cont->words[14],"{");
 
-   strcpy(test_cont->words[15],"a_myarr");
-   strcpy(test_cont->words[16],"APPEND");
+   strcpy(test_cont->words[15],"APPEND");
+   strcpy(test_cont->words[16],"a_myarr");
    strcpy(test_cont->words[17],"A");
    strcpy(test_cont->words[18],";");
    strcpy(test_cont->words[19],"abc");
@@ -422,8 +422,8 @@ void test_func_arr_interaction(void)
 
    strcpy(test_cont->words[1],"INITARR");
    strcpy(test_cont->words[2],"a_myarr");
-   strcpy(test_cont->words[3],"a_myarr");
-   strcpy(test_cont->words[4],"APPEND");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"a_myarr");
    strcpy(test_cont->words[5],"7");
    strcpy(test_cont->words[6],";");
    strcpy(test_cont->words[7],"SETFUNC");
@@ -458,8 +458,8 @@ void test_func_arr_interaction(void)
 
    strcpy(test_cont->words[1],"INITARR");
    strcpy(test_cont->words[2],"a_myarr");
-   strcpy(test_cont->words[3],"a_myarr");
-   strcpy(test_cont->words[4],"APPEND");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"a_myarr");
    strcpy(test_cont->words[5],"7");
    strcpy(test_cont->words[6],";");
    strcpy(test_cont->words[7],"SETFUNC");
@@ -470,21 +470,22 @@ void test_func_arr_interaction(void)
    strcpy(test_cont->words[11],"}");
 
    strcpy(test_cont->words[12],"{");
-   strcpy(test_cont->words[13],"a_myarr");
-   strcpy(test_cont->words[14],"[");
+   strcpy(test_cont->words[13],"CHANGE");
+   strcpy(test_cont->words[14],"a_myarr");
+   strcpy(test_cont->words[15],"[");
 
-   strcpy(test_cont->words[15],"0");
-   strcpy(test_cont->words[16],"]");
-   strcpy(test_cont->words[17],":=");
-   strcpy(test_cont->words[18],"A");
-   strcpy(test_cont->words[19],";");
-   strcpy(test_cont->words[20],"}");
-   strcpy(test_cont->words[21],"abc");
+   strcpy(test_cont->words[16],"0");
+   strcpy(test_cont->words[17],"]");
+   strcpy(test_cont->words[18],":=");
+   strcpy(test_cont->words[19],"A");
+   strcpy(test_cont->words[20],";");
+   strcpy(test_cont->words[21],"}");
+   strcpy(test_cont->words[22],"abc");
 
-   strcpy(test_cont->words[22],"{");
-   strcpy(test_cont->words[23],"10");
-   strcpy(test_cont->words[24],"}");
+   strcpy(test_cont->words[23],"{");
+   strcpy(test_cont->words[24],"10");
    strcpy(test_cont->words[25],"}");
+   strcpy(test_cont->words[26],"}");
    TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
    test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
    TEST_ASSERT_EQUAL_DOUBLE(test_arr->head->data,10);
@@ -496,7 +497,7 @@ void test_flow_arr_interaction(void)
 {
    word_cont* test_cont;
    line_cont* test_line_cont;
-   
+
 
    test_cont=init_word_cont();
    test_line_cont=init_line_cont();
@@ -504,8 +505,8 @@ void test_flow_arr_interaction(void)
 
    strcpy(test_cont->words[1],"INITARR");
    strcpy(test_cont->words[2],"a_myarr");
-   strcpy(test_cont->words[3],"a_myarr");
-   strcpy(test_cont->words[4],"APPEND");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"a_myarr");
    strcpy(test_cont->words[5],"7");
    strcpy(test_cont->words[6],";");
 
@@ -519,30 +520,30 @@ void test_flow_arr_interaction(void)
    strcpy(test_cont->words[13],"7");
 
    strcpy(test_cont->words[14],"{");
-   strcpy(test_cont->words[15],"a_myarr");
-   strcpy(test_cont->words[16],"[");
-   strcpy(test_cont->words[17],"0");
-   strcpy(test_cont->words[18],"]");
-   strcpy(test_cont->words[19],":=");
-   strcpy(test_cont->words[20],"8");
-   strcpy(test_cont->words[21],";");
+   strcpy(test_cont->words[15],"CHANGE");
+   strcpy(test_cont->words[16],"a_myarr");
+   strcpy(test_cont->words[17],"[");
+   strcpy(test_cont->words[18],"0");
+   strcpy(test_cont->words[19],"]");
+   strcpy(test_cont->words[20],":=");
+   strcpy(test_cont->words[21],"8");
+   strcpy(test_cont->words[22],";");
 
-   strcpy(test_cont->words[22],"IF");
-   strcpy(test_cont->words[23],"a_myarr");
-   strcpy(test_cont->words[24],"[");
-   strcpy(test_cont->words[25],"0");
-   strcpy(test_cont->words[26],"]");
-   strcpy(test_cont->words[27],"==");
-   strcpy(test_cont->words[28],"8");
+   strcpy(test_cont->words[23],"IF");
+   strcpy(test_cont->words[24],"a_myarr");
+   strcpy(test_cont->words[25],"[");
+   strcpy(test_cont->words[26],"0");
+   strcpy(test_cont->words[27],"]");
+   strcpy(test_cont->words[28],"==");
+   strcpy(test_cont->words[29],"8");
 
-   strcpy(test_cont->words[29],"{");
-   strcpy(test_cont->words[30],"FD");
-   strcpy(test_cont->words[31],"1");
-   strcpy(test_cont->words[32],"}");
-
+   strcpy(test_cont->words[30],"{");
+   strcpy(test_cont->words[31],"FD");
+   strcpy(test_cont->words[32],"1");
    strcpy(test_cont->words[33],"}");
 
    strcpy(test_cont->words[34],"}");
+   strcpy(test_cont->words[35],"}");
    TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->y,1);
    free_word_cont(test_cont);
@@ -556,8 +557,8 @@ void test_flow_arr_interaction(void)
 
    strcpy(test_cont->words[1],"INITARR");
    strcpy(test_cont->words[2],"a_myarr");
-   strcpy(test_cont->words[3],"a_myarr");
-   strcpy(test_cont->words[4],"APPEND");
+   strcpy(test_cont->words[3],"APPEND");
+   strcpy(test_cont->words[4],"a_myarr");
    strcpy(test_cont->words[5],"7");
    strcpy(test_cont->words[6],";");
 

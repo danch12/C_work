@@ -29,36 +29,76 @@ op get_op(word_cont* to_check);
 bool valid_var(word_cont* to_check);
 bool valid_num(word_cont* to_check);
 
+/*going to pretty much just try to emulate how cython do opcodes
+with a big switch statement - cant emulate it perfectly because
+we have to do the strcmp first but still speeds up the code
+compared to just brute force running all the functions and seeing
+which one returns true*/
+
+
+opcode get_opcode(word_cont* to_check)
+{
+   if(strcmp(to_check->words[to_check->position],"FD")==0)
+   {
+      return fd;
+   }
+   if((strcmp(to_check->words[to_check->position],"LT")==0)||\
+      (strcmp(to_check->words[to_check->position],"RT")==0))
+   {
+      return rot;
+   }
+   if(strcmp(to_check->words[to_check->position],"DO")==0)
+   {
+      return do_loop;
+   }
+   if(strcmp(to_check->words[to_check->position],"SET")==0)
+   {
+      return set;
+   }
+   return inv_opcode;
+}
 
 bool run_instruction(word_cont* to_check,line_cont* line_arr)
 {
-   int init_pos;
-   init_pos=to_check->position;
-   if(init_pos>=to_check->capacity)
+   opcode current_op;
+   if(to_check->position>=to_check->capacity)
    {
       return false;
    }
-   if(get_rotation(to_check,line_arr))
+   current_op=get_opcode(to_check);
+   switch(current_op)
    {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(move_forward(to_check,line_arr))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(run_set(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(run_do(to_check,line_arr))
-   {
-      return true;
+      case fd:
+      if(move_forward(to_check,line_arr))
+      {
+         return true;
+      }
+      break;
+      case rot:
+      if(get_rotation(to_check,line_arr))
+      {
+         return true;
+      }
+      break;
+      case do_loop:
+      if(run_do(to_check,line_arr))
+      {
+         return true;
+      }
+      break;
+      case set:
+      if(run_set(to_check))
+      {
+         return true;
+      }
+      break;
+      default:
+      strcpy(to_check->err_message,"invalid opcode used");
+      return false;
    }
    return false;
 }
+
 
 
 bool free_word_cont(word_cont* to_free)
@@ -243,7 +283,7 @@ bool get_rotation(word_cont* to_check,line_cont* line_arr)
    {
       if(dir==left)
       {
-         temp=num+line_arr->pending_line->rotation;         
+         temp=num+line_arr->pending_line->rotation;
       }
       else
       {

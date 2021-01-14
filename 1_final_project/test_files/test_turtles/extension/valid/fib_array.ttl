@@ -1,5 +1,6 @@
 { INITARR a_arr LOAD a_arr ./test_files/test_sizes/more_nums.txt 
- SETFUNC fib { A } 
+ 
+SETFUNC fib { A } 
 { 
    IF A == 0 
    { 

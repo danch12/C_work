@@ -1,10 +1,5 @@
 #include "specific.h"
-/*
-#ifdef _WIN32
-   #define SLASH '\\'
-#else
-   #define SLASH '/'
-#endif*/
+
 
 typedef enum assoc_type {function, array} assoc_type;
 
@@ -12,7 +7,7 @@ bool run_funcset(word_cont* to_check);
 bool run_funcrun(word_cont* to_check,line_cont* line_arr,double** return_val);
 bool run_flowstate(word_cont* to_check,line_cont* line_arr);
 bool run_return(word_cont* to_check,line_cont* line_arr);
-
+bool valid_funcvar(word_cont* to_check);
 bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN]);
 bool valid_set(word_cont* to_check);
 bool valid_do(word_cont* to_check);
@@ -161,23 +156,6 @@ word_cont* read_in_file(char* filename)
    return n_cont;
 }
 
-/*
-bool add_path(char* filename,word_cont* n_cont)
-{
-   char *last_slash;
-   char *parent;
-   last_slash = NULL;
-   parent = NULL;
-
-   last_slash = strrchr(filename, SLASH);
-
-   parent = strndup(filename, strlen(filename) - strlen(last_slash)+1);
-   n_cont->path= (char*)safe_calloc(strlen(parent)+1,sizeof(char));
-   strcpy(n_cont->path,parent);
-   free(parent);
-
-   return true;
-}*/
 
 
 FILE* get_file_words(char* filename,int* lines)
@@ -198,49 +176,78 @@ FILE* get_file_words(char* filename,int* lines)
 }
 
 
-bool run_list_instruct(word_cont* to_check,line_cont* line_arr,\
-                        int init_pos)
+
+opcode get_opcode(word_cont* to_check)
 {
-   if(run_init_arr(to_check))
+   if(strcmp(to_check->words[to_check->position],"FD")==0)
    {
-      return true;
+      return fd;
    }
-   to_check->position=init_pos;
-   if(run_append(to_check,line_arr))
+   if((strcmp(to_check->words[to_check->position],"LT")==0)||\
+      (strcmp(to_check->words[to_check->position],"RT")==0))
    {
-      return true;
+      return rot;
    }
-   to_check->position=init_pos;
-   if(run_change(to_check,line_arr))
+   if(strcmp(to_check->words[to_check->position],"DO")==0)
    {
-      return true;
+      return do_loop;
    }
-   to_check->position=init_pos;
-   if(run_delete_arr_val(to_check,line_arr))
+   if(strcmp(to_check->words[to_check->position],"SET")==0)
    {
-      return true;
+      return set;
    }
-   to_check->position=init_pos;
-   if(run_file_to_array(to_check))
+   if(strcmp(to_check->words[to_check->position],"SETFUNC")==0)
    {
-      return true;
+      return set_func;
    }
-   to_check->position=init_pos;
-   return false;
+   if(strcmp(to_check->words[to_check->position],"RETURN")==0)
+   {
+      return return_val;
+   }
+   if(strcmp(to_check->words[to_check->position],"IF")==0)
+   {
+      return flowstate;
+   }
+   if(strcmp(to_check->words[to_check->position],"INITARR")==0)
+   {
+      return initarr;
+   }
+   if(strcmp(to_check->words[to_check->position],"APPEND")==0)
+   {
+      return append;
+   }
+   if(strcmp(to_check->words[to_check->position],"CHANGE")==0)
+   {
+      return change;
+   }
+   if(strcmp(to_check->words[to_check->position],"DEL")==0)
+   {
+      return del;
+   }
+   if(strcmp(to_check->words[to_check->position],"LOAD")==0)
+   {
+      return load;
+   }
+   if(valid_funcvar(to_check))
+   {
+      return run_func;
+   }
+
+   return inv_opcode;
 }
 
-/*if we have already seen a return then we do not execute any more
-commands*/
+
 bool run_instruction(word_cont* to_check,line_cont* line_arr)
 {
-   int init_pos;
    double* placeholder;
+   opcode current_op;
    placeholder=NULL;
-   init_pos=to_check->position;
-   if(init_pos>=to_check->capacity)
+   if(to_check->position>=to_check->capacity)
    {
       return false;
    }
+   /*if we have already seen a return then we do not execute any more
+   commands just check syntax*/
    if(to_check->return_val)
    {
       if(valid_instruct(to_check))
@@ -249,53 +256,95 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
       }
       return false;
    }
-   if(get_rotation(to_check,line_arr))
+   current_op=get_opcode(to_check);
+   switch(current_op)
    {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(move_forward(to_check,line_arr))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(run_set(to_check,line_arr))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(run_do(to_check,line_arr))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(run_funcset(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   /*not using return value here */
-   if(run_funcrun(to_check,line_arr,&placeholder))
-   {
-      if(placeholder)
+      case fd:
+      if(move_forward(to_check,line_arr))
       {
-         free(placeholder);
+         return true;
       }
-      return true;
-   }
-   to_check->position=init_pos;
-   if(run_return(to_check,line_arr))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(run_flowstate(to_check,line_arr))
-   {
-      return true;
-   }
-   if(run_list_instruct(to_check,line_arr,init_pos))
-   {
-      return true;
+      break;
+      case rot:
+      if(get_rotation(to_check,line_arr))
+      {
+         return true;
+      }
+      break;
+      case do_loop:
+      if(run_do(to_check,line_arr))
+      {
+         return true;
+      }
+      break;
+      case set:
+      if(run_set(to_check,line_arr))
+      {
+         return true;
+      }
+      break;
+      case set_func:
+      if(run_funcset(to_check))
+      {
+         return true;
+      }
+      break;
+      case run_func:
+      /*not using return value here */
+      if(run_funcrun(to_check,line_arr,&placeholder))
+      {
+         if(placeholder)
+         {
+            free(placeholder);
+         }
+         return true;
+      }
+      break;
+      case return_val:
+      if(run_return(to_check,line_arr))
+      {
+         return true;
+      }
+      break;
+      case flowstate:
+      if(run_flowstate(to_check,line_arr))
+      {
+         return true;
+      }
+      break;
+      case initarr:
+      if(run_init_arr(to_check))
+      {
+         return true;
+      }
+      break;
+      case append:
+      if(run_append(to_check,line_arr))
+      {
+         return true;
+      }
+      break;
+      case change:
+      if(run_change(to_check,line_arr))
+      {
+         return true;
+      }
+      break;
+      case del:
+      if(run_delete_arr_val(to_check,line_arr))
+      {
+         return true;
+      }
+      break;
+      case load:
+      if(run_file_to_array(to_check))
+      {
+         return true;
+      }
+      break;
+      default:
+      strcpy(to_check->err_message,"invalid opcode used");
+      return false;
    }
    return false;
 }
@@ -356,75 +405,109 @@ bool valid_list_instruct(word_cont* to_check,int init_pos)
    {
       return true;
    }
-   to_check->position=init_pos;
-   if(valid_file_to_array(to_check))
-   {
-      return true;
-   }
+
 
    return false;
 }
 
 bool valid_instruct(word_cont* to_check)
 {
-   int i;
+   opcode current_op;
    int init_pos;
-   char instructions[NUMINSTRUCTIONS][INSTRUCTLEN]= {"FD", "LT","RT"};
    init_pos=to_check->position;
-   if(init_pos>=to_check->capacity)
+   current_op=get_opcode(to_check);
+   switch(current_op)
    {
-      return false;
-   }
-   for(i=0;i<NUMINSTRUCTIONS;i++)
-   {
-      if(valid_mv(to_check,instructions[i]))
+      case fd:
+      if(valid_mv(to_check,"FD"))
       {
          return true;
       }
-      else
+      break;
+      case rot:
+      if(valid_mv(to_check,"LT"))
       {
-         to_check->position=init_pos;
+         return true;
       }
-   }
-   if(valid_set(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
+      to_check->position=init_pos;
+      if(valid_mv(to_check,"RT"))
+      {
+         return true;
+      }
+      break;
+      case do_loop:
+      if(valid_do(to_check))
+      {
+         return true;
+      }
+      break;
+      case set:
+      if(valid_set(to_check))
+      {
+         return true;
+      }
+      break;
+      case set_func:
+      if(valid_funcset(to_check))
+      {
+         return true;
+      }
+      break;
+      case run_func:
 
-   if(valid_do(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(valid_funcset(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(valid_funcrun(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(valid_return(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(valid_flowstate(to_check))
-   {
-      return true;
-   }
-   if(valid_list_instruct(to_check,init_pos))
-   {
-      return true;
+      if(valid_funcrun(to_check))
+      {
+         return true;
+      }
+      break;
+      case return_val:
+      if(valid_return(to_check))
+      {
+         return true;
+      }
+      break;
+      case flowstate:
+      if(valid_flowstate(to_check))
+      {
+         return true;
+      }
+      break;
+      case initarr:
+      if(valid_init_arr(to_check))
+      {
+         return true;
+      }
+      break;
+      case append:
+      if(valid_append(to_check))
+      {
+         return true;
+      }
+      break;
+      case change:
+      if(valid_change(to_check))
+      {
+         return true;
+      }
+      break;
+      case del:
+      if(valid_delete_arr_val(to_check))
+      {
+         return true;
+      }
+      break;
+      case load:
+      if(valid_file_to_array(to_check))
+      {
+         return true;
+      }
+      break;
+      default:
+      strcpy(to_check->err_message,"invalid opcode used");
+      return false;
    }
    return false;
 }
-
-
-
 
 
 

@@ -1,5 +1,4 @@
-Thought it would be cool to create functions- allowing for functions to take arguments as well. Cant do recursion properly until we do flow control but may try to implement in the future.
-
+Thought it would be cool to create functions- allowing for functions to take arguments as well. 
 Basic idea is that running a function should be almost the same as running the main code because the main code is pretty much a function in itself. 
 
 Also had a look at how cython does their objects and stuff for a bit of inspiration but stripped the things back quite a lot as it seemed a bit overkill - https://tenthousandmeters.com/blog/python-behind-the-scenes-1-how-the-cpython-vm-works/
@@ -31,7 +30,7 @@ Grammar for functions
 
 For FUNCVAR it can be any combination of lowercase letters up to a length of 50, sorry I didn't know how to say it properly with a formal grammar. Thought it would be a good idea to have them lowercase so they wouldn't interfere with any reserved words.
 
-Additionally in the word struct for the extension I have added more features - added a pointer to parent that allows the function to use functions defined in the "main" bit of code. Good thing about doing it this way is it sort of starts to build in scope as it will check for local functions first then go to main functions. This also means we can define functions within functions within functions etc - not that you would usually want to but I quite like having the option. 
+Additionally in the word struct for the extension I have added more features - added a pointer to parent that allows the function to use functions defined in the "main" bit of code. Cool thing about doing it this way is it sort of starts to build in scope as it will check for local functions first then go to main functions. This also means we can define functions within functions within functions etc - not that you would usually want to but I quite like having the option. 
 
 When I run the function I create a deep copy of the function with its arguments then just run it like it was the main bit of the code- this means that I can run as many copies of the function as I want- therefore allowing for recursion.
 
@@ -65,10 +64,10 @@ Formal Grammar -
 
 <INITARRAY> := "INITARR" <ARRAYIDENTIFIER> 
 
-<APPEND>  :=  <ARRAYIDENTIFIER> "APPEND" <POLISH>
+<APPEND>  := "APPEND" <ARRAYIDENTIFIER> <POLISH>
 
 
-<CHANGEVAL> :=  <ARRAYIDENTIFIER> "[" <VARNUM> "]" ":=" <POLISH>
+<CHANGEVAL> :=  "CHANGE" <ARRAYIDENTIFIER> "[" <VARNUM> "]" ":=" <POLISH>
 
 <REMOVEVAL> := "DEL" <ARRAYIDENTIFIER> "[" <VARNUM> "]"
 
@@ -88,6 +87,12 @@ Because we do not know what length arrays this could result in we need another i
 
 <LEN> "LEN" <ARRAYIDENTIFIER>
 
+
+Just as I was finishing doing all of the above I realised it's actually super useful to start each instruction with a identifier like CHANGE or SET, the only one that I didn't start with an identifier is runfunc because it makes the code a lot more clunky to write I think. Especially as you can use runfunc pretty much anywhere like imagine in c having to do my_arr[RUNFUNC my_func(arg_list)] - its just quite long and makes it more cumbersome to write.
+
+I finished the above and still got a bit of time so thought I'd try out making a debugger. Not sure where I will get with this but will try my best. The two most challenging things in this will be how to break down do loops and also how to do functions well. 
+
+To start with I'm just going to create a debugger that deals with the main official grammar and then if I'm lucky and things go well I will proceed to my extension grammar as well.
 
 
 

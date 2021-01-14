@@ -117,10 +117,10 @@ bool valid_arr_identifier(word_cont* to_check)
 
 bool valid_append(word_cont* to_check)
 {
-   if(valid_arr_identifier(to_check))
+   if(strcmp(to_check->words[to_check->position],"APPEND")==0)
    {
       to_check->position++;
-      if(strcmp(to_check->words[to_check->position],"APPEND")==0)
+      if(valid_arr_identifier(to_check))
       {
          to_check->position++;
          if(valid_polish(to_check))
@@ -138,12 +138,12 @@ bool run_append(word_cont* to_check,line_cont* line_arr)
    char arr_name[MAXARRLEN];
    turt_arr* arr;
    double num;
-   if(get_arr_identifier(to_check,arr_name))
-   {
 
-      if(strcmp(to_check->words[to_check->position],"APPEND")==0)
+   if(strcmp(to_check->words[to_check->position],"APPEND")==0)
+   {
+      to_check->position++;
+      if(get_arr_identifier(to_check,arr_name))
       {
-         to_check->position++;
          /*returns null if not found*/
          arr=get_arr(to_check,arr_name);
          if(run_polish(to_check,&num,line_arr))
@@ -164,27 +164,31 @@ bool run_append(word_cont* to_check,line_cont* line_arr)
 
 bool valid_change(word_cont* to_check)
 {
-   if(valid_arr_identifier(to_check))
+   if(strcmp(to_check->words[to_check->position],"CHANGE")==0)
    {
       to_check->position++;
-      if(strcmp(to_check->words[to_check->position],"[")==0)
+      if(valid_arr_identifier(to_check))
       {
          to_check->position++;
-         if(valid_varnum(to_check))
+         if(strcmp(to_check->words[to_check->position],"[")==0)
          {
-            if(strcmp(to_check->words[to_check->position],"]")==0)
+            to_check->position++;
+            if(valid_varnum(to_check))
             {
-               to_check->position++;
-               if(strcmp(to_check->words[to_check->position],":=")==0)
+               if(strcmp(to_check->words[to_check->position],"]")==0)
                {
                   to_check->position++;
-                  if(valid_polish(to_check))
+                  if(strcmp(to_check->words[to_check->position],":=")==0)
                   {
-                     return true;
+                     to_check->position++;
+                     if(valid_polish(to_check))
+                     {
+                        return true;
+                     }
                   }
                }
-            }
 
+            }
          }
       }
    }
@@ -205,7 +209,7 @@ bool run_change(word_cont* to_check,line_cont* line_arr)
       if(!arr)
       {
 
-         strcpy(to_check->err_message,"array not found - potentially not initalised yet.");
+         strcpy(to_check->err_message,"array not found - potentially not initalised yet");
          return false;
       }
       if(change_val_arr(num,ind,arr))
@@ -222,23 +226,27 @@ bool run_change(word_cont* to_check,line_cont* line_arr)
 bool change_helper(word_cont* to_check, line_cont* line_arr,\
                   int* ind,double* num,char arr_name[MAXARRLEN])
 {
-   if(get_arr_identifier(to_check,arr_name))
+   if(strcmp(to_check->words[to_check->position],"CHANGE")==0)
    {
-      if(strcmp(to_check->words[to_check->position],"[")==0)
+      to_check->position++;
+      if(get_arr_identifier(to_check,arr_name))
       {
-         to_check->position++;
+         if(strcmp(to_check->words[to_check->position],"[")==0)
          {
-            if(get_valid_ind(to_check,line_arr,ind))
+            to_check->position++;
             {
-               if(strcmp(to_check->words[to_check->position],"]")==0)
+               if(get_valid_ind(to_check,line_arr,ind))
                {
-                  to_check->position++;
-                  if(strcmp(to_check->words[to_check->position],":=")==0)
+                  if(strcmp(to_check->words[to_check->position],"]")==0)
                   {
                      to_check->position++;
-                     if(run_polish(to_check,num,line_arr))
+                     if(strcmp(to_check->words[to_check->position],":=")==0)
                      {
-                        return true;
+                        to_check->position++;
+                        if(run_polish(to_check,num,line_arr))
+                        {
+                           return true;
+                        }
                      }
                   }
                }
@@ -246,7 +254,6 @@ bool change_helper(word_cont* to_check, line_cont* line_arr,\
          }
       }
    }
-
    return false;
 }
 

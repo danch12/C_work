@@ -28,7 +28,7 @@
 
 typedef enum direction {left, right,invalid} direction;
 typedef enum op {plus, minus,mult,divide,invalid_op} op;
-
+typedef enum opcode {fd,rot,do_loop,set,set_func,return_val,run_func,flowstate,initarr,append,change,del,load,inv_opcode} opcode;
 /*started off by making a struct that specifically holds
 functions - but makes more sense to just add that
 functionality to word_container so we dont have to redo

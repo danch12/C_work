@@ -22,7 +22,7 @@
 
 typedef enum direction {left, right,invalid} direction;
 typedef enum op {plus, minus,mult,divide,invalid_op} op;
-
+typedef enum opcode {fd,rot,do_loop,set,inv_opcode} opcode;
 
 typedef struct word_container
 {
