@@ -272,6 +272,7 @@ void test_bigger_arrays(void)
       TEST_ASSERT_TRUE(assoc_lookup(test_assoc,word));
       strcat(word,"a");
    }
+   assoc_free(test_assoc);
 }
 
 

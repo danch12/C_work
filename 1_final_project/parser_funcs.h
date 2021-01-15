@@ -14,6 +14,7 @@
 
 #define MAXERRLEN 100
 #define NUMVARS 26
+#define BLANK 0
 
 /*was going to use a hash map to store variables but
 seems a bit extravagent when there are only 26 possible
@@ -37,6 +38,7 @@ everything apart from the moves
 
 /*valid funcs return true if entry is valid will also increase the
 position of to_check*/
+bool valid_larger_than_one(word_cont* to_check,int len);
 bool valid_num(word_cont* to_check);
 
 bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN]);

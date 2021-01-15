@@ -19,7 +19,9 @@ nodeptr init_node(void* d,size_t datasize)
 {
    nodeptr n_node;
    n_node=(nodeptr)safe_calloc(1,sizeof(node));
-   n_node->data=(void*)safe_calloc(1,sizeof(datasize));
+
+   n_node->data=(void*)safe_calloc(1,datasize);
+
    memcpy(n_node->data,d,datasize);
    n_node->next=NULL;
    return n_node;

@@ -87,6 +87,7 @@ bool valid_instruct(word_cont* to_check);
 bool valid_varnum(word_cont* to_check);
 bool get_varnum(word_cont* to_check,double* num,line_cont* line_arr);
 bool run_set(word_cont* to_check,line_cont* line_arr);
+opcode get_opcode(word_cont* to_check);
 bool run_instruction(word_cont* to_check,line_cont* line_arr);
 bool move_forward(word_cont* to_check,line_cont* l_arr);
 bool get_rotation(word_cont* to_check,line_cont* line_arr);

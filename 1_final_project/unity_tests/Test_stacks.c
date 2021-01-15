@@ -119,12 +119,22 @@ void test_stack_struct(void)
    int i;
 
    test_stack=stack_init(sizeof(test_struct));
+   test_s=safe_calloc(1,sizeof(test_struct));
+   test_s->id =10;
+   stack_push(test_stack,test_s);
+   TEST_ASSERT_TRUE(stack_peek(test_stack,&test_ptr));
+   ((test_struct*)test_ptr)->id=5;
+   TEST_ASSERT_TRUE(stack_pop(test_stack,&test_ptr));
+   TEST_ASSERT_TRUE(((test_struct*)test_ptr)->id==5);
+   free(test_ptr);
+
+   test_stack=stack_init(sizeof(test_struct));
 
    test_s=safe_calloc(1,sizeof(test_struct));
    test_s->id =10;
    stack_push(test_stack,test_s);
    TEST_ASSERT_TRUE(stack_pop(test_stack,&test_ptr));
-
+   free(test_ptr);
    for(i=0;i<1000;i++)
    {
       test_s->id =i;

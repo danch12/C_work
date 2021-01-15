@@ -60,6 +60,7 @@ typedef struct line_container
 FILE* get_file_words(char* filename,int* lines);
 word_cont* read_in_file(char* filename);
 bool free_word_cont(word_cont* to_free);
+opcode get_opcode(word_cont* to_check);
 bool run_instruction(word_cont* to_check,line_cont* line_arr);
 bool valid_instruct(word_cont* to_check);
 

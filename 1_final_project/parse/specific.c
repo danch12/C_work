@@ -15,6 +15,7 @@ bool free_word_cont(word_cont* to_free)
       {
          free(to_free->words[i]);
       }
+      free(to_free->words);
       free(to_free);
    }
 

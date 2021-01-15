@@ -889,7 +889,8 @@ void test_true(void)
    TEST_ASSERT_TRUE(run_true(test_cont,test_line_cont));
    TEST_ASSERT_TRUE(test_line_cont->size==10);
    TEST_ASSERT_TRUE(test_cont->position==17);
-
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
 
    test_cont=init_word_cont();
    test_line_cont=init_line_cont();
@@ -915,8 +916,9 @@ void test_true(void)
    TEST_ASSERT_TRUE(test_cont->position==12);
 
    free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
 
-
+   test_line_cont=init_line_cont();
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"{");
 

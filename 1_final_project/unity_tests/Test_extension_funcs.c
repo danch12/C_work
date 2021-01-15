@@ -639,8 +639,9 @@ void test_place_all_args(void)
    TEST_ASSERT_TRUE(place_all_args(test_cont,test_func,0,test_line_cont));
    TEST_ASSERT_EQUAL_DOUBLE(*test_func->var_array[0],90.5);
    free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
 
-
+   test_line_cont=init_line_cont();
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"SETFUNC");
    strcpy(test_cont->words[1],"abc");
@@ -664,7 +665,9 @@ void test_place_all_args(void)
    TEST_ASSERT_EQUAL_DOUBLE(*test_func->var_array[0],-30);
    TEST_ASSERT_EQUAL_DOUBLE(*test_func->var_array[25],3.78);
    free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
 
+   test_line_cont=init_line_cont();
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"SETFUNC");
    strcpy(test_cont->words[1],"abc");
@@ -685,7 +688,10 @@ void test_place_all_args(void)
    TEST_ASSERT_TRUE(place_all_args(test_cont,test_func,0,test_line_cont));
    TEST_ASSERT_EQUAL_DOUBLE(*test_func->var_array[0],-30);
    free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
 
+
+   test_line_cont=init_line_cont();
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"SETFUNC");
    strcpy(test_cont->words[1],"abc");
@@ -706,6 +712,7 @@ void test_place_all_args(void)
    test_cont->position=8;
    TEST_ASSERT_TRUE(!place_all_args(test_cont,test_func,0,test_line_cont));
    free_word_cont(test_cont);
+
 
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"SETFUNC");
@@ -785,6 +792,7 @@ void test_place_all_args(void)
    test_cont->position=8;
    TEST_ASSERT_TRUE(!place_all_args(test_cont,test_func,0,test_line_cont));
    free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
 
 }
 

@@ -32,6 +32,9 @@ void test_valid_nums(void)
    strcpy(test_cont->words[0],"123.4");
    TEST_ASSERT_TRUE(valid_num(test_cont));
    test_cont->position=0;
+   strcpy(test_cont->words[0],".123");
+   TEST_ASSERT_TRUE(valid_num(test_cont));
+   test_cont->position=0;
 
    strcpy(test_cont->words[0],"123.a");
    TEST_ASSERT_FALSE(valid_num(test_cont));
@@ -50,6 +53,17 @@ void test_valid_nums(void)
    strcpy(test_cont->words[0]," ");
    TEST_ASSERT_FALSE(valid_num(test_cont));
    TEST_ASSERT_TRUE(test_cont->position==0);
+
+   strcpy(test_cont->words[0],"1-1");
+   TEST_ASSERT_FALSE(valid_num(test_cont));
+   strcpy(test_cont->words[0],"-");
+   TEST_ASSERT_FALSE(valid_num(test_cont));
+   strcpy(test_cont->words[0],".");
+   TEST_ASSERT_FALSE(valid_num(test_cont));
+   strcpy(test_cont->words[0],"1.1.");
+   TEST_ASSERT_FALSE(valid_num(test_cont));
+   strcpy(test_cont->words[0],"-1.1-");
+   TEST_ASSERT_FALSE(valid_num(test_cont));
    free_word_cont(test_cont);
 }
 

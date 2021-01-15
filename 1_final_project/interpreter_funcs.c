@@ -95,29 +95,33 @@ bool get_num(word_cont* to_check,double* num)
 dont increase the position at the end*/
 bool valid_number(word_cont* to_check)
 {
-   int i;
    int len;
    if(to_check->position>=to_check->capacity)
    {
       return false;
    }
    len=strlen(to_check->words[to_check->position]);
-   /*blank string not number*/
-   if(len==0)
+   switch(len)
    {
+      /*blank string not number*/
+      case BLANK:
       return false;
-   }
-   for(i=0;i<len;i++)
-   {
-      if(!isdigit(to_check->words[to_check->position][i])\
-         &&(to_check->words[to_check->position][i]!='.')\
-         &&(to_check->words[to_check->position][i]!='-'))
+      /*if single number then has to actually be a number*/
+      case 1:
+      if(!isdigit(to_check->words[to_check->position][0]))
       {
          return false;
       }
+      return true;
+      default:
+      if(valid_larger_than_one(to_check,len))
+      {
+         return true;
+      }
    }
-   return true;
+   return false;
 }
+
 
 
 bool run_main(word_cont* to_check,line_cont* line_arr)

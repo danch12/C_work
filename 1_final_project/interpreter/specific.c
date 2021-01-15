@@ -386,7 +386,8 @@ bool get_varnum(word_cont* to_check,double* num)
 }
 
 
-
+/*still can use variable after the do loop
+bit like in c*/
 bool run_do(word_cont* to_check,line_cont* line_arr)
 {
    int var_pos;

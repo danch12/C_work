@@ -1,35 +1,78 @@
 #include "parser_funcs.h"
 
-
-
+/*going to consider .1233 valid
+.123.456 is not valid*/
+bool valid_larger_than_one(word_cont* to_check,int len)
+{
+   bool seen_dot;
+   int i;
+   seen_dot=false;
+   if(to_check->words[to_check->position][0]=='.')
+   {
+      seen_dot=true;
+   }
+   else
+   {
+      /*check first spot for a negative sign*/
+      if(!isdigit(to_check->words[to_check->position][0])\
+         &&(to_check->words[to_check->position][0]!='-'))
+      {
+         return false;
+      }
+   }
+   /*then check rest of number*/
+   for(i=1;i<len;i++)
+   {
+      if(!isdigit(to_check->words[to_check->position][i]))
+      {
+         if(to_check->words[to_check->position][i]!='.'||\
+            seen_dot)
+         {
+            return false;
+         }
+         if(to_check->words[to_check->position][i]=='.')
+         {
+            seen_dot=true;
+         }
+      }
+   }
+   return true;
+}
 
 
 bool valid_num(word_cont* to_check)
 {
-   int i;
    int len;
+
    if(to_check->position>=to_check->capacity)
    {
       return false;
    }
    len=strlen(to_check->words[to_check->position]);
-   /*blank string not number*/
-   if(len==0)
+   switch(len)
    {
+      /*blank string not number*/
+      case BLANK:
       return false;
-   }
-   for(i=0;i<len;i++)
-   {
-      if(!isdigit(to_check->words[to_check->position][i])\
-         &&(to_check->words[to_check->position][i]!='.')\
-         &&(to_check->words[to_check->position][i]!='-'))
+      /*if single number then has to actually be a number*/
+      case 1:
+      if(!isdigit(to_check->words[to_check->position][0]))
       {
          return false;
       }
+      to_check->position++;
+      return true;
+      default:
+      if(valid_larger_than_one(to_check,len))
+      {
+         to_check->position++;
+         return true;
+      }
    }
-   to_check->position++;
-   return true;
+   return false;
+
 }
+
 
 bool valid_var(word_cont* to_check)
 {
