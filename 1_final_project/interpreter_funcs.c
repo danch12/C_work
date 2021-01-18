@@ -17,10 +17,8 @@ bool rotate(double degrees,coord* to_rotate, coord* rotation_point)
       /*go to origin then rotate*/
       n_y= to_rotate->y - rotation_point->y;
       n_x= to_rotate->x -rotation_point->x;
-
       to_rotate->y = ((n_x *sin(radians)) + \
                      (n_y * cos(radians)))+ rotation_point->y;
-
       to_rotate->x = (n_x * cos(radians) - \
                      (n_y *sin(radians)))+rotation_point->x;
       return true;

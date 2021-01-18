@@ -84,8 +84,8 @@ u_exten_arr_san: unity_tests/Test_extension_arrays.c src/unity.c src/unity.h  ex
 u_exten_arr_fast: unity_tests/Test_extension_arrays.c src/unity.c src/unity.h  extension_arrays.c extension_arrays.h  exten/specific.c exten/specific.h  extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
 	$(CC) unity_tests/Test_extension_arrays.c src/unity.c extension_arrays.c  exten/specific.c extension_funcs.c extension_flow.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) -o u_exten_arr_fast $(CFLAGSFAST) $(INCEXTEN) $(LIDLIBS)
 
-u_debugger_san:unity_tests/Test_debugger.c src/unity.c src/unity.h debugger_funcs.c debugger_funcs.h extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h extension_arrays.c extension_arrays.h $(ARRFULL)
-	$(CC) unity_tests/Test_debugger.c src/unity.c debugger_funcs.c  extension_funcs.c extension_flow.c exten/specific.c extension_arrays.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_debugger_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
+u_debugger_san:unity_tests/Test_debugger.c src/unity.c src/unity.h debugger_funcs.c debugger_funcs.h    $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
+	$(CC) unity_tests/Test_debugger.c src/unity.c debugger_funcs.c   interpreter/specific.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_debugger_san $(CFLAGSSAN) $(INCINTERP) $(LIDLIBS)
 
 parser_san: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
 	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser_san $(CFLAGSSAN) $(INCPARSE) $(LIDLIBS)

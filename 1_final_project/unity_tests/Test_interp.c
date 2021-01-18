@@ -1061,7 +1061,6 @@ void test_do(void)
    double test_double , test_double_2;
    int i;
    test_cont=init_word_cont();
-
    test_line_cont=init_line_cont();
    strcpy(test_cont->words[0],"DO");
    strcpy(test_cont->words[1],"A");
@@ -1121,6 +1120,24 @@ void test_do(void)
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
 
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"DO");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],"FROM");
+   strcpy(test_cont->words[3],"3");
+   strcpy(test_cont->words[4],"TO");
+   strcpy(test_cont->words[5],"9");
+   strcpy(test_cont->words[6],"{");
+   strcpy(test_cont->words[7],"}");
+   strcpy(test_cont->words[8],"FD");
+   strcpy(test_cont->words[9],"A");
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(run_instruction(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==1);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->y,9);
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
    /*change the var in the loop*/
    test_cont=init_word_cont();
 
