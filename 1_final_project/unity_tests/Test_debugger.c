@@ -3,7 +3,7 @@
 
 
 
-#define MAXTESTCAP 100
+#define MAXTESTCAP 150
 #define MAXTESTLEN 70
 
 
@@ -176,7 +176,7 @@ void test_loops(void)
    i=find_end_pos(test_d->program);
 
    TEST_ASSERT_TRUE(i==9);
-
+   test_d->program->capacity=8;
    strcpy(test_d->program->words[0],"FD");
    strcpy(test_d->program->words[1],"1.1.");
    strcpy(test_d->program->words[2],"2");
@@ -204,7 +204,7 @@ void test_loops(void)
    strcpy(test_d->program->words[0],"}");
    i=find_end_pos(test_d->program);
    TEST_ASSERT_TRUE(i==1);
-
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
    test_d=init_debugger();
@@ -451,6 +451,7 @@ void test_step_instruct_loops(void)
    TEST_ASSERT_TRUE(!step_instruction(test_d));
    TEST_ASSERT_TRUE(test_d->program->position==11);
    TEST_ASSERT_TRUE(test_d->output->size==2);
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
 
@@ -500,6 +501,7 @@ void test_step_instruct_loops(void)
    TEST_ASSERT_TRUE(!step_instruction(test_d));
    TEST_ASSERT_TRUE(test_d->output->size==2);
    TEST_ASSERT_TRUE(test_d->program->position==19);
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
    test_d=init_debugger();
@@ -518,6 +520,7 @@ void test_step_instruct_loops(void)
    strcpy(test_d->program->words[9],"}");
    strcpy(test_d->program->words[10],"}");
    TEST_ASSERT_TRUE(!step_instruction(test_d));
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
 
@@ -542,6 +545,7 @@ void test_step_instruct_loops(void)
    TEST_ASSERT_TRUE(step_instruction(test_d));
    TEST_ASSERT_TRUE(step_instruction(test_d));
    TEST_ASSERT_TRUE(test_d->output->size==3);
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
 
@@ -561,6 +565,7 @@ void test_step_instruct_loops(void)
    strcpy(test_d->program->words[9],"}");
    TEST_ASSERT_TRUE(step_instruction(test_d));
    TEST_ASSERT_TRUE(!step_instruction(test_d));
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 }
 
@@ -581,6 +586,7 @@ void test_step_instruct_set(void)
    TEST_ASSERT_TRUE(step_instruction(test_d));
    TEST_ASSERT_TRUE(test_d->program->position==7);
    TEST_ASSERT_EQUAL_DOUBLE(*test_d->program->var_array[0],2);
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
    /*this is the real test*/
@@ -606,14 +612,427 @@ void test_step_instruct_set(void)
    strcpy(test_d->program->words[14],"}");
 
    strcpy(test_d->program->words[15],"}");
+
    TEST_ASSERT_TRUE(step_instruction(test_d));
+   TEST_ASSERT_TRUE(test_d->loop_stack->size==1);
    TEST_ASSERT_TRUE(step_instruction(test_d));
    TEST_ASSERT_TRUE(step_instruction(test_d));
    TEST_ASSERT_TRUE(!step_instruction(test_d));
    TEST_ASSERT_TRUE(test_d->output->size==1);
+   TEST_ASSERT_TRUE(test_d->loop_stack->size==0);
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 }
 
+void test_advance(void)
+{
+   debugger* test_d;
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=15;
+   strcpy(test_d->program->words[0],"DO");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],"FROM");
+   strcpy(test_d->program->words[3],"1");
+   strcpy(test_d->program->words[4],"TO");
+   strcpy(test_d->program->words[5],"4");
+   strcpy(test_d->program->words[6],"{");
+
+   strcpy(test_d->program->words[7],"SET");
+   strcpy(test_d->program->words[8],"A");
+   strcpy(test_d->program->words[9],":=");
+   strcpy(test_d->program->words[10],"8");
+   strcpy(test_d->program->words[11],";");
+   strcpy(test_d->program->words[12],"FD");
+   strcpy(test_d->program->words[13],"A");
+   strcpy(test_d->program->words[14],"}");
+
+   strcpy(test_d->program->words[15],"}");
+
+   TEST_ASSERT_TRUE(advance_to_mistake(test_d));
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=10;
+   strcpy(test_d->program->words[0],"DO");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],"FROM");
+   strcpy(test_d->program->words[3],"3");
+   strcpy(test_d->program->words[4],"TO");
+   strcpy(test_d->program->words[5],"2");
+   strcpy(test_d->program->words[6],"{");
+   strcpy(test_d->program->words[7],"FD");
+   strcpy(test_d->program->words[8],"NO");
+   strcpy(test_d->program->words[9],"}");
+   strcpy(test_d->program->words[10],"}");
+   TEST_ASSERT_TRUE(!advance_to_mistake(test_d));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,8);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+
+
+
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=2;
+   strcpy(test_d->program->words[0],"FD");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],"}");
+
+   TEST_ASSERT_TRUE(!advance_to_mistake(test_d));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,0);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=9;
+   strcpy(test_d->program->words[0],"SET");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],":=");
+   strcpy(test_d->program->words[3],"10");
+   strcpy(test_d->program->words[4],";");
+   strcpy(test_d->program->words[5],"FD");
+   strcpy(test_d->program->words[6],"10");
+   strcpy(test_d->program->words[7],"LT");
+   strcpy(test_d->program->words[8],"B");
+   strcpy(test_d->program->words[9],"}");
+   TEST_ASSERT_TRUE(!advance_to_mistake(test_d));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,7);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=9;
+   strcpy(test_d->program->words[0],"SET");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],":=");
+   strcpy(test_d->program->words[3],"10");
+   strcpy(test_d->program->words[4],";");
+   strcpy(test_d->program->words[5],"FD");
+   strcpy(test_d->program->words[6],"10");
+   strcpy(test_d->program->words[7],"LT");
+   strcpy(test_d->program->words[8],"A");
+   strcpy(test_d->program->words[9],"}");
+   TEST_ASSERT_TRUE(advance_to_mistake(test_d));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,9);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=9;
+   strcpy(test_d->program->words[0],"DO");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],"FROM");
+   strcpy(test_d->program->words[3],"1000");
+   strcpy(test_d->program->words[4],"TO");
+   strcpy(test_d->program->words[5],"1001");
+   strcpy(test_d->program->words[6],"{");
+   strcpy(test_d->program->words[7],"FD");
+   strcpy(test_d->program->words[8],"2");
+   strcpy(test_d->program->words[9],"}");
+   TEST_ASSERT_TRUE(!advance_to_mistake(test_d));
+
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,9);
+   TEST_ASSERT_TRUE(strcmp(test_d->info,"missing bracket in code")==0);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+
+}
+
+void test_show_args(void)
+{
+   debugger* test_d;
+   char test_str[ONEARGLEN];
+   char test_str_2[FULLARGSTRLEN];
+   int i;
+   str_num(999999.999,test_str);
+
+   TEST_ASSERT_TRUE(strcmp(test_str,"= 999.. ")==0);
+   str_num(99.999,test_str);
+   TEST_ASSERT_TRUE(strcmp(test_str,"= 99.99 ")==0);
+   str_num(199.099,test_str);
+   TEST_ASSERT_TRUE(strcmp(test_str,"= 199.09 ")==0);
+
+   str_num(1.099,test_str);
+   TEST_ASSERT_TRUE(strcmp(test_str,"= 1.09 ")==0);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=10;
+   strcpy(test_d->program->words[0],"DO");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],"FROM");
+   strcpy(test_d->program->words[3],"1000");
+   strcpy(test_d->program->words[4],"TO");
+   strcpy(test_d->program->words[5],"1001");
+   strcpy(test_d->program->words[6],"{");
+   strcpy(test_d->program->words[7],"FD");
+   strcpy(test_d->program->words[8],"2");
+   strcpy(test_d->program->words[9],"}");
+   strcpy(test_d->program->words[10],"}");
+   TEST_ASSERT_TRUE(advance_to_mistake(test_d));
+   show_current_vars(test_d,test_str_2);
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"A= 100.. B= NA C= NA D= NA E= NA \nF= NA G= NA H= NA I= NA J= NA \nK= NA L= NA M= NA N= NA O= NA \nP= NA Q= NA R= NA S= NA T= NA \nU= NA V= NA W= NA X= NA Y= NA \nZ= NA ")==0);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=10;
+   strcpy(test_d->program->words[0],"SET");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],":=");
+   strcpy(test_d->program->words[3],"1");
+   strcpy(test_d->program->words[4],";");
+   strcpy(test_d->program->words[5],"SET");
+   strcpy(test_d->program->words[6],"D");
+   strcpy(test_d->program->words[7],":=");
+   strcpy(test_d->program->words[8],"50.4");
+   strcpy(test_d->program->words[9],";");
+   strcpy(test_d->program->words[10],"}");
+   TEST_ASSERT_TRUE(advance_to_mistake(test_d));
+   show_current_vars(test_d,test_str_2);
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"A= 1.00 B= NA C= NA D= 50.40 E= NA \nF= NA G= NA H= NA I= NA J= NA \nK= NA L= NA M= NA N= NA O= NA \nP= NA Q= NA R= NA S= NA T= NA \nU= NA V= NA W= NA X= NA Y= NA \nZ= NA ")==0);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=10;
+   strcpy(test_d->program->words[0],"SET");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],":=");
+   strcpy(test_d->program->words[3],"999.99");
+   strcpy(test_d->program->words[4],";");
+   strcpy(test_d->program->words[5],"SET");
+   strcpy(test_d->program->words[6],"D");
+   strcpy(test_d->program->words[7],":=");
+   strcpy(test_d->program->words[8],"999.99");
+   strcpy(test_d->program->words[9],";");
+   strcpy(test_d->program->words[10],"}");
+   TEST_ASSERT_TRUE(advance_to_mistake(test_d));
+   show_current_vars(test_d,test_str_2);
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"A= 999.99 B= NA C= NA D= 999.99 E= NA \nF= NA G= NA H= NA I= NA J= NA \nK= NA L= NA M= NA N= NA O= NA \nP= NA Q= NA R= NA S= NA T= NA \nU= NA V= NA W= NA X= NA Y= NA \nZ= NA ")==0);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=130;
+
+   for(i=0;i<130;i+=5)
+   {
+
+      strcpy(test_d->program->words[i],"SET");
+      test_d->program->words[i+1][0]='A'+i/5;
+      test_d->program->words[i+1][1]='\0';
+      strcpy(test_d->program->words[i+2],":=");
+      strcpy(test_d->program->words[i+3],"999.99");
+      strcpy(test_d->program->words[i+4],";");
+   }
+   strcpy(test_d->program->words[130],"}");
+   TEST_ASSERT_TRUE(advance_to_mistake(test_d));
+   show_current_vars(test_d,test_str_2);
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"A= 999.99 B= 999.99 C= 999.99 D= 999.99 E= 999.99 \nF= 999.99 G= 999.99 H= 999.99 I= 999.99 J= 999.99 \nK= 999.99 L= 999.99 M= 999.99 N= 999.99 O= 999.99 \nP= 999.99 Q= 999.99 R= 999.99 S= 999.99 T= 999.99 \nU= 999.99 V= 999.99 W= 999.99 X= 999.99 Y= 999.99 \nZ= 999.99 ")==0);
+   /*999.99 is the longest number possible*/
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+}
+
+void test_error_collate(void)
+{
+   debugger* test_d;
+   char test_str_2[FULLARGSTRLEN];
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=9;
+   strcpy(test_d->program->words[0],"SET");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],":=");
+   strcpy(test_d->program->words[3],"999.99");
+   strcpy(test_d->program->words[4],";");
+   strcpy(test_d->program->words[5],"SET");
+   strcpy(test_d->program->words[6],"D");
+   strcpy(test_d->program->words[7],":=");
+   strcpy(test_d->program->words[8],"999.99");
+   strcpy(test_d->program->words[9],";");
+
+   TEST_ASSERT_TRUE(!advance_to_mistake(test_d));
+   collate_instruct_messages(test_d,test_str_2);
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"error around word 10 \nmissing bracket in code\n")==0);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=8;
+   strcpy(test_d->program->words[0],"SET");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],":=");
+   strcpy(test_d->program->words[3],"999.99");
+   strcpy(test_d->program->words[4],"192");
+   strcpy(test_d->program->words[5],"453");
+   strcpy(test_d->program->words[6],"/");
+   strcpy(test_d->program->words[7],";");
+   strcpy(test_d->program->words[8],"}");
+   TEST_ASSERT_TRUE(!advance_to_mistake(test_d));
+   collate_instruct_messages(test_d,test_str_2);
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"error around word 0 SET\nmore than one number left on stack at end of expr\n")==0);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=9;
+   strcpy(test_d->program->words[0],"DO");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],"FROM");
+   strcpy(test_d->program->words[3],"1");
+   strcpy(test_d->program->words[4],"TO");
+   strcpy(test_d->program->words[5],"2");
+   strcpy(test_d->program->words[6],"{");
+   strcpy(test_d->program->words[7],"FD");
+   strcpy(test_d->program->words[8],"A");
+   strcpy(test_d->program->words[9],"}");
+
+   TEST_ASSERT_TRUE(!advance_to_mistake(test_d));
+   collate_instruct_messages(test_d,test_str_2);
+
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"error around word 9 }\nmissing bracket in code\n")==0);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=9;
+   strcpy(test_d->program->words[0],"DO");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],"FROM");
+   strcpy(test_d->program->words[3],"3");
+   strcpy(test_d->program->words[4],"TO");
+   strcpy(test_d->program->words[5],"2");
+   strcpy(test_d->program->words[6],"{");
+   strcpy(test_d->program->words[7],"FD");
+   strcpy(test_d->program->words[8],"fhhjg");
+   strcpy(test_d->program->words[9],"}");
+
+   TEST_ASSERT_TRUE(!advance_to_mistake(test_d));
+   collate_instruct_messages(test_d,test_str_2);
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"error around word 8 fhhjg\nsyntax error in unused loop\n")==0);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=9;
+   strcpy(test_d->program->words[0],"DO");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],"FROM");
+   strcpy(test_d->program->words[3],"1");
+   strcpy(test_d->program->words[4],"TO");
+   strcpy(test_d->program->words[5],"2");
+   strcpy(test_d->program->words[6],"{");
+   strcpy(test_d->program->words[7],"FD");
+   strcpy(test_d->program->words[8],"B");
+   strcpy(test_d->program->words[9],"}");
+
+   TEST_ASSERT_TRUE(!advance_to_mistake(test_d));
+   collate_instruct_messages(test_d,test_str_2);
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"error around word 7 FD\npotentially haven't set variable before calling it\n")==0);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=10;
+   strcpy(test_d->program->words[0],"DO");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],"FROM");
+   strcpy(test_d->program->words[3],"1");
+   strcpy(test_d->program->words[4],"TO");
+   strcpy(test_d->program->words[5],"2");
+   strcpy(test_d->program->words[6],"{");
+   strcpy(test_d->program->words[7],"FD");
+   strcpy(test_d->program->words[8],"A");
+   strcpy(test_d->program->words[9],"}");
+   strcpy(test_d->program->words[10],"}");
+
+   TEST_ASSERT_TRUE(advance_to_mistake(test_d));
+   collate_instruct_messages(test_d,test_str_2);
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"no mistakes found. At end of program")==0);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+}
+
+
+void test_run_action(void)
+{
+   debugger* test_d;
+   char test_str_2[FULLARGSTRLEN];
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=10;
+   strcpy(test_d->program->words[0],"DO");
+   strcpy(test_d->program->words[1],"A");
+   strcpy(test_d->program->words[2],"FROM");
+   strcpy(test_d->program->words[3],"1");
+   strcpy(test_d->program->words[4],"TO");
+   strcpy(test_d->program->words[5],"2");
+   strcpy(test_d->program->words[6],"{");
+   strcpy(test_d->program->words[7],"FD");
+   strcpy(test_d->program->words[8],"A");
+   strcpy(test_d->program->words[9],"}");
+   strcpy(test_d->program->words[10],"}");
+   TEST_ASSERT_TRUE(run_action(test_d,"show vars\n",test_str_2));
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"A= NA B= NA C= NA D= NA E= NA \nF= NA G= NA H= NA I= NA J= NA \nK= NA L= NA M= NA N= NA O= NA \nP= NA Q= NA R= NA S= NA T= NA \nU= NA V= NA W= NA X= NA Y= NA \nZ= NA ")==0);
+   TEST_ASSERT_TRUE(run_action(test_d,"single step\n",test_str_2));
+   TEST_ASSERT_TRUE(!test_d->stop);
+   TEST_ASSERT_TRUE(run_action(test_d,"show vars\n",test_str_2));
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"A= 1.00 B= NA C= NA D= NA E= NA \nF= NA G= NA H= NA I= NA J= NA \nK= NA L= NA M= NA N= NA O= NA \nP= NA Q= NA R= NA S= NA T= NA \nU= NA V= NA W= NA X= NA Y= NA \nZ= NA ")==0);
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",test_str_2));
+   TEST_ASSERT_TRUE(test_d->program->position==10);
+   TEST_ASSERT_TRUE(test_d->stop);
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = read_in_file("test_files/test_turtles/interpreter/valid/circle_with_more_circles.ttl");
+   test_d->program->position=1;
+   test_d->output= init_line_cont();
+
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",test_str_2));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,32);
+   free_debugger(test_d);
+}
 
 int main(void)
 {
@@ -622,6 +1041,10 @@ int main(void)
    RUN_TEST(test_loops);
    RUN_TEST(test_step_instruct_loops);
    RUN_TEST(test_step_instruct_set);
+   RUN_TEST(test_advance);
+   RUN_TEST(test_show_args);
+   RUN_TEST(test_error_collate);
+   RUN_TEST(test_run_action);
    return UNITY_END();
 }
 
@@ -634,8 +1057,8 @@ word_cont* init_word_cont(void)
    int i;
    n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    n_cont->capacity=MAXTESTCAP;
-   n_cont->words= (char**)safe_calloc(MAXTESTCAP,sizeof(char*));
-   for(i=0;i<MAXTESTCAP;i++)
+   n_cont->words= (char**)safe_calloc(MAXTESTCAP+1,sizeof(char*));
+   for(i=0;i<MAXTESTCAP+1;i++)
    {
       n_cont->words[i]=(char*)safe_calloc(MAXTESTLEN,sizeof(char));
       n_cont->words[i][0]='\0';

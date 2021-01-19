@@ -60,7 +60,7 @@ opcode get_opcode(word_cont* to_check)
 bool run_instruction(word_cont* to_check,line_cont* line_arr)
 {
    opcode current_op;
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -105,7 +105,7 @@ bool free_word_cont(word_cont* to_free)
    int i;
    if(to_free)
    {
-      for(i=0;i<to_free->capacity;i++)
+      for(i=0;i<=to_free->capacity;i++)
       {
          free(to_free->words[i]);
       }
@@ -133,7 +133,8 @@ word_cont* read_in_file(char* filename)
    num_lines=0;
    n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    fp=get_file_words(filename,&num_lines);
-   n_cont->capacity=num_lines;
+   /*need to minus 1 for indexing*/
+   n_cont->capacity=num_lines-1;
    n_cont->position=0;
    n_cont->words= (char**)safe_calloc(num_lines,sizeof(char*));
    n_cont->err_message[0]='\0';
@@ -307,7 +308,7 @@ bool get_rotation(word_cont* to_check,line_cont* line_arr)
 
 bool run_polish(word_cont* to_check,double* num)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -342,7 +343,7 @@ bool run_set(word_cont* to_check)
 {
    double to_set;
    int var_p;
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -357,6 +358,7 @@ bool run_set(word_cont* to_check)
 
             if(run_polish(to_check,&to_set))
             {
+
                if(!to_check->var_array[var_p])
                {
                   to_check->var_array[var_p]=(double*)safe_calloc(1,\
@@ -424,7 +426,7 @@ bool do_helper(word_cont* to_check,int* var_pos,\
                double* start,double* end)
 {
    int loop_start;
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }

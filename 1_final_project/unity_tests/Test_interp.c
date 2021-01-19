@@ -1379,6 +1379,28 @@ void test_main_full(void)
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
 
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"DO");
+   strcpy(test_cont->words[2],"A");
+   strcpy(test_cont->words[3],"FROM");
+   strcpy(test_cont->words[4],"1");
+   strcpy(test_cont->words[5],"TO");
+   strcpy(test_cont->words[6],"8");
+   strcpy(test_cont->words[7],"{");
+   strcpy(test_cont->words[8],"FD");
+   strcpy(test_cont->words[9],"30");
+   strcpy(test_cont->words[10],"LT");
+   strcpy(test_cont->words[11],"45");
+   strcpy(test_cont->words[12],"}");
+   strcpy(test_cont->words[13],"}");
+   strcpy(test_cont->words[14],"}");
+   strcpy(test_cont->words[15],"}");
+   TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
 
    test_cont=init_word_cont();
    test_line_cont=init_line_cont();
@@ -1431,7 +1453,7 @@ void test_main_full(void)
    test_cont=read_in_file("test_files/test_turtles/parser/valid/adding_loops.ttl");
 
    test_line_cont=init_line_cont();
-   TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
+   run_main(test_cont,test_line_cont);
    TEST_ASSERT_TRUE(test_line_cont->size==8);
 
 
@@ -1511,8 +1533,8 @@ word_cont* init_word_cont(void)
    int i;
    n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    n_cont->capacity=MAXTESTCAP;
-   n_cont->words= (char**)safe_calloc(MAXTESTCAP,sizeof(char*));
-   for(i=0;i<MAXTESTCAP;i++)
+   n_cont->words= (char**)safe_calloc(MAXTESTCAP+1,sizeof(char*));
+   for(i=0;i<MAXTESTCAP+1;i++)
    {
       n_cont->words[i]=(char*)safe_calloc(MAXTESTLEN,sizeof(char));
       n_cont->words[i][0]='\0';

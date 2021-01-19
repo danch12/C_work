@@ -94,7 +94,7 @@ dont increase the position at the end*/
 bool valid_number(word_cont* to_check)
 {
    int len;
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -124,7 +124,7 @@ bool valid_number(word_cont* to_check)
 
 bool run_main(word_cont* to_check,line_cont* line_arr)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -145,7 +145,7 @@ bool run_main(word_cont* to_check,line_cont* line_arr)
 bool run_instruction_list(word_cont* to_check,\
                         line_cont* line_arr)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }

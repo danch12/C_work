@@ -90,7 +90,8 @@ u_debugger_san:unity_tests/Test_debugger.c src/unity.c src/unity.h debugger_func
 parser_san: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
 	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser_san $(CFLAGSSAN) $(INCPARSE) $(LIDLIBS)
 
-
+debugger:debugger.c debugger_funcs.c debugger_funcs.h    $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
+	$(CC) debugger.c debugger_funcs.c  interpreter/specific.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) -o debugger $(CFLAGSSAN) $(INCINTERP) $(LIDLIBS)
 
 parser: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
 	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
