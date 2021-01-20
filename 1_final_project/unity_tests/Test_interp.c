@@ -690,6 +690,25 @@ void test_polish(void)
    TEST_ASSERT_EQUAL_DOUBLE(test_double,180);
    free_word_cont(test_cont);
 
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"90");
+   strcpy(test_cont->words[1],"+");
+   strcpy(test_cont->words[2],"+");
+   strcpy(test_cont->words[3],";");
+   TEST_ASSERT_TRUE(!run_polish(test_cont,&test_double));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"90");
+   strcpy(test_cont->words[1],"90");
+   strcpy(test_cont->words[2],"10");
+   strcpy(test_cont->words[3],"+");
+   strcpy(test_cont->words[4],"+");
+   strcpy(test_cont->words[5],";");
+   TEST_ASSERT_TRUE(run_polish(test_cont,&test_double));
+   free_word_cont(test_cont);
+
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"90");
    strcpy(test_cont->words[1],"90");

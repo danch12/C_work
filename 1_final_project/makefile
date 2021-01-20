@@ -125,30 +125,34 @@ run_tests: u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_sa
 
 
 #runs a series of invalid files and stores error message in p_errors.txt the | true stops the makefile from terminating after seeing an error
-run_parser_err: parser_fast
+run_parser_err: parser
 	echo "test_files/test_turtles/parser/invalid/bad_spacing.ttl" > p_errors.txt
-	./parser_fast test_files/test_turtles/parser/invalid/bad_spacing.ttl 2>> p_errors.txt | true
+	./parser test_files/test_turtles/parser/invalid/bad_spacing.ttl 2>> p_errors.txt | true
 	echo "test_files/test_turtles/parser/invalid/invalid_command.ttl" >> p_errors.txt
-	./parser_fast test_files/test_turtles/parser/invalid/invalid_command.ttl 2>>p_errors.txt | true
+	./parser test_files/test_turtles/parser/invalid/invalid_command.ttl 2>>p_errors.txt | true
 	echo "test_files/test_turtles/parser/invalid/missing_bracket.ttl" >> p_errors.txt
-	./parser_fast test_files/test_turtles/parser/invalid/missing_bracket.ttl 2>> p_errors.txt |true
+	./parser test_files/test_turtles/parser/invalid/missing_bracket.ttl 2>> p_errors.txt |true
 	echo "test_files/test_turtles/parser/invalid/invalid_do.ttl" >> p_errors.txt
-	./parser_fast test_files/test_turtles/parser/invalid/invalid_do.ttl 2>> p_errors.txt | true
+	./parser test_files/test_turtles/parser/invalid/invalid_do.ttl 2>> p_errors.txt | true
 	echo "test_files/test_turtles/parser/invalid/invalid_nested_loop.ttl" >> p_errors.txt
-	./parser_fast test_files/test_turtles/parser/invalid/invalid_nested_loop.ttl 2>> p_errors.txt | true
+	./parser test_files/test_turtles/parser/invalid/invalid_nested_loop.ttl 2>> p_errors.txt | true
 	echo "test_files/test_turtles/parser/invalid/invalid_set.ttl" >> p_errors.txt
-	./parser_fast test_files/test_turtles/parser/invalid/invalid_set.ttl 2>> p_errors.txt | true
+	./parser test_files/test_turtles/parser/invalid/invalid_set.ttl 2>> p_errors.txt | true
 	echo "test_files/test_turtles/parser/invalid/invalid_set_2.ttl" >> p_errors.txt
-	./parser_fast test_files/test_turtles/parser/invalid/invalid_set_2.ttl 2>> p_errors.txt
+	./parser test_files/test_turtles/parser/invalid/invalid_set_2.ttl 2>> p_errors.txt | true
+	echo "test_files/test_turtles/parser/invalid/text_after_main.ttl" >> p_errors.txt
+	./parser test_files/test_turtles/parser/invalid/text_after_main.ttl 2>> p_errors.txt | true
 
-run_parser_val: parser_fast
-	./parser_fast test_files/test_turtles/parser/valid/adding_loops.ttl
-	./parser_fast test_files/test_turtles/parser/valid/more_do.ttl
-	./parser_fast test_files/test_turtles/parser/valid/nested_loops.ttl
-	./parser_fast test_files/test_turtles/parser/valid/polish_2.ttl
-	./parser_fast test_files/test_turtles/parser/valid/polish.ttl
-	./parser_fast test_files/test_turtles/parser/valid/stupid_valid_do.ttl
-	./parser_fast test_files/test_turtles/parser/valid/using_variables.ttl
+
+
+run_parser_val: parser
+	./parser test_files/test_turtles/parser/valid/adding_loops.ttl
+	./parser test_files/test_turtles/parser/valid/more_do.ttl
+	./parser test_files/test_turtles/parser/valid/nested_loops.ttl
+	./parser test_files/test_turtles/parser/valid/polish_2.ttl
+	./parser test_files/test_turtles/parser/valid/polish.ttl
+	./parser test_files/test_turtles/parser/valid/stupid_valid_do.ttl
+	./parser test_files/test_turtles/parser/valid/using_variables.ttl
 
 run_interp_err: interp
 	echo "test_files/test_turtles/interpreter/invalid/no_nums.ttl" > i_errors.txt

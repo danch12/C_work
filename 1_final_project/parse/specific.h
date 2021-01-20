@@ -9,12 +9,16 @@
 #define NUMVARS 26
 #define INSTRUCTLEN 3
 #define NUMINSTRUCTIONS 3
+#define MAXERRLEN 100
+#define FINAL_INCREASE 1
 
 typedef struct word_container
 {
    char** words;
    int position;
+   /*capacity is index of final word*/
    int capacity;
+   char err_message[MAXERRLEN];
 }word_cont;
 
 typedef enum opcode {fd,rot,do_loop,set,inv_opcode} opcode;

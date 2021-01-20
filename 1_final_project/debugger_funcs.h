@@ -9,7 +9,6 @@
 #define TWODP 100
 #define MAXACTIONLEN 100
 #define INFOLEN 200
-#define DEBUGSTART 1
 
 #include "specific.h"
 #include "ADTS_and_general/general.h"
@@ -20,7 +19,7 @@
 #include "extension_flow.h"
 #include "extension_arrays.h"
 
-typedef enum action {to_mistake,s_step,show_vars,show_pos,help,invalid_act} action;
+typedef enum action {to_mistake,s_step,show_vars,show_pos,show_code,invalid_act} action;
 
 typedef struct loop_tracker
 {
@@ -53,7 +52,9 @@ bool free_debugger(debugger* to_free);
 bool step_instruction(debugger* to_check);
 
 /*finds end of loop/ instructlist*/
-int find_end_pos(word_cont* to_check);
+int find_end_pos(word_cont* to_check,int starting_brackets);
+/*checks to see if extra code after main */
+bool check_past_main(debugger* debug);
 
 /*checks to see if we are at the end of a loop
 and if so updates to position back to start*/
@@ -75,4 +76,10 @@ action get_action(char action_str[MAXACTIONLEN]);
 /*returns false if weird action entered*/
 bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
                char result_str[FULLARGSTRLEN]);
+
+bool check_start(debugger* to_check);
+/*will show 5 words behind and 5 ahead*/
+void show_code_pos(debugger* to_check,char out_str[FULLARGSTRLEN]);
+/*will show last 5 coords */
+void show_recent_coords(debugger* debug,char out_str[FULLARGSTRLEN]);
 #endif

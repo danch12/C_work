@@ -15,7 +15,6 @@ bool step_instruction(debugger* to_check)
 {
    opcode current_op;
    int init_pos;
-
    if(instruct_checks(to_check))
    {
 
@@ -48,14 +47,15 @@ bool step_instruction(debugger* to_check)
          }
          break;
          case set:
-
          if(run_set(to_check->program))
          {
-
             return true;
          }
          to_check->program->position=init_pos;
          break;
+         case i_list:
+         to_check->program->position++;
+         return true;
          default:
          strcpy(to_check->program->err_message,"invalid opcode used");
       }
@@ -63,17 +63,38 @@ bool step_instruction(debugger* to_check)
    return false;
 }
 
-/*not using instruct lists so will
-just skip } checks for random
-brackets will be done in another function
-however after skipping however many brackets
-we will need to recheck for loops*/
+bool check_start(debugger* to_check)
+{
+
+   if(strcmp(to_check->program->words\
+      [to_check->program->position],"{")!=0)
+   {
+      strcpy(to_check->info,"error in starting bracket");
+      return false;
+   }
+
+   return true;
+}
+
+bool initial_checks(debugger* to_check)
+{
+   if(check_start(to_check))
+   {
+      if(!check_past_main(to_check))
+      {
+         strcpy(to_check->info,"code present after main, please fix before using debugger");
+         return false;
+      }
+      to_check->program->position++;
+      return true;
+   }
+   return false;
+}
+
 bool instruct_checks(debugger* to_check)
 {
-   int init_pos;
    /*end checks if we are at end of one iteration
    fin checks if we are at the end of all iters*/
-
    check_loop_end(to_check);
    while(check_loop_fin(to_check))
    {
@@ -83,22 +104,6 @@ bool instruct_checks(debugger* to_check)
    if(to_check->program->position>=\
       to_check->program->capacity)
    {
-      return false;
-   }
-   init_pos=to_check->program->position;
-
-   if(strcmp(to_check->program->words\
-      [to_check->program->position],"}")==0)
-   {
-      to_check->program->position++;
-   }
-
-   if(init_pos!=to_check->program->position)
-   {
-      if(instruct_checks(to_check))
-      {
-         return true;
-      }
       return false;
    }
    return true;
@@ -192,7 +197,6 @@ bool step_do(debugger* debug)
          }
          debug->program->position=record->start_pos;
       }
-
       stack_push(debug->loop_stack,record);
       free(record);
       return true;
@@ -228,7 +232,7 @@ loop_tracker* step_do_helper(word_cont* to_check)
                         to_check->position++;
                         record->start_pos=to_check->position;
                         record->fin_flag=false;
-                        end_pos=find_end_pos(to_check);
+                        end_pos=find_end_pos(to_check,START_BRACKET);
                         if(end_pos==NOTFOUND)
                         {
                            free(record);
@@ -253,14 +257,14 @@ loop_tracker* step_do_helper(word_cont* to_check)
 
 /*cant just run valid instruct list
  as that wont work for invalid ones*/
-int find_end_pos(word_cont* to_check)
+int find_end_pos(word_cont* to_check,int starting_brackets)
 {
    int left_brackets,right_brackets;
    int end_pos;
-   left_brackets=START_BRACKET;
+   left_brackets=starting_brackets;
    right_brackets=0;
    end_pos=to_check->position;
-   while(left_brackets!=right_brackets)
+   while(left_brackets!=right_brackets || left_brackets==0)
    {
 
       if(end_pos>to_check->capacity)
@@ -279,6 +283,16 @@ int find_end_pos(word_cont* to_check)
    }
    return end_pos;
 
+}
+
+bool check_past_main(debugger* debug)
+{
+   if(find_end_pos(debug->program,0)<=\
+      debug->program->capacity)
+   {
+      return false;
+   }
+   return true;
 }
 
 /*going to have the vars like A = 1.453 to two dps to start with
@@ -322,14 +336,25 @@ void show_current_vars(debugger* debug,char out_str[FULLARGSTRLEN])
 void str_num(double num,char num_str[ONEARGLEN])
 {
    int i_num;
+   bool neg;
+   neg=false;
+   if(num< -MAXPOSLEN)
+   {
+      neg=true;
+      num=fabs(num);
+   }
    if(num>MAXPOSLEN)
    {
       while(num>MAXPOSLEN)
       {
          num=num/10;
       }
+      if(neg)
+      {
+         num=num*-1;
+      }
       sprintf(num_str,"= %d",(int)num);
-      strcat(num_str,".. ");
+      strcat(num_str,"... ");
    }
    else
    {
@@ -341,8 +366,46 @@ void str_num(double num,char num_str[ONEARGLEN])
    }
 }
 
+/*will show 5 words behind and 5 ahead*/
+void show_code_pos(debugger* to_check,char out_str[FULLARGSTRLEN])
+{
+   int from,to,pos,i;
+   out_str[0]='\0';
+   pos=to_check->program->position;
+   from = (pos-SPREAD>0) ? pos-SPREAD : 0;
+   to = (pos+SPREAD<to_check->program->capacity) ? pos+SPREAD : \
+                                       to_check->program->capacity;
+   for(i=from;i<=to;i++)
+   {
+      strcat(out_str,to_check->program->words[i]);
+      if(i==pos)
+      {
+         strcat(out_str,"<- current pos");
+      }
+      strcat(out_str, "\n");
+   }
+}
 
-/*void show_coords(debugger* debug)*/
+/*will show last 5 coords */
+void show_recent_coords(debugger* debug,char out_str[FULLARGSTRLEN])
+{
+   int i,start,max_ind;
+   char temp[ONEARGLEN];
+   out_str[0]='\0';
+   max_ind=debug->output->size-1;
+   start= (max_ind-SPREAD>0) ? max_ind-SPREAD : 0;
+   for(i=start;i<=max_ind;i++)
+   {
+      sprintf(temp,"%3d y ",i);
+      strcat(out_str,temp);
+      str_num(debug->output->array[i]->end->y,temp);
+      strcat(out_str,temp);
+      strcat(out_str,"| x ");
+      str_num(debug->output->array[i]->end->x,temp);
+      strcat(out_str,temp);
+      strcat(out_str,"\n");
+   }
+}
 
 /*returns false if weird action entered*/
 bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
@@ -356,12 +419,6 @@ bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
       if(!step_instruction(to_check))
       {
          collate_instruct_messages(to_check,result_str);
-         to_check->stop=true;
-      }
-      if(to_check->program->position>=\
-         to_check->program->capacity)
-      {
-         to_check->stop=true;
       }
       return true;
 
@@ -370,14 +427,18 @@ bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
       {
          collate_instruct_messages(to_check,result_str);
       }
-      to_check->stop=true;
+      else
+      {
+         strcpy(result_str,to_check->info);
+      }
       return true;
-
       case show_vars:
       show_current_vars(to_check,result_str);
       return true;
       case show_pos:
       sprintf(result_str,"position = %d",to_check->program->position);
+      case show_code:
+      show_code_pos(to_check,result_str);
       return true;
       default:
       return false;
@@ -394,7 +455,7 @@ void collate_instruct_messages(debugger* to_check,\
    }
    else
    {
-
+      /*bug around here*/
       sprintf(result_str,"error around word %d %s\n",\
       to_check->program->position,\
       to_check->program->words[to_check->program->position]);
@@ -453,6 +514,10 @@ action get_action(char action_str[MAXACTIONLEN])
    if(strcmp(action_str,"show pos\n")==0)
    {
       return show_pos;
+   }
+   if(strcmp(action_str,"show code\n")==0)
+   {
+      return show_code;
    }
    return invalid_act;
 }

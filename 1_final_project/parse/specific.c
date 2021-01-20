@@ -11,7 +11,7 @@ bool free_word_cont(word_cont* to_free)
    int i;
    if(to_free)
    {
-      for(i=0;i<to_free->capacity;i++)
+      for(i=0;i<=to_free->capacity;i++)
       {
          free(to_free->words[i]);
       }
@@ -50,9 +50,11 @@ word_cont* read_in_file(char* filename)
    num_lines=0;
    n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    fp=get_file_words(filename,&num_lines);
-   n_cont->capacity=num_lines;
+   /*minus one for index*/
+   n_cont->capacity=num_lines-1;
    n_cont->position=0;
    n_cont->words= (char**)safe_calloc(num_lines,sizeof(char*));
+   n_cont->err_message[0]='\0';
    count=0;
    while(fscanf(fp,"%s",buffer)==1)
    {

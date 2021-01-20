@@ -54,6 +54,13 @@ opcode get_opcode(word_cont* to_check)
    {
       return set;
    }
+   /*for debugger in the interpreting stage these will
+      get eaten by the switch default*/
+   if(strcmp(to_check->words[to_check->position],"}")==0)
+   {
+      return i_list;
+   }
+   
    return inv_opcode;
 }
 

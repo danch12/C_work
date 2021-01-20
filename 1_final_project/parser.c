@@ -18,6 +18,10 @@ int main(int argc, char* argv[])
          {
             fprintf(stderr,"error in processing file around word %d %s\n",\
                   n_cont->position,n_cont->words[n_cont->position]);
+            if(strlen(n_cont->err_message)>0)
+            {
+               fprintf(stderr,"%s",n_cont->err_message);
+            }
             exit(EXIT_FAILURE);
          }
          free_word_cont(n_cont);

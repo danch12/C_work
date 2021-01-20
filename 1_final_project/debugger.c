@@ -15,7 +15,11 @@ int main(int argc, char* argv[])
    {
       debug=init_debugger();
       debug->program=read_in_file(argv[1]);
-      debug->program->position=DEBUGSTART;
+      if(!initial_checks(debug))
+      {
+         fprintf(stderr,"%s",debug->info);
+         exit(EXIT_FAILURE);
+      }
       debug->output=init_line_cont();
       result[0]='\0';
       if(debug->program)

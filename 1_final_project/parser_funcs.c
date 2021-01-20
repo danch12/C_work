@@ -44,7 +44,7 @@ bool valid_num(word_cont* to_check)
 {
    int len;
 
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -76,7 +76,7 @@ bool valid_num(word_cont* to_check)
 
 bool valid_var(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -95,7 +95,7 @@ bool valid_var(word_cont* to_check)
 
 bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN])
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -115,7 +115,7 @@ bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN])
 
 bool valid_instructlist(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -142,16 +142,22 @@ bool valid_instructlist(word_cont* to_check)
 
 bool valid_main(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
    if(strcmp(to_check->words[to_check->position],"{")==0)
    {
       to_check->position++;
-
+      /*position should be capacity+1 as we increase the position
+      after last }*/
       if(valid_instructlist(to_check))
       {
+         if(to_check->position!=to_check->capacity+FINAL_INCREASE)
+         {
+            strcpy(to_check->err_message,"code after main?");
+            return false;
+         }
          return true;
       }
    }
@@ -161,7 +167,7 @@ bool valid_main(word_cont* to_check)
 
 bool valid_op(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -191,7 +197,7 @@ bool valid_op(word_cont* to_check)
 
 bool valid_polish(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -220,7 +226,7 @@ bool valid_polish(word_cont* to_check)
 
 bool valid_set(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -244,7 +250,7 @@ bool valid_set(word_cont* to_check)
 
 bool valid_do(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }

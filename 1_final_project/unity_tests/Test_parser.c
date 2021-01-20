@@ -111,7 +111,7 @@ void test_valid_move(void)
    strcpy(test_cont->words[0],"FD");
    TEST_ASSERT_TRUE(valid_mv(test_cont,"FD"));
    test_cont->position=0;
-
+   test_cont->capacity=MAXTESTCAP;
    free_word_cont(test_cont);
 }
 
@@ -193,14 +193,17 @@ void test_valid_move_instruct(void)
    TEST_ASSERT_TRUE(!valid_main(test_cont));
 
    test_cont->position=0;
+   test_cont->capacity=3;
    strcpy(test_cont->words[0],"{");
    strcpy(test_cont->words[1],"FD");
    strcpy(test_cont->words[2],"2654");
    strcpy(test_cont->words[3],"}");
    TEST_ASSERT_TRUE(valid_main(test_cont));
-   TEST_ASSERT_TRUE(test_cont->position==4);
+
+   TEST_ASSERT_EQUAL_INT(test_cont->position,4);
 
    test_cont->position=0;
+   test_cont->capacity=1;
    strcpy(test_cont->words[1],"}");
    TEST_ASSERT_TRUE(valid_main(test_cont));
 
@@ -210,10 +213,12 @@ void test_valid_move_instruct(void)
    TEST_ASSERT_TRUE(!valid_main(test_cont));
 
    test_cont->position=0;
+   test_cont->capacity=4;
    strcpy(test_cont->words[0],"{");
    strcpy(test_cont->words[3],"");
    strcpy(test_cont->words[4],"}");
    TEST_ASSERT_TRUE(!valid_main(test_cont));
+   test_cont->capacity=MAXTESTCAP;
    free_word_cont(test_cont);
 
 }
@@ -251,6 +256,7 @@ void test_valid_ops(void)
    TEST_ASSERT_TRUE(test_cont->position==1);
    test_cont->position=0;
    TEST_ASSERT_TRUE(valid_varnum(test_cont));
+   test_cont->capacity=MAXTESTCAP;
    free_word_cont(test_cont);
 }
 
@@ -305,6 +311,7 @@ void test_valid_polish(void)
    strcpy(test_cont->words[1],"A");
    strcpy(test_cont->words[3],"A");
    TEST_ASSERT_TRUE(!valid_polish(test_cont));
+   test_cont->capacity=MAXTESTCAP;
    free_word_cont(test_cont);
 }
 
@@ -416,6 +423,7 @@ void test_sets(void)
    test_cont->position=0;
    TEST_ASSERT_TRUE(!valid_instruct(test_cont));
    test_cont->position=0;
+   test_cont->capacity=MAXTESTCAP;
    free_word_cont(test_cont);
 }
 
@@ -513,11 +521,12 @@ void test_dos(void)
    TEST_ASSERT_TRUE(!valid_instruct(test_cont));
    test_cont->position=0;
    strcpy(test_cont->words[7],"DO");
+   test_cont->capacity=MAXTESTCAP;
    free_word_cont(test_cont);
 
 
    test_cont=init_word_cont();
-
+   test_cont->capacity=17;
    strcpy(test_cont->words[0],"{");
    strcpy(test_cont->words[1],"FD");
    strcpy(test_cont->words[2],"A");
@@ -542,7 +551,7 @@ void test_dos(void)
    TEST_ASSERT_TRUE(valid_main(test_cont));
    TEST_ASSERT_TRUE(test_cont->position==18);
    test_cont->position=0;
-
+   test_cont->capacity=29;
    strcpy(test_cont->words[17],"DO");
    strcpy(test_cont->words[18],"C");
    strcpy(test_cont->words[19],"FROM");
@@ -556,11 +565,10 @@ void test_dos(void)
    strcpy(test_cont->words[27],"30");
    strcpy(test_cont->words[28],"}");
    strcpy(test_cont->words[29],"}");
-   strcpy(test_cont->words[30],"}");
    TEST_ASSERT_TRUE(valid_main(test_cont));
    TEST_ASSERT_TRUE(test_cont->position==30);
    test_cont->position=0;
-
+   test_cont->capacity=17;
    strcpy(test_cont->words[0],"{");
    strcpy(test_cont->words[1],"FD");
    strcpy(test_cont->words[2],"40");
@@ -591,7 +599,24 @@ void test_dos(void)
    TEST_ASSERT_TRUE(!valid_main(test_cont));
    strcpy(test_cont->words[1],"FD");
    test_cont->position=0;
+   test_cont->capacity=MAXTESTCAP;
+   free_word_cont(test_cont);
 
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"}");
+   strcpy(test_cont->words[2],"}");
+   TEST_ASSERT_TRUE(!valid_main(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"}");
+   strcpy(test_cont->words[2],"}");
+   strcpy(test_cont->words[3],"fdjhdjd");
+   strcpy(test_cont->words[4],"?????");
+   TEST_ASSERT_TRUE(!valid_main(test_cont));
    free_word_cont(test_cont);
 }
 
@@ -705,8 +730,8 @@ word_cont* init_word_cont(void)
    int i;
    n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    n_cont->capacity=MAXTESTCAP;
-   n_cont->words= (char**)safe_calloc(MAXTESTCAP,sizeof(char*));
-   for(i=0;i<MAXTESTCAP;i++)
+   n_cont->words= (char**)safe_calloc(MAXTESTCAP+1,sizeof(char*));
+   for(i=0;i<=MAXTESTCAP;i++)
    {
       n_cont->words[i]=(char*)safe_calloc(MAXTESTLEN,sizeof(char));
       n_cont->words[i][0]='\0';
@@ -722,7 +747,7 @@ bool concat_word_cont(word_cont* to_concat, char target[MAXLEN])
    if(to_concat)
    {
       target[0]='\0';
-      for(i=0;i<to_concat->capacity;i++)
+      for(i=0;i<=to_concat->capacity;i++)
       {
          strcat(target,to_concat->words[i]);
       }
