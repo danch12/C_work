@@ -93,7 +93,9 @@ bool free_word_cont(word_cont* to_free)
    {
       for(i=0;i<to_free->capacity;i++)
       {
+
          free(to_free->words[i]);
+
       }
       for(i=0;i<NUMVARS;i++)
       {
@@ -126,7 +128,8 @@ word_cont* read_in_file(char* filename)
    num_lines=0;
    n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    fp=get_file_words(filename,&num_lines);
-   n_cont->capacity=num_lines;
+   n_cont->capacity=num_lines-1;
+
    n_cont->position=0;
    n_cont->words= (char**)safe_calloc(num_lines,sizeof(char*));
    n_cont->err_message[0]='\0';
@@ -241,7 +244,7 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
    double* placeholder;
    opcode current_op;
    placeholder=NULL;
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -351,7 +354,7 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
 
 bool valid_varnum(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -646,7 +649,7 @@ bool do_helper(word_cont* to_check,int* var_pos,\
                double* start,double* end,line_cont* line_arr)
 {
    int loop_start;
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -702,7 +705,7 @@ bool polish_num(word_cont* to_check,line_cont* line_arr)
 /*num is going to be passed in by set function*/
 bool run_polish(word_cont* to_check,double* num,line_cont* line_arr)
 {
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }
@@ -737,7 +740,7 @@ bool run_set(word_cont* to_check,line_cont* line_arr)
 {
    double to_set;
    int var_p;
-   if(to_check->position>=to_check->capacity)
+   if(to_check->position>to_check->capacity)
    {
       return false;
    }

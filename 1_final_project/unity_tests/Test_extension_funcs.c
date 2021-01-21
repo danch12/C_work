@@ -1835,7 +1835,7 @@ void test_instructlist_returns(void)
 
    strcpy(test_cont->words[27],"abc");
    strcpy(test_cont->words[28],"{");
-   strcpy(test_cont->words[29],"B");
+   strcpy(test_cont->words[29],"C");
    strcpy(test_cont->words[30],"}");
 
    strcpy(test_cont->words[31],"}");

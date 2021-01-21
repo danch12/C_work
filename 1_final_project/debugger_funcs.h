@@ -1,6 +1,22 @@
 #ifndef DEBUGGER_FUNCS_H
 #define DEBUGGER_FUNCS_H
 
+#include "specific.h"
+#include "ADTS_and_general/general.h"
+#include "specific.h"
+#include "parser_funcs.h"
+#include "interpreter_funcs.h"
+#include "extension_funcs.h"
+#include "extension_flow.h"
+#include "extension_arrays.h"
+
+#ifdef LIVE_VERSION
+#include "ADTS_and_general/neillsdl2.h"
+#define MIDWIDTH WWIDTH/2
+#define MIDHEIGHT WHEIGHT/2
+#define WHITE 255
+#endif
+
 #define NOTFOUND -1
 #define FULLARGSTRLEN 300
 #define ONEARGLEN 15
@@ -13,15 +29,6 @@
 #define NWORDS 8
 #define MWORDLEN 5
 #define LARGESTART 10
-
-#include "specific.h"
-#include "ADTS_and_general/general.h"
-#include "specific.h"
-#include "parser_funcs.h"
-#include "interpreter_funcs.h"
-#include "extension_funcs.h"
-#include "extension_flow.h"
-#include "extension_arrays.h"
 
 typedef enum action {to_mistake,s_step,show_vars,show_pos,show_code,show_coords,suggestion,visualize,invalid_act} action;
 
@@ -80,7 +87,7 @@ action get_action(char action_str[MAXACTIONLEN]);
 /*returns false if weird action entered*/
 bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
                char result_str[FULLARGSTRLEN]);
-
+bool initial_checks(debugger* to_check);
 bool check_start(debugger* to_check);
 /*will show 5 words behind and 5 ahead*/
 void show_code_pos(debugger* to_check,\
@@ -103,4 +110,5 @@ void suggest_keyword(char orig[MAXLEN], \
          char suggestion[FULLARGSTRLEN]);
 void make_suggestion(debugger* to_check,\
             char result_str[FULLARGSTRLEN]);
+void draw_lines(line_cont* l_arr);
 #endif

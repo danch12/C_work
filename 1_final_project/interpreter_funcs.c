@@ -17,6 +17,7 @@ bool rotate(double degrees,coord* to_rotate, coord* rotation_point)
       /*go to origin then rotate*/
       n_y= to_rotate->y - rotation_point->y;
       n_x= to_rotate->x -rotation_point->x;
+
       to_rotate->y = ((n_x *sin(radians)) + \
                      (n_y * cos(radians)))+ rotation_point->y;
       to_rotate->x = (n_x * cos(radians) - \
@@ -94,7 +95,7 @@ dont increase the position at the end*/
 bool valid_number(word_cont* to_check)
 {
    int len;
-   if(to_check->position>to_check->capacity)
+   if(to_check->position>=to_check->capacity)
    {
       return false;
    }
@@ -124,7 +125,7 @@ bool valid_number(word_cont* to_check)
 
 bool run_main(word_cont* to_check,line_cont* line_arr)
 {
-   if(to_check->position>to_check->capacity)
+   if(to_check->position>=to_check->capacity)
    {
       return false;
    }
@@ -145,7 +146,7 @@ bool run_main(word_cont* to_check,line_cont* line_arr)
 bool run_instruction_list(word_cont* to_check,\
                         line_cont* line_arr)
 {
-   if(to_check->position>to_check->capacity)
+   if(to_check->position>=to_check->capacity)
    {
       return false;
    }
@@ -390,7 +391,6 @@ bool get_var_pos(word_cont* to_check,int* var_p)
    }
    return false;
 }
-
 
 
 bool get_var(word_cont* to_check,double* num)

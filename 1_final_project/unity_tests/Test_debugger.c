@@ -1161,6 +1161,13 @@ void test_show_recent_coords(void)
    TEST_ASSERT_TRUE(strcmp(test_str_2,"  0 y = 1.00 | x = 0.00 \n  1 y = 2.99 | x = -0.03 \n  2 y = 5.99 | x = -0.19 \n  3 y = 9.97 | x = -0.61 \n")==0);
    test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   show_recent_coords(test_d,test_str_2);
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"\n"));
+   free_debugger(test_d);
 }
 
 
@@ -1490,7 +1497,7 @@ word_cont* init_word_cont(void)
    int i;
    n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    n_cont->capacity=MAXTESTCAP;
-   n_cont->words= (char**)safe_calloc(MAXTESTCAP+1,sizeof(char*));
+   n_cont->words= (char**)safe_calloc(MAXTESTCAP,sizeof(char*));
    for(i=0;i<MAXTESTCAP+1;i++)
    {
       n_cont->words[i]=(char*)safe_calloc(MAXTESTLEN,sizeof(char));

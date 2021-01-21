@@ -90,8 +90,8 @@ u_debugger_san:unity_tests/Test_debugger.c src/unity.c src/unity.h debugger_func
 parser_san: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
 	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser_san $(CFLAGSSAN) $(INCPARSE) $(LIDLIBS)
 
-debugger:debugger.c debugger_funcs.c debugger_funcs.h    $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
-	$(CC) debugger.c debugger_funcs.c  interpreter/specific.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) -o debugger $(CFLAGSSAN) $(INCINTERP) $(LIDLIBS)
+debugger:debugger.c debugger_funcs.c debugger_funcs.h  $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h
+	$(CC) -DLIVE_VERSION debugger.c debugger_funcs.c  interpreter/specific.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) ADTS_and_general/neillsdl2.c -o debugger $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
 parser: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
 	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)

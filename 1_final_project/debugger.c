@@ -1,6 +1,7 @@
 #include "debugger_funcs.h"
 
 
+
 int main(int argc, char* argv[])
 {
    debugger* debug;
@@ -24,6 +25,7 @@ int main(int argc, char* argv[])
       result[0]='\0';
       if(debug->program)
       {
+         printf("enter a command:\n");
          fgets(command,FULLARGSTRLEN,stdin);
          while(strcmp(command, "quit\n") != 0)
          {

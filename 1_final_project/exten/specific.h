@@ -19,7 +19,7 @@
 #define INITSIZE 16
 #define SCALEFACTOR 2
 #define LETTER_TO_NUM 65
-
+#define FINAL_INCREASE 1
 #define PI 3.14159265359
 #define DEGTORAD 180
 #define DEGREES 360

@@ -592,6 +592,10 @@ action get_action(char action_str[MAXACTIONLEN])
    {
       return suggestion;
    }
+   if(strcmp(action_str,"visualize\n")==0)
+   {
+      return visualize;
+   }
    return invalid_act;
 }
 
