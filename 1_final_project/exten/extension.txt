@@ -94,6 +94,7 @@ I finished the above and still got a bit of time so thought I'd try out making a
 
 To start with I'm just going to create a debugger that deals with the main official grammar and then if I'm lucky and things go well I will proceed to my extension grammar as well.
 
+Implemented a form of fuzzy matching to suggest commands when there is errors using Levenshtein_distance (https://en.wikipedia.org/wiki/Levenshtein_distance). Saw a version of it implemented in python that im just going to convert to c https://stackabuse.com/levenshtein-distance-and-text-similarity-in-python/. Although since most of the words are just two letters it isn't the perfect metric.
 
 
 

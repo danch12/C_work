@@ -1,5 +1,6 @@
 #include "debugger_funcs.h"
 
+void draw_lines(line_cont* l_arr);
 
 
 /*returns true if no mistakes else false*/
@@ -407,6 +408,10 @@ void show_recent_coords(debugger* debug,char out_str[FULLARGSTRLEN])
    }
 }
 
+/*only want to use SDL in live version as
+you cant really assert test it anyway
+and it causes memory leaks*/
+#ifdef LIVE_VERSION
 /*returns false if weird action entered*/
 bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
                char result_str[FULLARGSTRLEN])
@@ -437,13 +442,73 @@ bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
       return true;
       case show_pos:
       sprintf(result_str,"position = %d",to_check->program->position);
+      return true;
       case show_code:
       show_code_pos(to_check,result_str);
+      return true;
+      case show_coords:
+      show_recent_coords(to_check,result_str);
+      return true;
+      case suggestion:
+      make_suggestion(to_check,result_str);
+      return true;
+      case visualize:
+      draw_lines(to_check->output);
       return true;
       default:
       return false;
    }
 }
+
+#else
+
+/*returns false if weird action entered*/
+bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
+               char result_str[FULLARGSTRLEN])
+{
+   action curr_action;
+   curr_action=get_action(action_str);
+   switch(curr_action)
+   {
+      case s_step:
+      if(!step_instruction(to_check))
+      {
+         collate_instruct_messages(to_check,result_str);
+      }
+      return true;
+
+      case to_mistake:
+      if(!advance_to_mistake(to_check))
+      {
+         collate_instruct_messages(to_check,result_str);
+      }
+      else
+      {
+         strcpy(result_str,to_check->info);
+      }
+      return true;
+      case show_vars:
+      show_current_vars(to_check,result_str);
+      return true;
+      case show_pos:
+      sprintf(result_str,"position = %d",to_check->program->position);
+      return true;
+      case show_code:
+      show_code_pos(to_check,result_str);
+      return true;
+      case show_coords:
+      show_recent_coords(to_check,result_str);
+      return true;
+      case suggestion:
+      make_suggestion(to_check,result_str);
+      return true;
+      default:
+      return false;
+   }
+}
+
+#endif
+
 
 
 void collate_instruct_messages(debugger* to_check,\
@@ -519,6 +584,14 @@ action get_action(char action_str[MAXACTIONLEN])
    {
       return show_code;
    }
+   if(strcmp(action_str,"show coords\n")==0)
+   {
+      return show_coords;
+   }
+   if(strcmp(action_str,"give suggestion\n")==0)
+   {
+      return suggestion;
+   }
    return invalid_act;
 }
 
@@ -547,4 +620,129 @@ bool free_debugger(debugger* to_free)
       free(to_free);
    }
    return true;
+}
+
+/*levenshtein matrix is 1 indexed so have to add
+1 to a lot of things. put some links in my extension
+file on levenshtein distance that i used*/
+int levenshtein(char* word_1,char* word_2)
+{
+   int word_1_len,word_2_len;
+   int** matrix;
+   int x,y,answer;
+   word_1_len=strlen(word_1)+LEVIND;
+   word_2_len=strlen(word_2)+LEVIND;
+   matrix=(int**)safe_calloc_2d(word_1_len,word_2_len,\
+                                 sizeof(int));
+   for(y=0;y<word_1_len;y++)
+   {
+      matrix[y][0]=y;
+   }
+   for(x=0;x<word_2_len;x++)
+   {
+      matrix[0][x]=x;
+   }
+   for(y=LEVIND;y<word_1_len;y++)
+   {
+      for(x=LEVIND;x<word_2_len;x++)
+      {
+         if(word_1[y-LEVIND]==word_2[x-LEVIND])
+         {
+            matrix[y][x]=min_three(matrix[y-LEVIND][x]+LEVIND,
+                                 matrix[y-LEVIND][x-LEVIND],
+                                 matrix[y][x-LEVIND]+LEVIND);
+         }
+         else
+         {
+            matrix[y][x]=min_three(matrix[y-LEVIND][x]+LEVIND,
+                                 matrix[y-LEVIND][x-LEVIND]+LEVIND,
+                                 matrix[y][x-LEVIND]+LEVIND);
+         }
+      }
+   }
+   answer= matrix[word_1_len-LEVIND][word_2_len-LEVIND];
+   free_2d(matrix,word_1_len);
+   return answer;
+}
+
+
+int min_two(int a,int b)
+{
+   return (a<b) ? a:b;
+}
+
+int min_three(int a,int b, int c)
+{
+   return min_two(min_two(a,b),c);
+}
+
+
+void make_suggestion(debugger* to_check,\
+            char result_str[FULLARGSTRLEN])
+{
+   char orig[MAXLEN];
+   strcpy(orig,to_check->program->words\
+               [to_check->program->position]);
+   suggest_keyword(orig,result_str);
+}
+
+/*will not make suggestions for things like hfhjfhdkhdjfhfhffzzzzz
+because there is no telling what they wanted there */
+void suggest_keyword(char orig[MAXLEN],\
+                  char suggestion[FULLARGSTRLEN])
+{
+   char keywords[NWORDS][MWORDLEN]={"TO","FROM","DO",\
+                                    "FD","LT","RT",\
+                                    "SET",":="};
+   int lev_distance[NWORDS];
+   char upper_orig[MAXLEN];
+   int i,lowest_pos;
+   if(strlen(orig)==0)
+   {
+      strcpy(suggestion,"no suggestion possible:blank string?");
+      return;
+   }
+   str_to_upper(orig,upper_orig);
+   for(i=0;i<NWORDS;i++)
+   {
+      lev_distance[i]=levenshtein(upper_orig,keywords[i]);
+   }
+   lowest_pos=find_low(lev_distance);
+   if(lowest_pos==NOTFOUND)
+   {
+      strcpy(suggestion,"no suggestion possible");
+   }
+   else
+   {
+      strcpy(suggestion,keywords[lowest_pos]);
+   }
+}
+
+
+void str_to_upper(char orig[MAXLEN],char upper[MAXLEN])
+{
+   unsigned int i;
+
+   for(i=0;i<strlen(orig);i++)
+   {
+      upper[i]=toupper(orig[i]);
+   }
+   upper[i]='\0';
+}
+
+
+int find_low(int lev_distance[NWORDS])
+{
+   int i, lowest_val,lowest_pos;
+   lowest_val=LARGESTART;
+   lowest_pos=NOTFOUND;
+   for(i=0;i<NWORDS;i++)
+   {
+      if(lev_distance[i]<lowest_val)
+      {
+         lowest_val=lev_distance[i];
+         lowest_pos=i;
+      }
+   }
+   return lowest_pos;
 }

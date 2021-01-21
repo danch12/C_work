@@ -893,6 +893,7 @@ void test_code_after_main(void)
    i=find_end_pos(test_d->program,0);
    TEST_ASSERT_EQUAL_INT(i,6);
    TEST_ASSERT_TRUE(!check_past_main(test_d));
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
    test_d=init_debugger();
@@ -912,6 +913,7 @@ void test_code_after_main(void)
    i=find_end_pos(test_d->program,0);
    TEST_ASSERT_EQUAL_INT(i,9);
    TEST_ASSERT_TRUE(!check_past_main(test_d));
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
    test_d=init_debugger();
@@ -931,6 +933,7 @@ void test_code_after_main(void)
    i=find_end_pos(test_d->program,0);
    TEST_ASSERT_EQUAL_INT(i,10);
    TEST_ASSERT_TRUE(check_past_main(test_d));
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
 }
@@ -1082,7 +1085,8 @@ void test_show_code_pos(void)
    TEST_ASSERT_TRUE(step_instruction(test_d));
    show_code_pos(test_d,test_str_2);
    TEST_ASSERT_TRUE(strcmp(test_str_2,"SET\nA\n:=\n999.99\n;\nSET<- current pos\nD\n:=\n999.99\n;\n}\n")==0);
-
+   test_d->program->capacity=MAXTESTCAP;
+   free_debugger(test_d);
 }
 
 void test_show_recent_coords(void)
@@ -1107,6 +1111,7 @@ void test_show_recent_coords(void)
    TEST_ASSERT_TRUE(advance_to_mistake(test_d));
    show_recent_coords(test_d,test_str_2);
    TEST_ASSERT_TRUE(strcmp(test_str_2,"  0 y = 900.90 | x = 0.00 \n  1 y = 180... | x = 0.00 \n  2 y = 270... | x = 0.00 \n  3 y = 360... | x = 0.00 \n  4 y = 451... | x = 0.00 \n  5 y = 542... | x = 0.00 \n")==0);
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
 
@@ -1129,6 +1134,7 @@ void test_show_recent_coords(void)
    show_recent_coords(test_d,test_str_2);
 
    TEST_ASSERT_TRUE(strcmp(test_str_2,"  5 y = 542... | x = 0.00 \n  6 y = 632... | x = 0.00 \n  7 y = 723... | x = 0.00 \n  8 y = 814... | x = 0.00 \n  9 y = 905... | x = 0.00 \n 10 y = 996... | x = 0.00 \n")==0);
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
 
@@ -1151,8 +1157,9 @@ void test_show_recent_coords(void)
    strcpy(test_d->program->words[12],"}");
    TEST_ASSERT_TRUE(advance_to_mistake(test_d));
    show_recent_coords(test_d,test_str_2);
-   printf("%s",test_str_2);
 
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"  0 y = 1.00 | x = 0.00 \n  1 y = 2.99 | x = -0.03 \n  2 y = 5.99 | x = -0.19 \n  3 y = 9.97 | x = -0.61 \n")==0);
+   test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 }
 
@@ -1290,7 +1297,7 @@ void test_error_collate(void)
    free_debugger(test_d);
 }
 
-
+/*need to do more */
 void test_run_action(void)
 {
    debugger* test_d;
@@ -1381,7 +1388,79 @@ void test_run_action(void)
    TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",test_str_2));
    TEST_ASSERT_EQUAL_INT(test_d->program->position,32);
    free_debugger(test_d);
+
+
 }
+
+void test_fuzzy(void)
+{
+   char word1[MAXLEN],word2[MAXLEN],test_s[FULLARGSTRLEN];
+   debugger* test_d;
+   TEST_ASSERT_EQUAL_INT(min_three(1,2,3),1);
+   TEST_ASSERT_EQUAL_INT(min_three(1,1,3),1);
+   TEST_ASSERT_EQUAL_INT(min_three(3,200,3),3);
+   TEST_ASSERT_EQUAL_INT(levenshtein("sitting","kitten"),3);
+   TEST_ASSERT_EQUAL_INT(levenshtein("TO","DO"),1);
+   /*caps sensitive*/
+   TEST_ASSERT_EQUAL_INT(levenshtein("TO","to"),2);
+   TEST_ASSERT_EQUAL_INT(levenshtein("TO",""),2);
+   TEST_ASSERT_EQUAL_INT(levenshtein("TO","123"),3);
+   strcpy(word1,"hello");
+   str_to_upper(word1,word2);
+   TEST_ASSERT_TRUE(strcmp(word2,"HELLO")==0);
+   strcpy(word1,"he11o");
+   str_to_upper(word1,word2);
+   TEST_ASSERT_TRUE(strcmp(word2,"HE11O")==0);
+
+   strcpy(word1,"TD");
+   suggest_keyword(word1,test_s);
+   TEST_ASSERT_TRUE(strcmp(test_s,"TO")==0);
+   strcpy(word1,"td");
+   suggest_keyword(word1,test_s);
+   TEST_ASSERT_TRUE(strcmp(test_s,"TO")==0);
+
+   strcpy(word1,"FRAM");
+   suggest_keyword(word1,test_s);
+   TEST_ASSERT_TRUE(strcmp(test_s,"FROM")==0);
+
+   strcpy(word1,"SE");
+   suggest_keyword(word1,test_s);
+   TEST_ASSERT_TRUE(strcmp(test_s,"SET")==0);
+
+   strcpy(word1,"set");
+   suggest_keyword(word1,test_s);
+   TEST_ASSERT_TRUE(strcmp(test_s,"SET")==0);
+
+
+   strcpy(word1,"abhehdhdjdjdnn");
+   suggest_keyword(word1,test_s);
+   TEST_ASSERT_TRUE(strcmp(test_s,"no suggestion possible")==0);
+
+   strcpy(word1,"");
+   suggest_keyword(word1,test_s);
+   TEST_ASSERT_TRUE(strcmp(test_s,"no suggestion possible:blank string?")==0);
+
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   strcpy(test_d->program->words[0],"td");
+   make_suggestion(test_d,test_s);
+   TEST_ASSERT_TRUE(strcmp(test_s,"TO")==0);
+   strcpy(test_d->program->words[0],"");
+   make_suggestion(test_d,test_s);
+   TEST_ASSERT_TRUE(strcmp(test_s,"no suggestion possible:blank string?")==0);
+   strcpy(test_d->program->words[0],"<<");
+   make_suggestion(test_d,test_s);
+   /*its not perfect*/
+   TEST_ASSERT_TRUE(strcmp(test_s,"TO")==0);
+
+   strcpy(test_d->program->words[0],"fram");
+   make_suggestion(test_d,test_s);
+   TEST_ASSERT_TRUE(strcmp(test_s,"FROM")==0);
+   free_debugger(test_d);
+}
+
 
 int main(void)
 {
@@ -1397,6 +1476,7 @@ int main(void)
    RUN_TEST(test_show_recent_coords);
    RUN_TEST(test_error_collate);
    RUN_TEST(test_run_action);
+   RUN_TEST(test_fuzzy);
 
    return UNITY_END();
 }

@@ -60,7 +60,7 @@ opcode get_opcode(word_cont* to_check)
    {
       return i_list;
    }
-   
+
    return inv_opcode;
 }
 
@@ -410,7 +410,8 @@ bool run_do(word_cont* to_check,line_cont* line_arr)
       {
          if(!to_check->var_array[var_pos])
          {
-            to_check->var_array[var_pos]=(double*)safe_calloc(1,sizeof(double));
+            to_check->var_array[var_pos]=(double*)safe_calloc(1,\
+                                                   sizeof(double));
          }
          *to_check->var_array[var_pos]=i;
          to_check->position=beg_loop;

@@ -43,3 +43,35 @@ int main(int argc, char* argv[])
       return 0;
    }
 }
+
+
+void draw_lines(line_cont* l_arr)
+{
+   SDL_Simplewin sw;
+   int i;
+   if(l_arr)
+   {
+      Neill_SDL_Init(&sw);
+      /*technically only white when all three are white
+      but MAX doesnt really give same effect*/
+      Neill_SDL_SetDrawColour(&sw,WHITE,WHITE,WHITE);
+      for(i=0;i<l_arr->size;i++)
+      {
+
+         SDL_RenderDrawLine(sw.renderer, \
+                           (int)l_arr->array[i]->start->x+MIDWIDTH,\
+                           (int)l_arr->array[i]->start->y+MIDHEIGHT, \
+                            (int)l_arr->array[i]->end->x+MIDWIDTH,\
+                         (int)l_arr->array[i]->end->y+MIDHEIGHT);
+         Neill_SDL_UpdateScreen(&sw);
+      }
+      do
+      {
+        Neill_SDL_Events(&sw);
+      }while(!sw.finished);
+      SDL_Quit();
+      atexit(SDL_Quit);
+   }
+
+
+}

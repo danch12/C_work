@@ -13,7 +13,38 @@ void* safe_calloc(size_t nitems, size_t size)
    return ptr;
 }
 
+/*adapted version of yours*/
+void* safe_calloc_2d(int height,int width ,size_t size)
+{
+   int i;
+   void** ptr;
+   ptr = calloc(height, sizeof(void*));
+   if(ptr==NULL)
+   {
+      fprintf(stderr,"Not enough space\n");
+   	exit(EXIT_FAILURE);
+   }
+   for(i=0;i<height;i++)
+   {
+      ptr[i] = calloc(width, size);
+      if(ptr==NULL)
+      {
+         fprintf(stderr,"Not enough space\n");
+      	exit(EXIT_FAILURE);
+      }
+   }
+   return ptr;
+}
 
+void free_2d(int** ptr,int height)
+{
+   int i;
+   for(i=0;i<height;i++)
+   {
+      free(ptr[i]);
+   }
+   free(ptr);
+}
 
 FILE* safe_fopen(char* filename)
 {

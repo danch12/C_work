@@ -9,6 +9,10 @@
 #define TWODP 100
 #define MAXACTIONLEN 100
 #define INFOLEN 200
+#define LEVIND 1
+#define NWORDS 8
+#define MWORDLEN 5
+#define LARGESTART 10
 
 #include "specific.h"
 #include "ADTS_and_general/general.h"
@@ -19,7 +23,7 @@
 #include "extension_flow.h"
 #include "extension_arrays.h"
 
-typedef enum action {to_mistake,s_step,show_vars,show_pos,show_code,invalid_act} action;
+typedef enum action {to_mistake,s_step,show_vars,show_pos,show_code,show_coords,suggestion,visualize,invalid_act} action;
 
 typedef struct loop_tracker
 {
@@ -79,7 +83,24 @@ bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
 
 bool check_start(debugger* to_check);
 /*will show 5 words behind and 5 ahead*/
-void show_code_pos(debugger* to_check,char out_str[FULLARGSTRLEN]);
+void show_code_pos(debugger* to_check,\
+               char out_str[FULLARGSTRLEN]);
 /*will show last 5 coords */
-void show_recent_coords(debugger* debug,char out_str[FULLARGSTRLEN]);
+void show_recent_coords(debugger* debug,\
+                  char out_str[FULLARGSTRLEN]);
+
+
+int min_three(int a,int b, int c);
+/*levenshtein matrix is 1 indexed so have to add
+1 to a lot of things*/
+int levenshtein(char* word_1,char* word_2);
+
+int find_low(int lev_distance[NWORDS]);
+void str_to_upper(char orig[MAXLEN],char upper[MAXLEN]);
+/*will not make suggestions for things like hfhjfhdkhdjfhfhffzzzzz
+because there is no telling what they wanted there */
+void suggest_keyword(char orig[MAXLEN], \
+         char suggestion[FULLARGSTRLEN]);
+void make_suggestion(debugger* to_check,\
+            char result_str[FULLARGSTRLEN]);
 #endif
