@@ -23,12 +23,22 @@ int main(int argc, char* argv[])
             {
                fprintf(stderr,"%s\n",w_cont->err_message);
             }
+            do
+            {
+              Neill_SDL_Events(&w_cont->sw);
+            }while(!w_cont->sw.finished);
+            SDL_Quit();
+            atexit(SDL_Quit);
             exit(EXIT_FAILURE);
          }
-         draw_lines(l_cont);
       }
    }
-
+   do
+   {
+     Neill_SDL_Events(&w_cont->sw);
+   }while(!w_cont->sw.finished);
+   SDL_Quit();
+   atexit(SDL_Quit);
    free_line_cont(l_cont);
    free_word_cont(w_cont);
    return 0;

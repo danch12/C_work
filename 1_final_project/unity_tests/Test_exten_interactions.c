@@ -21,8 +21,6 @@ void tearDown(void)
 void test_func_flow_interaction(void)
 {
    word_cont* test_cont;
-
-
    line_cont* test_line_cont;
 
 
@@ -274,6 +272,85 @@ void test_func_flow_interaction(void)
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->y,90);
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+
+   strcpy(test_cont->words[0],"{");
+
+   strcpy(test_cont->words[1],"SETFUNC");
+   strcpy(test_cont->words[2],"fib");
+   strcpy(test_cont->words[3],"{");
+   strcpy(test_cont->words[4],"A");
+   strcpy(test_cont->words[5],"}");
+
+   strcpy(test_cont->words[6],"{");
+   strcpy(test_cont->words[7],"IF");
+   strcpy(test_cont->words[8],"A");
+   strcpy(test_cont->words[9],"<=");
+   strcpy(test_cont->words[10],"1");
+   strcpy(test_cont->words[11],"{");
+   strcpy(test_cont->words[12],"RETURN");
+   strcpy(test_cont->words[13],"A");
+   strcpy(test_cont->words[14],"}");
+
+   strcpy(test_cont->words[15],"ELSE");
+   strcpy(test_cont->words[16],"{");
+
+   strcpy(test_cont->words[17],"SET");
+   strcpy(test_cont->words[18],"C");
+   strcpy(test_cont->words[19],":=");
+   strcpy(test_cont->words[20],"A");
+   strcpy(test_cont->words[21],"1");
+   strcpy(test_cont->words[22],"-");
+   strcpy(test_cont->words[23],";");
+
+   strcpy(test_cont->words[24],"SET");
+   strcpy(test_cont->words[25],"D");
+   strcpy(test_cont->words[26],":=");
+   strcpy(test_cont->words[27],"A");
+   strcpy(test_cont->words[28],"2");
+   strcpy(test_cont->words[29],"-");
+   strcpy(test_cont->words[30],";");
+
+   strcpy(test_cont->words[31],"SET");
+   strcpy(test_cont->words[32],"B");
+   strcpy(test_cont->words[33],":=");
+
+   strcpy(test_cont->words[34],"fib");
+   strcpy(test_cont->words[35],"{");
+   strcpy(test_cont->words[36],"C");
+   strcpy(test_cont->words[37],"}");
+
+   strcpy(test_cont->words[38],"fib");
+   strcpy(test_cont->words[39],"{");
+   strcpy(test_cont->words[40],"D");
+   strcpy(test_cont->words[41],"}");
+
+   strcpy(test_cont->words[42],"+");
+   strcpy(test_cont->words[43],";");
+
+   strcpy(test_cont->words[44],"FD");
+
+   strcpy(test_cont->words[45],"B");
+   strcpy(test_cont->words[46],"RETURN");
+   strcpy(test_cont->words[47],"B");
+   strcpy(test_cont->words[48],"}");
+   strcpy(test_cont->words[49],"}");
+
+   strcpy(test_cont->words[50],"fib");
+   strcpy(test_cont->words[51],"{");
+   strcpy(test_cont->words[52],"5");
+   strcpy(test_cont->words[53],"}");
+   strcpy(test_cont->words[54],"}");
+
+   TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
+
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[test_line_cont->size-1]->end->y-test_line_cont->array[test_line_cont->size-1]->start->y,5);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
 }
 
 void test_func_arr_interaction(void)

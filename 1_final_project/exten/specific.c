@@ -128,7 +128,7 @@ word_cont* read_in_file(char* filename)
    num_lines=0;
    n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    fp=get_file_words(filename,&num_lines);
-   n_cont->capacity=num_lines-1;
+   n_cont->capacity=num_lines;
 
    n_cont->position=0;
    n_cont->words= (char**)safe_calloc(num_lines,sizeof(char*));
@@ -154,7 +154,10 @@ word_cont* read_in_file(char* filename)
    n_cont->n_args=UNUSED;
    n_cont->parent=NULL;
    n_cont->return_val=NULL;
-
+   #ifdef INTERP_PRODUCTION
+   Neill_SDL_Init(&n_cont->sw);
+   Neill_SDL_SetDrawColour(&n_cont->sw,WHITE,WHITE,WHITE);
+   #endif
    return n_cont;
 }
 
@@ -244,7 +247,8 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
    double* placeholder;
    opcode current_op;
    placeholder=NULL;
-   if(to_check->position>to_check->capacity)
+
+   if(to_check->position>=to_check->capacity)
    {
       return false;
    }
@@ -354,7 +358,7 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
 
 bool valid_varnum(word_cont* to_check)
 {
-   if(to_check->position>to_check->capacity)
+   if(to_check->position>=to_check->capacity)
    {
       return false;
    }
@@ -541,6 +545,21 @@ bool get_varnum(word_cont* to_check,double* num,line_cont* line_arr)
    return false;
 }
 
+#ifdef INTERP_PRODUCTION
+void simple_draw(word_cont* to_check,line* to_draw)
+{
+   while(to_check->parent)
+   {
+      to_check=to_check->parent;
+   }
+   SDL_RenderDrawLine(to_check->sw.renderer, \
+                     (int)to_draw->start->x+MIDWIDTH,\
+                     (int)to_draw->start->y+MIDHEIGHT, \
+                      (int)to_draw->end->x+MIDWIDTH,\
+                   (int)to_draw->end->y+MIDHEIGHT);
+   Neill_SDL_UpdateScreen(&to_check->sw);
+}
+#endif
 
 bool move_forward(word_cont* to_check,line_cont* l_arr)
 {
@@ -561,6 +580,9 @@ bool move_forward(word_cont* to_check,line_cont* l_arr)
             end_coord,l_arr->pending_line->start))
          {
             finished_line=finish_line(l_arr->pending_line,end_coord);
+            #ifdef INTERP_PRODUCTION
+            simple_draw(to_check,finished_line);
+            #endif
             store_line(l_arr,finished_line);
             /*reusing pending_line over and over by just
              changing its start point to the last lines
@@ -649,7 +671,7 @@ bool do_helper(word_cont* to_check,int* var_pos,\
                double* start,double* end,line_cont* line_arr)
 {
    int loop_start;
-   if(to_check->position>to_check->capacity)
+   if(to_check->position>=to_check->capacity)
    {
       return false;
    }
@@ -705,7 +727,7 @@ bool polish_num(word_cont* to_check,line_cont* line_arr)
 /*num is going to be passed in by set function*/
 bool run_polish(word_cont* to_check,double* num,line_cont* line_arr)
 {
-   if(to_check->position>to_check->capacity)
+   if(to_check->position>=to_check->capacity)
    {
       return false;
    }
@@ -740,7 +762,7 @@ bool run_set(word_cont* to_check,line_cont* line_arr)
 {
    double to_set;
    int var_p;
-   if(to_check->position>to_check->capacity)
+   if(to_check->position>=to_check->capacity)
    {
       return false;
    }

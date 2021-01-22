@@ -1,6 +1,4 @@
-{ INITARR a_arr LOAD a_arr ./test_files/test_sizes/more_nums.txt 
- 
-SETFUNC fib { A } 
+{ SETFUNC fib { A } 
 { 
    IF A == 0 
    { 
@@ -14,20 +12,13 @@ SETFUNC fib { A }
      }
      ELSE 
      { 
-     
+      
       SET C := A 1 - ; 
       SET D := A 2 - ; 
       SET B := fib { C } fib { D } + ; 
-      FD B RT B
+      FD B RT 90
       RETURN B 
      }
    }
 }
-
-SET B := LEN a_arr 1 - ;
-DO A FROM 0 TO B
-{
-fib { a_arr [ A ] }
-FD 100
-}
-}
+fib { 20 } } 

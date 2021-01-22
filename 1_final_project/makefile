@@ -87,23 +87,28 @@ u_exten_arr_fast: unity_tests/Test_extension_arrays.c src/unity.c src/unity.h  e
 u_debugger_san:unity_tests/Test_debugger.c src/unity.c src/unity.h debugger_funcs.c debugger_funcs.h    $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
 	$(CC) unity_tests/Test_debugger.c src/unity.c debugger_funcs.c   interpreter/specific.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_debugger_san $(CFLAGSSAN) $(INCINTERP) $(LIDLIBS)
 
+u_debugger_fast:unity_tests/Test_debugger.c src/unity.c src/unity.h debugger_funcs.c debugger_funcs.h    $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL)
+	$(CC) unity_tests/Test_debugger.c src/unity.c debugger_funcs.c   interpreter/specific.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_debugger_fast $(CFLAGSFAST) $(INCINTERP) $(LIDLIBS)
+
 parser_san: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
 	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser_san $(CFLAGSSAN) $(INCPARSE) $(LIDLIBS)
 
 debugger:debugger.c debugger_funcs.c debugger_funcs.h  $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h
 	$(CC) -DLIVE_VERSION debugger.c debugger_funcs.c  interpreter/specific.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) ADTS_and_general/neillsdl2.c -o debugger $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
-parser: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
+parse: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
 	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
 
 extension: extension.c extension_master.h extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h extension_arrays.c extension_arrays.h $(ARRFULL)
-	$(CC) extension.c extension_funcs.c extension_flow.c exten/specific.c extension_arrays.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) ADTS_and_general/neillsdl2.c -o extension $(CFLAGSSDL) $(INCEXTEN) $(LIDLIBSSDL)
+	$(CC) -DINTERP_PRODUCTION extension.c extension_funcs.c extension_flow.c exten/specific.c extension_arrays.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) ADTS_and_general/neillsdl2.c -o extension $(CFLAGSSDL) $(INCEXTEN) $(LIDLIBSSDL)
 
 interp: interpreter.c interpreter_master.h $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h  ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h  $(STACKSFULL) $(GENERALFULL)
-	$(CC) interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
+	$(CC) -DINTERP_PRODUCTION interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
 
-run_tests: u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_san u_arrays_fast u_parse_san u_parse_fast u_test_interp_san u_test_interp_fast u_exten_func_san u_exten_func_fast u_exten_flow_san u_exten_flow_fast u_exten_arr_san u_exten_arr_fast u_exten_interactions_san u_exten_interactions_fast
+
+
+run_tests: u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_san u_arrays_fast u_parse_san u_parse_fast u_test_interp_san u_test_interp_fast u_exten_func_san u_exten_func_fast u_exten_flow_san u_exten_flow_fast u_exten_arr_san u_exten_arr_fast u_exten_interactions_san u_exten_interactions_fast u_debugger_san u_debugger_fast
 	./u_stacks_san
 	./u_stacks_fast
 	./u_hash_map_san
@@ -122,6 +127,8 @@ run_tests: u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_sa
 	./u_exten_arr_fast
 	./u_exten_interactions_san
 	./u_exten_interactions_fast
+	./u_debugger_san
+	./u_debugger_fast
 
 
 #runs a series of invalid files and stores error message in p_errors.txt the | true stops the makefile from terminating after seeing an error
@@ -153,6 +160,7 @@ run_parser_val: parser
 	./parser test_files/test_turtles/parser/valid/polish.ttl
 	./parser test_files/test_turtles/parser/valid/stupid_valid_do.ttl
 	./parser test_files/test_turtles/parser/valid/using_variables.ttl
+
 
 run_interp_err: interp
 	echo "test_files/test_turtles/interpreter/invalid/no_nums.ttl" > i_errors.txt
@@ -193,4 +201,4 @@ run_extension_err:extension
 	./extension test_files/test_turtles/extension/invalid/non_existant_file.ttl 2>> ext_errors.txt | true
 
 clean:
-	rm -f u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_san u_arrays_fast u_parse_san u_parse_fast u_test_interp_san u_test_interp_fast u_exten_func_san u_exten_func_fast u_exten_flow_san u_exten_flow_fast u_exten_arr_san u_exten_arr_fast u_exten_interactions_san u_exten_interactions_fast
+	rm -f u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_san u_arrays_fast u_parse_san u_parse_fast u_test_interp_san u_test_interp_fast u_exten_func_san u_exten_func_fast u_exten_flow_san u_exten_flow_fast u_exten_arr_san u_exten_arr_fast u_exten_interactions_san u_exten_interactions_fast u_debugger_san u_debugger_fast

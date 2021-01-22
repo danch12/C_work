@@ -29,6 +29,7 @@
 #define NWORDS 8
 #define MWORDLEN 5
 #define LARGESTART 10
+#define INDEX 1
 
 typedef enum action {to_mistake,s_step,show_vars,show_pos,show_code,show_coords,suggestion,visualize,invalid_act} action;
 

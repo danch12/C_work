@@ -161,6 +161,10 @@ word_cont* read_in_file(char* filename)
    {
       n_cont->var_array[i]=NULL;
    }
+   #ifdef INTERP_PRODUCTION
+   Neill_SDL_Init(&n_cont->sw);
+   Neill_SDL_SetDrawColour(&n_cont->sw,WHITE,WHITE,WHITE);
+   #endif
    return n_cont;
 }
 
@@ -239,6 +243,17 @@ bool polish_num(word_cont* to_check)
 
 }
 
+#ifdef INTERP_PRODUCTION
+void simple_draw(word_cont* to_check,line* to_draw)
+{
+   SDL_RenderDrawLine(to_check->sw.renderer, \
+                     (int)to_draw->start->x+MIDWIDTH,\
+                     (int)to_draw->start->y+MIDHEIGHT, \
+                      (int)to_draw->end->x+MIDWIDTH,\
+                   (int)to_draw->end->y+MIDHEIGHT);
+   Neill_SDL_UpdateScreen(&to_check->sw);
+}
+#endif
 
 bool move_forward(word_cont* to_check,line_cont* l_arr)
 {
@@ -259,6 +274,9 @@ bool move_forward(word_cont* to_check,line_cont* l_arr)
             end_coord,l_arr->pending_line->start))
          {
             finished_line=finish_line(l_arr->pending_line,end_coord);
+            #ifdef INTERP_PRODUCTION
+            simple_draw(to_check,finished_line);
+            #endif
             store_line(l_arr,finished_line);
             /*reusing pending_line over and over by just
              changing its start point to the last lines

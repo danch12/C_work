@@ -12,10 +12,11 @@
      }
      ELSE 
      { 
-      FD A RT A
+      
       SET C := A 1 - ; 
       SET D := A 2 - ; 
       SET B := fib { C } fib { D } + ; 
+      FD B RT B
       RETURN B 
      }
    }

@@ -6,7 +6,7 @@
 #include "interpreter_funcs.h"
 #include "extension_funcs.h"
 
-#define EPSILON 0.00001
+
 typedef enum comparator {equal,greater,less,greater_equal,less_equal,inv_op} comparator;
 
 comparator get_comparator(word_cont* to_check);

@@ -7,6 +7,14 @@
 #include "../ADTS_and_general/general.h"
 #include "../ADTS_and_general/stacks/stack_funcs.h"
 
+#ifdef INTERP_PRODUCTION
+#include "../ADTS_and_general/neillsdl2.h"
+#define MIDWIDTH WWIDTH/2
+#define MIDHEIGHT WHEIGHT/2
+#define WHITE 255
+
+#endif
+
 #define MAXLEN 1000
 #define NUMVARS 26
 #define MAXERRLEN 100
@@ -20,6 +28,7 @@
 #define DEGREES 360
 #define ORIGIN 0
 #define SPREAD 5
+#define EPSILON 0.000001
 
 typedef enum direction {left, right,invalid} direction;
 typedef enum op {plus, minus,mult,divide,invalid_op} op;
@@ -33,6 +42,9 @@ typedef struct word_container
    stack* stackptr;
    double* var_array[NUMVARS];
    char err_message[MAXERRLEN];
+   #ifdef INTERP_PRODUCTION
+   SDL_Simplewin sw;
+   #endif
 }word_cont;
 
 typedef struct coord

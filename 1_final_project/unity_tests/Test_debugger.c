@@ -176,7 +176,7 @@ void test_loops(void)
    i=find_end_pos(test_d->program,1);
 
    TEST_ASSERT_TRUE(i==9);
-   test_d->program->capacity=8;
+   test_d->program->capacity=9;
    strcpy(test_d->program->words[0],"FD");
    strcpy(test_d->program->words[1],"1.1.");
    strcpy(test_d->program->words[2],"2");
@@ -425,7 +425,7 @@ void test_step_instruct_loops(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=10;
+   test_d->program->capacity=11;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -463,7 +463,7 @@ void test_step_instruct_loops(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=19;
+   test_d->program->capacity=20;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -515,7 +515,7 @@ void test_step_instruct_loops(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=11;
+   test_d->program->capacity=12;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -535,7 +535,7 @@ void test_step_instruct_loops(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=12;
+   test_d->program->capacity=13;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -562,7 +562,7 @@ void test_step_instruct_loops(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=12;
+   test_d->program->capacity=13;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -585,7 +585,7 @@ void test_step_instruct_set(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=7;
+   test_d->program->capacity=8;
    strcpy(test_d->program->words[0],"SET");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],":=");
@@ -603,7 +603,7 @@ void test_step_instruct_set(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=15;
+   test_d->program->capacity=16;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -642,7 +642,7 @@ void test_advance(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=15;
+   test_d->program->capacity=16;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -669,7 +669,7 @@ void test_advance(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=10;
+   test_d->program->capacity=11;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -693,7 +693,7 @@ void test_advance(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=2;
+   test_d->program->capacity=3;
    strcpy(test_d->program->words[0],"FD");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"}");
@@ -706,7 +706,7 @@ void test_advance(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=9;
+   test_d->program->capacity=10;
    strcpy(test_d->program->words[0],"SET");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],":=");
@@ -725,7 +725,7 @@ void test_advance(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=9;
+   test_d->program->capacity=10;
    strcpy(test_d->program->words[0],"SET");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],":=");
@@ -745,7 +745,7 @@ void test_advance(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=9;
+   test_d->program->capacity=10;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -880,7 +880,7 @@ void test_code_after_main(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=8;
+   test_d->program->capacity=9;
    strcpy(test_d->program->words[0],"{");
    strcpy(test_d->program->words[1],"{");
    strcpy(test_d->program->words[2],"1.1.");
@@ -899,7 +899,7 @@ void test_code_after_main(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=9;
+   test_d->program->capacity=10;
    strcpy(test_d->program->words[0],"{");
    strcpy(test_d->program->words[1],"{");
    strcpy(test_d->program->words[2],"1.1.");
@@ -919,7 +919,7 @@ void test_code_after_main(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=9;
+   test_d->program->capacity=10;
    strcpy(test_d->program->words[0],"{");
    strcpy(test_d->program->words[1],"{");
    strcpy(test_d->program->words[2],"1.1.");
@@ -961,7 +961,7 @@ void test_show_args(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=10;
+   test_d->program->capacity=11;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -983,7 +983,7 @@ void test_show_args(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=10;
+   test_d->program->capacity=11;
    strcpy(test_d->program->words[0],"SET");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],":=");
@@ -1004,7 +1004,7 @@ void test_show_args(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=10;
+   test_d->program->capacity=11;
    strcpy(test_d->program->words[0],"SET");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],":=");
@@ -1024,7 +1024,7 @@ void test_show_args(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=130;
+   test_d->program->capacity=131;
 
    for(i=0;i<130;i+=5)
    {
@@ -1052,7 +1052,7 @@ void test_show_code_pos(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=4;
+   test_d->program->capacity=5;
    strcpy(test_d->program->words[0],"SET");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],":=");
@@ -1070,7 +1070,7 @@ void test_show_code_pos(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=10;
+   test_d->program->capacity=11;
    strcpy(test_d->program->words[0],"SET");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],":=");
@@ -1096,7 +1096,7 @@ void test_show_recent_coords(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=10;
+   test_d->program->capacity=11;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -1118,7 +1118,7 @@ void test_show_recent_coords(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=10;
+   test_d->program->capacity=11;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -1141,7 +1141,7 @@ void test_show_recent_coords(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=12;
+   test_d->program->capacity=13;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -1178,7 +1178,7 @@ void test_error_collate(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=9;
+   test_d->program->capacity=10;
    strcpy(test_d->program->words[0],"SET");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],":=");
@@ -1200,7 +1200,7 @@ void test_error_collate(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=8;
+   test_d->program->capacity=9;
    strcpy(test_d->program->words[0],"SET");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],":=");
@@ -1219,7 +1219,7 @@ void test_error_collate(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=9;
+   test_d->program->capacity=10;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -1242,7 +1242,7 @@ void test_error_collate(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=9;
+   test_d->program->capacity=10;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -1263,7 +1263,7 @@ void test_error_collate(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=9;
+   test_d->program->capacity=10;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -1284,7 +1284,7 @@ void test_error_collate(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=10;
+   test_d->program->capacity=11;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -1312,7 +1312,7 @@ void test_run_action(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=10;
+   test_d->program->capacity=11;
    strcpy(test_d->program->words[0],"DO");
    strcpy(test_d->program->words[1],"A");
    strcpy(test_d->program->words[2],"FROM");
@@ -1338,7 +1338,7 @@ void test_run_action(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=1;
+   test_d->program->capacity=2;
    test_d->program->position=1;
    strcpy(test_d->program->words[0],"{");
    strcpy(test_d->program->words[1],"}");
@@ -1353,7 +1353,7 @@ void test_run_action(void)
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
-   test_d->program->capacity=0;
+   test_d->program->capacity=1;
    strcpy(test_d->program->words[0],"{{");
    TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",test_str_2));
    TEST_ASSERT_EQUAL_INT(test_d->program->position,0);
@@ -1498,7 +1498,7 @@ word_cont* init_word_cont(void)
    n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    n_cont->capacity=MAXTESTCAP;
    n_cont->words= (char**)safe_calloc(MAXTESTCAP,sizeof(char*));
-   for(i=0;i<MAXTESTCAP+1;i++)
+   for(i=0;i<MAXTESTCAP;i++)
    {
       n_cont->words[i]=(char*)safe_calloc(MAXTESTLEN,sizeof(char));
       n_cont->words[i][0]='\0';

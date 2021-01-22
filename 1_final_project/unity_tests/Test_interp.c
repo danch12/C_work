@@ -693,6 +693,16 @@ void test_polish(void)
 
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"90");
+   strcpy(test_cont->words[1],"0");
+   strcpy(test_cont->words[2],"/");
+   strcpy(test_cont->words[3],";");
+   TEST_ASSERT_TRUE(!run_polish(test_cont,&test_double));
+   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"trying to divde by 0")==0);
+   free_word_cont(test_cont);
+
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"90");
    strcpy(test_cont->words[1],"+");
    strcpy(test_cont->words[2],"+");
    strcpy(test_cont->words[3],";");
@@ -1212,6 +1222,45 @@ void test_do(void)
    strcpy(test_cont->words[1],"A");
    strcpy(test_cont->words[2],"FROM");
    strcpy(test_cont->words[3],"-1");
+   strcpy(test_cont->words[4],"TO");
+   strcpy(test_cont->words[5],"3");
+   strcpy(test_cont->words[6],"{");
+   strcpy(test_cont->words[7],"FD");
+   strcpy(test_cont->words[8],"1");
+   strcpy(test_cont->words[9],"}");
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==5);
+
+
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"DO");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],"FROM");
+   strcpy(test_cont->words[3],"-1");
+   strcpy(test_cont->words[4],"TO");
+   strcpy(test_cont->words[5],"3.5");
+   strcpy(test_cont->words[6],"{");
+   strcpy(test_cont->words[7],"FD");
+   strcpy(test_cont->words[8],"1");
+   strcpy(test_cont->words[9],"}");
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==5);
+
+
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+   
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"DO");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],"FROM");
+   strcpy(test_cont->words[3],"-1.5");
    strcpy(test_cont->words[4],"TO");
    strcpy(test_cont->words[5],"3");
    strcpy(test_cont->words[6],"{");

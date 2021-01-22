@@ -1,11 +1,4 @@
 #include "extension_arrays.h"
-/*
-
-#define MAXTESTCAP 100
-#define MAXTESTLEN 70
-#define MAXARRLEN 50
-#define EPSILON 0.00001
-*/
 
 
 

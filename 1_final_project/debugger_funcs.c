@@ -103,7 +103,7 @@ bool instruct_checks(debugger* to_check)
    }
 
    if(to_check->program->position>=\
-      to_check->program->capacity)
+      to_check->program->capacity-INDEX)
    {
       return false;
    }
@@ -258,7 +258,7 @@ loop_tracker* step_do_helper(word_cont* to_check)
 
 /*cant just run valid instruct list
  as that wont work for invalid ones*/
-int find_end_pos(word_cont* to_check,int starting_brackets)
+/*int find_end_pos(word_cont* to_check,int starting_brackets)
 {
    int left_brackets,right_brackets;
    int end_pos;
@@ -267,8 +267,7 @@ int find_end_pos(word_cont* to_check,int starting_brackets)
    end_pos=to_check->position;
    while(left_brackets!=right_brackets || left_brackets==0)
    {
-
-      if(end_pos>to_check->capacity)
+      if(end_pos>=to_check->capacity)
       {
          return NOTFOUND;
       }
@@ -283,13 +282,12 @@ int find_end_pos(word_cont* to_check,int starting_brackets)
       end_pos++;
    }
    return end_pos;
-
-}
+}*/
 
 bool check_past_main(debugger* debug)
 {
    if(find_end_pos(debug->program,0)<=\
-      debug->program->capacity)
+      debug->program->capacity-INDEX)
    {
       return false;
    }
@@ -374,8 +372,8 @@ void show_code_pos(debugger* to_check,char out_str[FULLARGSTRLEN])
    out_str[0]='\0';
    pos=to_check->program->position;
    from = (pos-SPREAD>0) ? pos-SPREAD : 0;
-   to = (pos+SPREAD<to_check->program->capacity) ? pos+SPREAD : \
-                                       to_check->program->capacity;
+   to = (pos+SPREAD<to_check->program->capacity-INDEX) ? pos+SPREAD : \
+                                       to_check->program->capacity-INDEX;
    for(i=from;i<=to;i++)
    {
       strcat(out_str,to_check->program->words[i]);
@@ -540,7 +538,7 @@ void collate_instruct_messages(debugger* to_check,\
 
 bool check_step_end(debugger* to_check)
 {
-   if(to_check->program->position==to_check->program->capacity)
+   if(to_check->program->position==to_check->program->capacity-INDEX)
    {
       if(strcmp(to_check->program->words[to_check->program->position],\
          "}")==0)
@@ -553,7 +551,7 @@ bool check_step_end(debugger* to_check)
 
       }
    }
-   if(to_check->program->position>=to_check->program->capacity)
+   if(to_check->program->position>=to_check->program->capacity-INDEX)
    {
       strcpy(to_check->info,"missing bracket in code");
    }

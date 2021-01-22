@@ -123,6 +123,7 @@ bool valid_funcvar(word_cont* to_check)
    }
    return true;
 }
+
 /*funcvar is the name of the function*/
 bool set_funcvar(word_cont* to_check,char func_name[MAXFUNCLEN])
 {

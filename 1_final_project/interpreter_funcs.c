@@ -316,6 +316,11 @@ bool do_operation(word_cont* to_check)
       break;
 
       case divide:
+      if(fabs(*(double*)num2)<EPSILON)
+      {
+         strcpy(to_check->err_message,"trying to divde by 0");
+         return false;
+      }
       result =  *(double*)num1 / *(double*)num2;
       break;
 
@@ -329,6 +334,8 @@ bool do_operation(word_cont* to_check)
    to_check->position++;
    return true;
 }
+
+
 
 /*need to get remaining num and check only one num there*/
 bool finish_polish(word_cont* to_check,double* result)
@@ -392,7 +399,7 @@ bool get_var_pos(word_cont* to_check,int* var_p)
    return false;
 }
 
-
+/*uninitialised variables will throw a error*/
 bool get_var(word_cont* to_check,double* num)
 {
    int pos;

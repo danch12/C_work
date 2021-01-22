@@ -1,13 +1,14 @@
-test_files/test_turtles/interpreter/invalid/no_nums.txt
-error in processing file around word 1 SET
+test_files/test_turtles/interpreter/invalid/no_nums.ttl
+error in processing file around word 4 ;
 no numbers on the stack at end of expr
-test_files/test_turtles/interpreter/invalid/too_many_nums.txt
-error in processing file around word 1 SET
+test_files/test_turtles/interpreter/invalid/too_many_nums.ttl
+error in processing file around word 6 ;
 more than one number left on stack at end of expr
-test_files/test_turtles/interpreter/invalid/unset_var.txt
-error in processing file around word 1 FD
+test_files/test_turtles/interpreter/invalid/unset_var.ttl
+error in processing file around word 3 }
 potentially haven't set variable before calling it
-test_files/test_turtles/parser/invalid/invalid_nested_loop.txt
+test_files/test_turtles/parser/invalid/invalid_nested_loop.ttl
 error in processing file around word 18 ;
-test_files/test_turtles/parser/invalid/invalid_set.txt
-error in processing file around word 1 SET
+invalid opcode used
+test_files/test_turtles/parser/invalid/invalid_set.ttl
+error in processing file around word 5 /
