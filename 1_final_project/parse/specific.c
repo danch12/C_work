@@ -41,20 +41,15 @@ bool valid_varnum(word_cont* to_check)
 }
 
 
-word_cont* read_in_file(char* filename)
+void read_words(char* filename,word_cont* n_cont)
 {
-   FILE* fp;
-   word_cont* n_cont;
    int num_lines,count;
+   FILE* fp;
    char buffer[MAXLEN];
    num_lines=0;
-   n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    fp=get_file_words(filename,&num_lines);
-   /*minus one for index*/
    n_cont->capacity=num_lines;
-   n_cont->position=0;
    n_cont->words= (char**)safe_calloc(num_lines,sizeof(char*));
-   n_cont->err_message[0]='\0';
    count=0;
    while(fscanf(fp,"%s",buffer)==1)
    {
@@ -64,6 +59,15 @@ word_cont* read_in_file(char* filename)
       count++;
    }
    fclose(fp);
+}
+
+word_cont* read_in_file(char* filename)
+{
+   word_cont* n_cont;
+   n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
+   read_words(filename,n_cont);
+   n_cont->position=0;
+   n_cont->err_message[0]='\0';
    return n_cont;
 }
 

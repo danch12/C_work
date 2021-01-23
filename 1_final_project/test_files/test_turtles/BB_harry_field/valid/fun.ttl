@@ -1,0 +1,9 @@
+{
+   SET C := 50 ;
+   DO A FROM 1 TO 500 {
+      SET B := A 1.1 * 4 + ;
+      FD B
+      RT C
+      SET C := C 1.001 * ;
+   }
+}

@@ -15,7 +15,8 @@
 #define MAXERRLEN 100
 #define NUMVARS 26
 #define BLANK 0
-
+#define NOTFOUND -1
+#define BRACKETSTART 0
 /*was going to use a hash map to store variables but
 seems a bit extravagent when there are only 26 possible
 variables - if i implement functions in future i will
@@ -50,8 +51,8 @@ bool valid_varnum(word_cont* to_check);
 bool valid_polish(word_cont* to_check);
 bool valid_set(word_cont* to_check);
 bool valid_do(word_cont* to_check);
-
-
+int find_end_pos(word_cont* to_check,int starting_brackets);
+bool code_after_main(word_cont* to_check);
 
 
 #endif

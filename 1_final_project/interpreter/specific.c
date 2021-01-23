@@ -1,22 +1,15 @@
 #include "specific.h"
 /*just the headers of functions that are defined in other places*/
-bool get_rotation(word_cont* to_check,line_cont* line_arr);
-bool move_forward(word_cont* to_check,line_cont* l_arr);
-bool run_set(word_cont* to_check);
-bool run_do(word_cont* to_check,line_cont* line_arr);
+
 bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN]);
 bool valid_set(word_cont* to_check);
 bool valid_do(word_cont* to_check);
-
-
-
 line* finish_line(line* prev_line,coord* endpoint);
 coord* init_coords(double x, double y);
 bool rotate(double degrees,coord* to_rotate, coord* rotation_point);
 bool get_num(word_cont* to_check,double* num);
 bool run_instruction_list(word_cont* to_check,\
                         line_cont* line_arr);
-
 void store_line(line_cont* l_arr, line* to_add);
 direction direction_helper(word_cont* to_check);
 bool valid_instructlist(word_cont* to_check);
@@ -33,7 +26,6 @@ with a big switch statement - cant emulate it perfectly because
 we have to do the strcmp first but still speeds up the code
 compared to just brute force running all the functions and seeing
 which one returns true*/
-
 
 opcode get_opcode(word_cont* to_check)
 {
@@ -131,21 +123,15 @@ bool free_word_cont(word_cont* to_free)
    return true;
 }
 
-word_cont* read_in_file(char* filename)
+void read_words(char* filename,word_cont* n_cont)
 {
+   int num_lines,count;
    FILE* fp;
-   word_cont* n_cont;
-   int num_lines,count,i;
    char buffer[MAXLEN];
    num_lines=0;
-   n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    fp=get_file_words(filename,&num_lines);
-   /*need to minus 1 for indexing*/
    n_cont->capacity=num_lines;
-   n_cont->position=0;
    n_cont->words= (char**)safe_calloc(num_lines,sizeof(char*));
-   n_cont->err_message[0]='\0';
-
    count=0;
    while(fscanf(fp,"%s",buffer)==1)
    {
@@ -155,7 +141,16 @@ word_cont* read_in_file(char* filename)
       count++;
    }
    fclose(fp);
+}
 
+word_cont* read_in_file(char* filename)
+{
+   word_cont* n_cont;
+   int i;
+   n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
+   n_cont->position=0;
+   read_words(filename,n_cont);
+   n_cont->err_message[0]='\0';
    n_cont->stackptr=stack_init(sizeof(double));
    for(i=0;i<NUMVARS;i++)
    {
@@ -164,6 +159,7 @@ word_cont* read_in_file(char* filename)
    #ifdef INTERP_PRODUCTION
    Neill_SDL_Init(&n_cont->sw);
    Neill_SDL_SetDrawColour(&n_cont->sw,WHITE,WHITE,WHITE);
+   Neill_SDL_UpdateScreen(&n_cont->sw);
    #endif
    return n_cont;
 }
@@ -255,6 +251,9 @@ void simple_draw(word_cont* to_check,line* to_draw)
 }
 #endif
 
+
+/*stores the total rotation and rotates from 0 every time
+to prevent rounding errors*/
 bool move_forward(word_cont* to_check,line_cont* l_arr)
 {
    double num;
@@ -278,6 +277,7 @@ bool move_forward(word_cont* to_check,line_cont* l_arr)
             simple_draw(to_check,finished_line);
             #endif
             store_line(l_arr,finished_line);
+
             /*reusing pending_line over and over by just
              changing its start point to the last lines
              end point*/
@@ -363,7 +363,8 @@ bool run_polish(word_cont* to_check,double* num)
    return false;
 }
 
-
+/*if you havent set a variable you cant
+use it */
 bool run_set(word_cont* to_check)
 {
    double to_set;
@@ -414,7 +415,11 @@ bool get_varnum(word_cont* to_check,double* num)
 
 
 /*still can use variable after the do loop
-bit like in c*/
+bit like in c
+
+also going to allow infinite loops
+if you want to do that to yourself im not going to
+stop you*/
 bool run_do(word_cont* to_check,line_cont* line_arr)
 {
    int var_pos;
@@ -447,7 +452,8 @@ bool run_do(word_cont* to_check,line_cont* line_arr)
 }
 
 
-
+/*checks syntax of whole loop including content of
+actual loop and stores info used by loop*/
 bool do_helper(word_cont* to_check,int* var_pos,\
                double* start,double* end)
 {

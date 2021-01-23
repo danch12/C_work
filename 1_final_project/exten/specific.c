@@ -106,7 +106,6 @@ bool free_word_cont(word_cont* to_free)
       }
       free(to_free->words);
       free(to_free->return_val);
-
       stack_free(to_free->stackptr);
       deep_free_assoc(to_free->arr_map,array);
       deep_free_assoc(to_free->func_map,function);
@@ -117,23 +116,15 @@ bool free_word_cont(word_cont* to_free)
 }
 
 
-
-
-word_cont* read_in_file(char* filename)
+void read_words(char* filename,word_cont* n_cont)
 {
+   int num_lines,count;
    FILE* fp;
-   word_cont* n_cont;
-   int num_lines,count,i;
    char buffer[MAXLEN];
    num_lines=0;
-   n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    fp=get_file_words(filename,&num_lines);
    n_cont->capacity=num_lines;
-
-   n_cont->position=0;
    n_cont->words= (char**)safe_calloc(num_lines,sizeof(char*));
-   n_cont->err_message[0]='\0';
-
    count=0;
    while(fscanf(fp,"%s",buffer)==1)
    {
@@ -143,7 +134,16 @@ word_cont* read_in_file(char* filename)
       count++;
    }
    fclose(fp);
+}
 
+word_cont* read_in_file(char* filename)
+{
+   word_cont* n_cont;
+   int i;
+   n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
+   n_cont->position=0;
+   read_words(filename,n_cont);
+   n_cont->err_message[0]='\0';
    n_cont->stackptr=stack_init(sizeof(double));
    for(i=0;i<NUMVARS;i++)
    {
@@ -157,6 +157,7 @@ word_cont* read_in_file(char* filename)
    #ifdef INTERP_PRODUCTION
    Neill_SDL_Init(&n_cont->sw);
    Neill_SDL_SetDrawColour(&n_cont->sw,WHITE,WHITE,WHITE);
+   Neill_SDL_UpdateScreen(&n_cont->sw);
    #endif
    return n_cont;
 }
@@ -242,6 +243,8 @@ opcode get_opcode(word_cont* to_check)
 }
 
 
+/*taking ideas from python with the massive switch
+statement*/
 bool run_instruction(word_cont* to_check,line_cont* line_arr)
 {
    double* placeholder;
@@ -385,36 +388,7 @@ bool valid_varnum(word_cont* to_check)
    return false;
 }
 
-bool valid_list_instruct(word_cont* to_check,int init_pos)
-{
-   if(valid_init_arr(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(valid_append(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(valid_change(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(valid_delete_arr_val(to_check))
-   {
-      return true;
-   }
-   to_check->position=init_pos;
-   if(valid_file_to_array(to_check))
-   {
-      return true;
-   }
 
-
-   return false;
-}
 
 bool valid_instruct(word_cont* to_check)
 {
@@ -558,6 +532,7 @@ void simple_draw(word_cont* to_check,line* to_draw)
                       (int)to_draw->end->x+MIDWIDTH,\
                    (int)to_draw->end->y+MIDHEIGHT);
    Neill_SDL_UpdateScreen(&to_check->sw);
+
 }
 #endif
 
@@ -584,6 +559,7 @@ bool move_forward(word_cont* to_check,line_cont* l_arr)
             simple_draw(to_check,finished_line);
             #endif
             store_line(l_arr,finished_line);
+            
             /*reusing pending_line over and over by just
              changing its start point to the last lines
              end point*/

@@ -25,8 +25,10 @@ typedef enum opcode {fd,rot,do_loop,set,inv_opcode} opcode;
 
 
 FILE* get_file_words(char* filename,int* lines);
+void read_words(char* filename,word_cont* n_cont);
 word_cont* read_in_file(char* filename);
 bool free_word_cont(word_cont* to_free);
 bool valid_instruct(word_cont* to_check);
+opcode get_opcode(word_cont* to_check);
 bool valid_varnum(word_cont* to_check);
 #endif

@@ -8,8 +8,7 @@ For my overall testing of parser.c I have added in two commands to my makefile -
 
 Additionally created each of the ADTS separately tested them by themselves in their own test file and then introduced them into the parsing/interpreting functions. 
 
-For the interpreting section of the task testing a bit harder because a lot of it is outputing to SDL. Made sense to me to create a data structure that held all the points that were going to be fed to the SDL function so that these could be tested and checked. Another benefit of this is that we can separate out the SDL functions from our interpreter tests and check if any of our interpreter functions have memory leaks outside of SDL.  Same theory went into building and testing the functions - start from the functions that can work by themselves and can be tested easily and then work our way up to functions that rely on these ones etc. 
-Ok so after reading your messages on the board it seems like you want us to draw the lines as we go which does make sense. So what im going to do is have a command to output to screen in a #ifdef guard and during production I can just compile it with that definition.
+For the interpreting section of the task testing a bit harder because a lot of it is outputing to SDL. Made sense to me to create a data structure that held all the points that were going to be fed to the SDL function so that these could be tested and checked. Another benefit of this is that we can separate out the SDL functions from our interpreter tests using #defines and check if any of our interpreter functions have memory leaks outside of SDL.  Same theory went into building and testing the functions - start from the functions that can work by themselves and can be tested easily and then work our way up to functions that rely on these ones etc. 
 
 For an example the order in which I created the first few main functions in interpreter went -
 
@@ -26,6 +25,8 @@ For testing how everything runs in regards to the interpreting stage I did a sim
 
 Also not sure if this is the correct place to say this but I put functions that are specific to each part of the project into their own specific.c and specific.h along with struct definitions. 
 
+For black box testing of the interpreter and the parser main bit I asked other students if they wanted to swap files with me so we could see how our code works on unseen files. I have named each of the folders in the test files after the people who gave me the files. As in if Tom Hanks gave me some files the folder is called BB_Tom_Hanks. 
+
 
 Lastly for the extension I followed pretty much the same ideas as the interpreter - although I split up the extension into three parts, one for functions, one for control flow and one for arrays. This meant that I was able to test each part easily without worrying about their interactions first. 
 
@@ -33,7 +34,7 @@ One thing I didn't test for throughout the files is testing to see how the funct
 
 
 
-For testing the debugger I did something a bit different. I got a working basic version done asap and then basically just gave out the executable to other people on the course - because I had a bit of time to get ahead a lot of people were still doing the interpreting stage so some of them were quite keen to use it (and help me find bugs). I was reading this thing from Spotify about how Spotify build their products using continuous improvement and shipping regularly and wanted to sort of emulate that. Obviously not going to be that realistic but was fun to have a go! I will include the pdf from Spotify in the zip file its actually a really cool read either way not sure if you'd be interested but still. This is in addition to all the usual testing I  did for all the other parts. This has the added benefit of people giving me suggestions for improvements to debugger that I haven't thought about and also does some form of black box testing as well.
+For testing the debugger I did something a bit extra. I got a working basic version done asap and then basically just gave out the executable to other people on the course - because I had a bit of time to get ahead a lot of people were still doing the interpreting stage so some of them were quite keen to use it (and help me find bugs). I was reading this thing from Spotify about how Spotify build their products using continuous improvement and shipping regularly and wanted to sort of emulate that. Obviously not going to be that realistic but was fun to have a go. I will include the pdf from Spotify in the zip file its actually a really cool read either way not sure if you'd be interested but I found it cool. This is in addition to all the usual testing I  did for all the other parts. This has the added benefit of people giving me suggestions for improvements to debugger that I haven't thought about and also does some form of black box testing as well because I have no control over what files they use.
 
 
 Also when making the debugger I tried to use as many of the functions from previous sections as possible - not sure if this is testing but by putting the functions to use in a different way made it easier to spot limitations and mistakes I had made in my previous code.

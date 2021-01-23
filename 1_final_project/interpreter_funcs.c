@@ -196,8 +196,6 @@ direction direction_helper(word_cont* to_check)
 }
 
 
-
-
 void store_line(line_cont* l_arr, line* to_add)
 {
    if(to_add)
@@ -319,6 +317,8 @@ bool do_operation(word_cont* to_check)
       if(fabs(*(double*)num2)<EPSILON)
       {
          strcpy(to_check->err_message,"trying to divde by 0");
+         free(num1);
+         free(num2);
          return false;
       }
       result =  *(double*)num1 / *(double*)num2;

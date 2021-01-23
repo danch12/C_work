@@ -127,7 +127,8 @@ void test_stack_struct(void)
    TEST_ASSERT_TRUE(stack_pop(test_stack,&test_ptr));
    TEST_ASSERT_TRUE(((test_struct*)test_ptr)->id==5);
    free(test_ptr);
-
+   stack_free(test_stack);
+   free(test_s);
    test_stack=stack_init(sizeof(test_struct));
 
    test_s=safe_calloc(1,sizeof(test_struct));

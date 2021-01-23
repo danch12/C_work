@@ -1376,6 +1376,69 @@ void test_main_no_returns(void)
    TEST_ASSERT_TRUE(!run_instruction_list(test_cont,test_line_cont));
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"}");
+
+   strcpy(test_cont->words[7],"FD");
+   strcpy(test_cont->words[8],"abc");
+   strcpy(test_cont->words[9],"{");
+   strcpy(test_cont->words[10],"10");
+   strcpy(test_cont->words[11],"}");
+
+   strcpy(test_cont->words[12],"}");
+
+
+   TEST_ASSERT_TRUE(!run_instruction_list(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"Function has no return value")==0);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"B");
+
+   strcpy(test_cont->words[5],"}");
+   strcpy(test_cont->words[6],"{");
+
+   strcpy(test_cont->words[7],"SET");
+   strcpy(test_cont->words[8],"C");
+   strcpy(test_cont->words[9],":=");
+   strcpy(test_cont->words[10],"A");
+   strcpy(test_cont->words[11],"B");
+
+   strcpy(test_cont->words[12],"*");
+   strcpy(test_cont->words[13],";");
+
+   strcpy(test_cont->words[14],"FD");
+
+   strcpy(test_cont->words[15],"C");
+
+   strcpy(test_cont->words[16],"}");
+
+   strcpy(test_cont->words[17],"abc");
+   strcpy(test_cont->words[18],"{");
+
+   strcpy(test_cont->words[19],"10");
+   strcpy(test_cont->words[20],"11");
+   strcpy(test_cont->words[21],"}");
+   strcpy(test_cont->words[22],"}");
+   TEST_ASSERT_TRUE(run_instruction_list(test_cont,test_line_cont));
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->y,110);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
 }
 
 
@@ -1399,6 +1462,9 @@ void test_valid_return(void)
 
    test_cont->position=0;
    strcpy(test_cont->words[1],"0.1A");
+   TEST_ASSERT_TRUE(!valid_return(test_cont));
+   test_cont->position=0;
+   strcpy(test_cont->words[1],"0.1.");
    TEST_ASSERT_TRUE(!valid_return(test_cont));
    test_cont->position=0;
    strcpy(test_cont->words[0],"return");

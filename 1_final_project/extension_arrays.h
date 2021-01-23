@@ -13,7 +13,7 @@
 
 
 #define MAXARRLEN 50
-
+#define MINARRLEN 2
 
 
 bool get_arr_identifier(word_cont* to_check,\
@@ -45,7 +45,10 @@ bool run_delete_arr_val(word_cont* to_check,line_cont* line_arr);
 bool valid_delete_arr_val(word_cont* to_check);
 
 
-
+/*once you set the bounds for a loop cant change
+so we prevent  weird behaviour when values in a list are
+deleted this is only relevant for do loops in relation to
+lists really*/
 bool valid_access_val(word_cont* to_check);
 bool run_access_val(word_cont* to_check,line_cont* line_arr,double* num);
 bool access_helper(word_cont* to_check,line_cont* line_arr,\

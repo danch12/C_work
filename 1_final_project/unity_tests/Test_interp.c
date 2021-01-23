@@ -93,6 +93,8 @@ void test_coord_funcs(void)
    TEST_ASSERT_EQUAL_DOUBLE(16,test_coord->y);
    free(test_coord);
    free(origin);
+
+
 }
 
 void test_get_num(void)
@@ -112,6 +114,18 @@ void test_get_num(void)
 
    TEST_ASSERT_FALSE(get_num(test_cont,&test_double));
    TEST_ASSERT_FALSE(get_num(NULL,&test_double));
+
+
+   strcpy(test_cont->words[0],"123.3.");
+   test_cont->position=0;
+
+   TEST_ASSERT_FALSE(get_num(test_cont,&test_double));
+
+
+   strcpy(test_cont->words[0],"123.31-");
+   test_cont->position=0;
+
+   TEST_ASSERT_FALSE(get_num(test_cont,&test_double));
    free_word_cont(test_cont);
 }
 
@@ -388,6 +402,23 @@ void test_basic_instruct_list(void)
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
 
+   test_line_cont=init_line_cont();
+   test_line_cont->pending_line->start->x=10;
+   test_line_cont->pending_line->start->y=20;
+   test_line_cont->pending_line->rotation=270;
+
+   test_cont=init_word_cont();
+
+   strcpy(test_cont->words[0],"LT");
+   strcpy(test_cont->words[1],"30");
+   strcpy(test_cont->words[2],"FD");
+   strcpy(test_cont->words[3],"30");
+   strcpy(test_cont->words[4],"}");
+   TEST_ASSERT_TRUE(run_instruction_list(test_cont,test_line_cont));
+
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
 
    test_line_cont=init_line_cont();
 
@@ -623,6 +654,14 @@ void test_polish(void)
    TEST_ASSERT_TRUE(!polish_num(test_cont));
    TEST_ASSERT_TRUE(test_cont->stackptr->size==2);
 
+   strcpy(test_cont->words[2],"70.-");
+   TEST_ASSERT_TRUE(!polish_num(test_cont));
+   TEST_ASSERT_TRUE(test_cont->stackptr->size==2);
+
+   strcpy(test_cont->words[2],"-.70.");
+   TEST_ASSERT_TRUE(!polish_num(test_cont));
+   TEST_ASSERT_TRUE(test_cont->stackptr->size==2);
+
    strcpy(test_cont->words[2],"");
    TEST_ASSERT_TRUE(!polish_num(test_cont));
    TEST_ASSERT_TRUE(test_cont->stackptr->size==2);
@@ -706,6 +745,11 @@ void test_polish(void)
    strcpy(test_cont->words[1],"+");
    strcpy(test_cont->words[2],"+");
    strcpy(test_cont->words[3],";");
+   TEST_ASSERT_TRUE(!run_polish(test_cont,&test_double));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],";");
    TEST_ASSERT_TRUE(!run_polish(test_cont,&test_double));
    free_word_cont(test_cont);
 
@@ -1214,6 +1258,35 @@ void test_do(void)
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
 
+   test_cont=init_word_cont();
+
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"DO");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],"FROM");
+   strcpy(test_cont->words[3],"1");
+   strcpy(test_cont->words[4],"TO");
+   strcpy(test_cont->words[5],"3");
+   strcpy(test_cont->words[6],"{");
+   strcpy(test_cont->words[7],"DO");
+   strcpy(test_cont->words[8],"A");
+   strcpy(test_cont->words[9],"FROM");
+   strcpy(test_cont->words[10],"2");
+   strcpy(test_cont->words[11],"TO");
+   strcpy(test_cont->words[12],"4");
+   strcpy(test_cont->words[13],"{");
+   strcpy(test_cont->words[14],"FD");
+   strcpy(test_cont->words[15],"1");
+   strcpy(test_cont->words[16],"}");
+   strcpy(test_cont->words[17],"}");
+
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==3);
+
+
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
 
    test_cont=init_word_cont();
 
@@ -1254,7 +1327,7 @@ void test_do(void)
 
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
-   
+
    test_cont=init_word_cont();
    test_line_cont=init_line_cont();
    strcpy(test_cont->words[0],"DO");
@@ -1601,8 +1674,8 @@ word_cont* init_word_cont(void)
    int i;
    n_cont=(word_cont*)safe_calloc(1,sizeof(word_cont));
    n_cont->capacity=MAXTESTCAP;
-   n_cont->words= (char**)safe_calloc(MAXTESTCAP+1,sizeof(char*));
-   for(i=0;i<MAXTESTCAP+1;i++)
+   n_cont->words= (char**)safe_calloc(MAXTESTCAP,sizeof(char*));
+   for(i=0;i<MAXTESTCAP;i++)
    {
       n_cont->words[i]=(char*)safe_calloc(MAXTESTLEN,sizeof(char));
       n_cont->words[i][0]='\0';

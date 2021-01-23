@@ -256,33 +256,6 @@ loop_tracker* step_do_helper(word_cont* to_check)
 }
 
 
-/*cant just run valid instruct list
- as that wont work for invalid ones*/
-/*int find_end_pos(word_cont* to_check,int starting_brackets)
-{
-   int left_brackets,right_brackets;
-   int end_pos;
-   left_brackets=starting_brackets;
-   right_brackets=0;
-   end_pos=to_check->position;
-   while(left_brackets!=right_brackets || left_brackets==0)
-   {
-      if(end_pos>=to_check->capacity)
-      {
-         return NOTFOUND;
-      }
-      if(strcmp(to_check->words[end_pos],"}")==0)
-      {
-         right_brackets++;
-      }
-      if(strcmp(to_check->words[end_pos],"{")==0)
-      {
-         left_brackets++;
-      }
-      end_pos++;
-   }
-   return end_pos;
-}*/
 
 bool check_past_main(debugger* debug)
 {

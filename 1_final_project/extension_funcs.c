@@ -434,7 +434,7 @@ bool place_arg(word_cont* to_check,word_cont* n_func,\
    return false;
 }
 
-
+/*quite similar to polish in a way*/
 bool place_all_args(word_cont* to_check,word_cont* n_func,\
                   int pos,line_cont* line_arr)
 {
@@ -603,8 +603,7 @@ bool get_func_val(word_cont* to_check,line_cont* line_arr,\
          return true;
       }
       /*if return val is null*/
-
-      strcpy(to_check->err_message,"Function has no return value\n");
+      strcpy(to_check->err_message,"Function has no return value");
    }
    free(r_val);
    return false;

@@ -1629,13 +1629,14 @@ void test_do_arr(void)
 
    TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
    test_arr=assoc_lookup(test_cont->arr_map,"a_myarr");
+   TEST_ASSERT_EQUAL_INT(test_arr->size,1);
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
 
 
    /*once you set the bounds for a loop cant change
-   so we prevent infinite loops and weird behaviour
-   when values in a list are deleted*/
+   so we prevent  weird behaviour when values in a list are
+   deleted*/
    test_cont = init_word_cont();
    test_line_cont= init_line_cont();
    strcpy(test_cont->words[0],"INITARR");
@@ -1968,13 +1969,6 @@ void test_paths(void)
    free_arr(test_arr);
    free_word_cont(test_cont);
 
-
-   test_cont = init_word_cont();
-   test_arr=arr_init();
-   TEST_ASSERT_FALSE(load_in(test_cont,test_arr,"test_files/test_sizes/not_a_file.txt"));
-   TEST_ASSERT_TRUE(strcmp(test_cont->err_message,"error while opening file- does it exist?")==0);
-   free_arr(test_arr);
-   free_word_cont(test_cont);
 
    test_cont = init_word_cont();
    test_arr=arr_init();

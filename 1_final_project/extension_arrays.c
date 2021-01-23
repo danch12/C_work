@@ -80,7 +80,7 @@ bool valid_arr_identifier(word_cont* to_check)
    {
       return false;
    }
-   if(strlen(to_check->words[to_check->position])<2)
+   if(strlen(to_check->words[to_check->position])<MINARRLEN)
    {
       return false;
    }
@@ -250,7 +250,7 @@ bool change_helper(word_cont* to_check, line_cont* line_arr,\
    return false;
 }
 
-/*guard aginst decimals being used as index*/
+/*guard aginst decimals and negative nums being used as index*/
 bool get_valid_ind(word_cont* to_check,line_cont* line_arr,int* ind)
 {
    double num;

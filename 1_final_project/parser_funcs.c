@@ -282,7 +282,10 @@ bool valid_do(word_cont* to_check)
    return false;
 }
 
-
+/*theres a world of bracket related problems out there
+im using quite a simple way but there are some really
+cool solutions to bracket matching online for our purposes
+though it seemed like overkill*/
 int find_end_pos(word_cont* to_check,int starting_brackets)
 {
    int left_brackets,right_brackets;
@@ -307,4 +310,20 @@ int find_end_pos(word_cont* to_check,int starting_brackets)
       end_pos++;
    }
    return end_pos;
+}
+
+bool code_after_main(word_cont* to_check)
+{
+   int end_pos;
+   end_pos=find_end_pos(to_check,BRACKETSTART);
+   if(to_check->words[end_pos])
+   {
+      {
+         if(strlen(to_check->words[end_pos]))
+         {
+            return true;
+         }
+      }
+   }
+   return false;
 }
