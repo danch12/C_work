@@ -97,7 +97,7 @@ debugger:debugger.c debugger_funcs.c debugger_funcs.h  $(PARSEFULL) $(INTERPFULL
 	$(CC) -DLIVE_VERSION debugger.c debugger_funcs.c  interpreter/specific.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) ADTS_and_general/neillsdl2.c -o debugger $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
 parse: parser.c $(PARSEFULL) $(GENERALFULL) parse/specific.h parse/specific.c
-	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parser $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
+	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parse/specific.c  -o parse $(CFLAGSFAST) $(INCPARSE) $(LIDLIBS)
 
 extension: extension.c extension_master.h extension_funcs.c  extension_funcs.h extension_flow.c extension_flow.h $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h extension_arrays.c extension_arrays.h $(ARRFULL)
 	$(CC) -DINTERP_PRODUCTION extension.c extension_funcs.c extension_flow.c exten/specific.c extension_arrays.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) ADTS_and_general/neillsdl2.c -o extension $(CFLAGSSDL) $(INCEXTEN) $(LIDLIBSSDL)
@@ -106,7 +106,11 @@ interp: interpreter.c interpreter_master.h $(PARSEFULL) $(INTERPFULL) interprete
 	$(CC) -DINTERP_PRODUCTION interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
 
-
+run_valgrind:
+	valgrind --gen-suppressions=all --suppressions=./linux_sdl_gl.sup --leak-check=full --show-leak-kinds=all ./parse
+	valgrind --gen-suppressions=all --suppressions=./linux_sdl_gl.sup --leak-check=full --show-leak-kinds=all ./interp
+	valgrind --gen-suppressions=all --suppressions=./linux_sdl_gl.sup --leak-check=full --show-leak-kinds=all ./extension
+	valgrind --gen-suppressions=all --suppressions=./linux_sdl_gl.sup --leak-check=full --show-leak-kinds=all ./debugger
 
 run_tests: u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_san u_arrays_fast u_parse_san u_parse_fast u_test_interp_san u_test_interp_fast u_exten_func_san u_exten_func_fast u_exten_flow_san u_exten_flow_fast u_exten_arr_san u_exten_arr_fast u_exten_interactions_san u_exten_interactions_fast u_debugger_san u_debugger_fast
 	./u_stacks_san

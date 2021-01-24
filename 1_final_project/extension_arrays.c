@@ -527,7 +527,7 @@ bool run_file_to_array(word_cont* to_check)
    return false;
 }
 
-
+/*weird valgrind leak here think from open file?*/
 bool load_in(word_cont* to_check,turt_arr* arr,char* filepath)
 {
    FILE* fp;
@@ -544,6 +544,7 @@ bool load_in(word_cont* to_check,turt_arr* arr,char* filepath)
    {
       if(sscanf(buffer,"%lf",&num)!=1)
       {
+         fclose(fp);
          strcpy(to_check->err_message,"error reading data in file");
          return false;
       }

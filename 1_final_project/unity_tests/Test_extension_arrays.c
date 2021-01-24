@@ -26,6 +26,7 @@ void test_identifier(void)
    word_cont* test_cont;
    char test_name[MAXARRLEN];
    test_cont = init_word_cont();
+
    strcpy(test_cont->words[0],"a_myarr");
    TEST_ASSERT_TRUE(valid_arr_identifier(test_cont));
    TEST_ASSERT_TRUE(get_arr_identifier(test_cont,test_name));
@@ -128,6 +129,7 @@ void test_init_arr(void)
    test_arr=assoc_lookup(test_cont->arr_map,"a_myarragain");
    TEST_ASSERT_TRUE(test_arr);
    free_word_cont(test_cont);
+
 
    test_cont = init_word_cont();
 
