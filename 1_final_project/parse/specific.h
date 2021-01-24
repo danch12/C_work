@@ -11,6 +11,7 @@
 #define NUMINSTRUCTIONS 3
 #define MAXERRLEN 100
 #define FINAL_INCREASE 1
+#define P_INCREASE 1
 
 typedef struct word_container
 {

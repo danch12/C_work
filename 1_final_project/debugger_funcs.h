@@ -17,6 +17,8 @@
 #define WHITE 255
 #endif
 
+
+#define NOBREAK -1
 #define NOTFOUND -1
 #define FULLARGSTRLEN 300
 #define ONEARGLEN 15
@@ -31,7 +33,8 @@
 #define LARGESTART 10
 #define INDEX 1
 
-typedef enum action {to_mistake,s_step,show_vars,show_pos,show_code,show_coords,suggestion,visualize,invalid_act} action;
+typedef enum action {to_mistake,s_step,show_vars,show_pos,\
+   show_code,show_coords,suggestion,visualize,set_break,rm_break,invalid_act} action;
 
 typedef struct loop_tracker
 {
@@ -52,7 +55,8 @@ typedef struct debugger
    line_cont* output;
    stack* loop_stack;
    char info[INFOLEN];
-   bool stop;
+   int break_p;
+
 }debugger;
 
 
@@ -112,4 +116,11 @@ void suggest_keyword(char orig[MAXLEN], \
 void make_suggestion(debugger* to_check,\
             char result_str[FULLARGSTRLEN]);
 void draw_lines(line_cont* l_arr);
+
+/*going to try make it slightly user friendly and
+take as many numbers as possible with strtol
+if the user enter 123abc it will still work*/
+void run_set_break(debugger* to_check,char num[MAXACTIONLEN],\
+                  char result_str[FULLARGSTRLEN]);
+void run_rm_break(debugger* to_check,char result_str[FULLARGSTRLEN]);
 #endif

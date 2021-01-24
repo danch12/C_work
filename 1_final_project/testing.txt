@@ -8,7 +8,9 @@ For my overall testing of parser.c I have added in two commands to my makefile -
 
 Additionally created each of the ADTS separately tested them by themselves in their own test file and then introduced them into the parsing/interpreting functions. 
 
-For the interpreting section of the task testing a bit harder because a lot of it is outputing to SDL. Made sense to me to create a data structure that held all the points that were going to be fed to the SDL function so that these could be tested and checked. Another benefit of this is that we can separate out the SDL functions from our interpreter tests using #defines and check if any of our interpreter functions have memory leaks outside of SDL.  Same theory went into building and testing the functions - start from the functions that can work by themselves and can be tested easily and then work our way up to functions that rely on these ones etc. 
+For the interpreting section of the task testing a bit harder because a lot of it is outputing to SDL. Made sense to me to create a data structure that held all the points that were going to be fed to the SDL function so that these could be tested and checked. Another benefit of this is that we can separate out the SDL functions from our interpreter tests using #defines and check if any of our interpreter functions have memory leaks outside of SDL. This is in addition to using a file I found here- https://github.com/Rickodesea/valgrindSup that suppresses SDL memory leak warnings from valgrind.
+
+Same theory went into building and testing the functions - start from the functions that can work by themselves and can be tested easily and then work our way up to functions that rely on these ones etc. 
 
 For an example the order in which I created the first few main functions in interpreter went -
 
@@ -16,7 +18,7 @@ Rotate -no dependancies
 get_num - dependancies from parser section 
 Get_rotation - dependancy - get_num
 move_forward - dependancies - get_num and rotate
-do_instruction - dependancies get_rotation and move_forward
+
 
 This allows for easier testing as we test each function thoroughly before moving onto the next so if there is a problem we do not have to dive deep into multiple layers of functions- instead abstracting away the complexities of rotating around a point or getting numbers as we go. This sort of permeates into how I set up my test files - basically split up the test files into smaller bits eg testing stacks or testing the functions part of my extension then mix different parts of the project together - not sure if its the most efficient way of testing but makes it clear what bit of the project you are testing at each stage and you can compartmentalise a lot easier. Also means you can focus on one specific part of the code at a time so makes spotting bugs and stuff easier. Only downside is it makes my makefile huge.
 
@@ -34,7 +36,7 @@ One thing I didn't test for throughout the files is testing to see how the funct
 
 
 
-For testing the debugger I did something a bit extra. I got a working basic version done asap and then basically just gave out the executable to other people on the course - because I had a bit of time to get ahead a lot of people were still doing the interpreting stage so some of them were quite keen to use it (and help me find bugs). I was reading this thing from Spotify about how Spotify build their products using continuous improvement and shipping regularly and wanted to sort of emulate that. Obviously not going to be that realistic but was fun to have a go. I will include the pdf from Spotify in the zip file its actually a really cool read either way not sure if you'd be interested but I found it cool. This is in addition to all the usual testing I  did for all the other parts. This has the added benefit of people giving me suggestions for improvements to debugger that I haven't thought about and also does some form of black box testing as well because I have no control over what files they use.
+For testing the debugger I did something a bit extra. I got a working basic version done asap and then basically just gave out the executable to other people on the course - because I had a bit of time to get ahead a lot of people were still doing the interpreting stage so some of them were quite keen to use it (and help me find bugs). I was reading this thing from Spotify about how Spotify build their products using continuous improvement and shipping regularly and wanted to sort of emulate that. Obviously not going to be that realistic but was fun to have a go. I will include the pdf from Spotify in the zip file its actually a really cool read either way not sure if you'd be interested but I found it interesting and informative. This is in addition to all the usual testing I  did for all the other parts. This has the added benefit of people giving me suggestions for improvements to debugger that I haven't thought about and also does some form of black box testing as well because I have no control over what files they use.
 
 
 Also when making the debugger I tried to use as many of the functions from previous sections as possible - not sure if this is testing but by putting the functions to use in a different way made it easier to spot limitations and mistakes I had made in my previous code.

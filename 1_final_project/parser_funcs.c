@@ -55,7 +55,7 @@ bool valid_num(word_cont* to_check)
       /*blank string not number*/
       case BLANK:
       return false;
-      /*if single number then has to actually be a number*/
+      /*if single char then has to actually be a number*/
       case 1:
       if(!isdigit(to_check->words[to_check->position][0]))
       {
@@ -150,8 +150,6 @@ bool valid_main(word_cont* to_check)
    if(strcmp(to_check->words[to_check->position],"{")==0)
    {
       to_check->position++;
-      /*position should be capacity+1 as we increase the position
-      after last }*/
       if(valid_instructlist(to_check))
       {
          return true;
@@ -276,52 +274,6 @@ bool valid_do(word_cont* to_check)
                   }
                }
             }
-         }
-      }
-   }
-   return false;
-}
-
-/*theres a world of bracket related problems out there
-im using quite a simple way but there are some really
-cool solutions to bracket matching online for our purposes
-though it seemed like overkill*/
-int find_end_pos(word_cont* to_check,int starting_brackets)
-{
-   int left_brackets,right_brackets;
-   int end_pos;
-   left_brackets=starting_brackets;
-   right_brackets=0;
-   end_pos=to_check->position;
-   while(left_brackets!=right_brackets || left_brackets==0)
-   {
-      if(end_pos>=to_check->capacity)
-      {
-         return NOTFOUND;
-      }
-      if(strcmp(to_check->words[end_pos],"}")==0)
-      {
-         right_brackets++;
-      }
-      if(strcmp(to_check->words[end_pos],"{")==0)
-      {
-         left_brackets++;
-      }
-      end_pos++;
-   }
-   return end_pos;
-}
-
-bool code_after_main(word_cont* to_check)
-{
-   int end_pos;
-   end_pos=find_end_pos(to_check,BRACKETSTART);
-   if(to_check->words[end_pos])
-   {
-      {
-         if(strlen(to_check->words[end_pos]))
-         {
-            return true;
          }
       }
    }

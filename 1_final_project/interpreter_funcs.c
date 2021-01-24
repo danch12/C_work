@@ -3,7 +3,9 @@
 
 
 /*https://www.khanacademy.org/computing/pixar/sets/rotation/v/sets-8
-found formulas for rotating a point */
+found formulas for rotating a point
+importantly want to reduce rounding errors
+ so we rotate from 0 degrees every time*/
 bool rotate(double degrees,coord* to_rotate, coord* rotation_point)
 {
    double radians;

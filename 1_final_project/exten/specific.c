@@ -531,6 +531,7 @@ void simple_draw(word_cont* to_check,line* to_draw)
                      (int)to_draw->start->y+MIDHEIGHT, \
                       (int)to_draw->end->x+MIDWIDTH,\
                    (int)to_draw->end->y+MIDHEIGHT);
+   Neill_SDL_Events(&to_check->sw);
    Neill_SDL_UpdateScreen(&to_check->sw);
 
 }
@@ -559,7 +560,7 @@ bool move_forward(word_cont* to_check,line_cont* l_arr)
             simple_draw(to_check,finished_line);
             #endif
             store_line(l_arr,finished_line);
-            
+
             /*reusing pending_line over and over by just
              changing its start point to the last lines
              end point*/

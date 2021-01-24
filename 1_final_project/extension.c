@@ -32,7 +32,10 @@ int main(int argc, char* argv[])
             atexit(SDL_Quit);
             exit(EXIT_FAILURE);
          }
-
+         if(w_cont->capacity!=w_cont->position)
+         {
+            fprintf(stderr,"there may be code after main that has not been checked; be careful\n");
+         }
       }
    }
    do

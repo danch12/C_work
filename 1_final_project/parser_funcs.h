@@ -17,24 +17,6 @@
 #define BLANK 0
 #define NOTFOUND -1
 #define BRACKETSTART 0
-/*was going to use a hash map to store variables but
-seems a bit extravagent when there are only 26 possible
-variables - if i implement functions in future i will
-use hash map though- although this also leads to an
-interesting question of how we indicate a variable hasnt
-been created as something like set A := 0 should be valid
-so cant just fill with zeros. because of this going to use
-pointers so we know that when we see a not NULL pointer
-that variable has been set
-
-will store the stack and any variable arrays in the
-word container as they are sort of like input
-controls where as line container is more of
-a output control so will keep separate-
-we can see word_container as holding all the
-intermediate stages of instructions - basically
-everything apart from the moves
-*/
 
 
 /*valid funcs return true if entry is valid will also increase the
@@ -51,8 +33,7 @@ bool valid_varnum(word_cont* to_check);
 bool valid_polish(word_cont* to_check);
 bool valid_set(word_cont* to_check);
 bool valid_do(word_cont* to_check);
-int find_end_pos(word_cont* to_check,int starting_brackets);
-bool code_after_main(word_cont* to_check);
+
 
 
 #endif

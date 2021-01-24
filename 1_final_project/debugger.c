@@ -6,6 +6,7 @@ int main(int argc, char* argv[])
 {
    debugger* debug;
    char command[MAXACTIONLEN];
+   char num[MAXACTIONLEN];
    char result[FULLARGSTRLEN];
    if(argc!=2)
    {
@@ -18,7 +19,7 @@ int main(int argc, char* argv[])
       debug->program=read_in_file(argv[1]);
       if(!initial_checks(debug))
       {
-         fprintf(stderr,"%s",debug->info);
+         fprintf(stderr,"%s\n",debug->info);
          exit(EXIT_FAILURE);
       }
       debug->output=init_line_cont();
@@ -26,10 +27,15 @@ int main(int argc, char* argv[])
       if(debug->program)
       {
          printf("enter a command:\n");
-         fgets(command,FULLARGSTRLEN,stdin);
+         safe_fgets(command,FULLARGSTRLEN,stdin);
          while(strcmp(command, "quit\n") != 0)
          {
-            if(!run_action(debug,command,result))
+            if(strcmp(command,"set break\n")==0)
+            {
+               printf("enter line number:\n");
+               safe_fgets(num,FULLARGSTRLEN,stdin);
+            }
+            if(!run_action(debug,command,num,result))
             {
                printf("unknown command\n");
             }
@@ -38,7 +44,7 @@ int main(int argc, char* argv[])
                printf("%s\n",result);
                result[0]='\0';
             }
-            fgets(command,FULLARGSTRLEN,stdin);
+            safe_fgets(command,FULLARGSTRLEN,stdin);
          }
       }
       free_debugger(debug);
@@ -54,8 +60,6 @@ void draw_lines(line_cont* l_arr)
    if(l_arr)
    {
       Neill_SDL_Init(&sw);
-      /*technically only white when all three are white
-      but MAX doesnt really give same effect*/
       Neill_SDL_SetDrawColour(&sw,WHITE,WHITE,WHITE);
       for(i=0;i<l_arr->size;i++)
       {
@@ -65,6 +69,7 @@ void draw_lines(line_cont* l_arr)
                            (int)l_arr->array[i]->start->y+MIDHEIGHT, \
                             (int)l_arr->array[i]->end->x+MIDWIDTH,\
                          (int)l_arr->array[i]->end->y+MIDHEIGHT);
+         Neill_SDL_Events(&sw);
          Neill_SDL_UpdateScreen(&sw);
       }
       do

@@ -101,7 +101,14 @@ bool instruct_checks(debugger* to_check)
    {
       check_loop_end(to_check);
    }
-
+   if(to_check->break_p!=NOBREAK)
+   {
+      if(to_check->program->position>=to_check->break_p)
+      {
+         strcpy(to_check->info,"at break point");
+         return false;
+      }
+   }
    if(to_check->program->position>=\
       to_check->program->capacity-INDEX)
    {
@@ -259,7 +266,7 @@ loop_tracker* step_do_helper(word_cont* to_check)
 
 bool check_past_main(debugger* debug)
 {
-   if(find_end_pos(debug->program,0)<=\
+   if(find_end_pos(debug->program,BRACKETSTART)<=\
       debug->program->capacity-INDEX)
    {
       return false;
@@ -267,6 +274,32 @@ bool check_past_main(debugger* debug)
    return true;
 }
 
+/*just need to match left brackets with right brackets*/
+int find_end_pos(word_cont* to_check,int starting_brackets)
+{
+   int left_brackets,right_brackets;
+   int end_pos;
+   left_brackets=starting_brackets;
+   right_brackets=0;
+   end_pos=to_check->position;
+   while(left_brackets!=right_brackets || left_brackets==0)
+   {
+      if(end_pos>=to_check->capacity)
+      {
+         return NOTFOUND;
+      }
+      if(strcmp(to_check->words[end_pos],"}")==0)
+      {
+         right_brackets++;
+      }
+      if(strcmp(to_check->words[end_pos],"{")==0)
+      {
+         left_brackets++;
+      }
+      end_pos++;
+   }
+   return end_pos;
+}
 /*going to have the vars like A = 1.453 to two dps to start with
 this means for each var there is at least 10 chars although maybe more
 so we want to give space for wiggle room- going to say that we only want
@@ -435,7 +468,7 @@ bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
 
 /*returns false if weird action entered*/
 bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
-               char result_str[FULLARGSTRLEN])
+               char num[MAXACTIONLEN],char result_str[FULLARGSTRLEN])
 {
    action curr_action;
    curr_action=get_action(action_str);
@@ -491,7 +524,6 @@ void collate_instruct_messages(debugger* to_check,\
    }
    else
    {
-      /*bug around here*/
       sprintf(result_str,"error around word %d %s\n",\
       to_check->program->position,\
       to_check->program->words[to_check->program->position]);
@@ -567,8 +599,39 @@ action get_action(char action_str[MAXACTIONLEN])
    {
       return visualize;
    }
+   if(strcmp(action_str,"set break\n")==0)
+   {
+      return set_break;
+   }
+   if(strcmp(action_str,"rm break\n")==0)
+   {
+      return rm_break;
+   }
    return invalid_act;
 }
+
+/*going to try make it slightly user friendly and
+take as many numbers as possible with strtol
+if the user enter 123abc it will still work*/
+void run_set_break(debugger* to_check,char num[MAXACTIONLEN],\
+                  char result_str[FULLARGSTRLEN])
+{
+   int i;
+   char* ptr;
+   i= (int)strtol(num,ptr,10);
+   if(i>=0)
+   {
+      to_check->break_p=i;
+      strcpy(result_str,"break point set");
+   }
+   strcpy(result_str,"cant set negative break points");
+}
+
+void run_rm_break(debugger* to_check,char result_str[FULLARGSTRLEN])
+{
+   to_check->break_p=NOBREAK;
+}
+
 
 debugger* init_debugger(void)
 {
@@ -576,6 +639,7 @@ debugger* init_debugger(void)
 
    n_debug=(debugger*)safe_calloc(1,sizeof(debugger));
    n_debug->loop_stack=stack_init(sizeof(loop_tracker));
+   n_debug->break_p=NOBREAK;
    return n_debug;
 }
 
@@ -599,7 +663,7 @@ bool free_debugger(debugger* to_free)
 
 /*levenshtein matrix is 1 indexed so have to add
 1 to a lot of things. put some links in my extension
-file on levenshtein distance that i used*/
+file on levenshtein distance that i used for reference*/
 int levenshtein(char* word_1,char* word_2)
 {
    int word_1_len,word_2_len;

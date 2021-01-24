@@ -58,3 +58,13 @@ FILE* safe_fopen(char* filename)
    }
    return fp;
 }
+
+
+void safe_fgets(char* str,int n, FILE *stream)
+{
+   if(fgets(str,n,stream)==NULL)
+   {
+      fprintf(stderr,"failed to read\n");
+      exit(EXIT_FAILURE);
+   }
+}

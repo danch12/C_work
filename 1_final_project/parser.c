@@ -24,8 +24,13 @@ int main(int argc, char* argv[])
             }
             exit(EXIT_FAILURE);
          }
+         if(w_cont->capacity!=w_cont->position)
+         {
+            fprintf(stderr,"there may be code after main that has not been checked; be careful\n");
+         }
          free_word_cont(n_cont);
       }
+
    }
    return 0;
 }

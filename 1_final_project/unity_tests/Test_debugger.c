@@ -1468,6 +1468,100 @@ void test_fuzzy(void)
    free_debugger(test_d);
 }
 
+void test_find_end(void)
+{
+   word_cont* test_cont;
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"FD");
+   strcpy(test_cont->words[2],"40");
+
+
+   strcpy(test_cont->words[3],"DO");
+   strcpy(test_cont->words[4],"B");
+   strcpy(test_cont->words[5],"FROM");
+   strcpy(test_cont->words[6],"A");
+   strcpy(test_cont->words[7],"TO");
+   strcpy(test_cont->words[8],"30");
+   strcpy(test_cont->words[9],"{");
+
+   strcpy(test_cont->words[10],"}");
+   strcpy(test_cont->words[11],"}");
+   TEST_ASSERT_EQUAL_INT(12,find_end_pos(test_cont,0));
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"{");
+   strcpy(test_cont->words[2],"}");
+
+
+   strcpy(test_cont->words[3],"{");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"}");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"TO");
+   strcpy(test_cont->words[8],"30");
+   strcpy(test_cont->words[9],"{");
+
+   strcpy(test_cont->words[10],"}");
+   strcpy(test_cont->words[11],"}");
+   TEST_ASSERT_EQUAL_INT(12,find_end_pos(test_cont,0));
+   test_cont->position=0;
+
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"{");
+   strcpy(test_cont->words[2],"}");
+
+
+   strcpy(test_cont->words[3],"{");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"AD");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"}");
+   strcpy(test_cont->words[8],"30");
+   strcpy(test_cont->words[9],"{");
+
+   strcpy(test_cont->words[10],"}");
+   strcpy(test_cont->words[11],"}");
+   TEST_ASSERT_EQUAL_INT(12,find_end_pos(test_cont,0));
+   test_cont->position=0;
+
+
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"}");
+   strcpy(test_cont->words[2],"}");
+
+
+   strcpy(test_cont->words[3],"{");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"AD");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"}");
+   strcpy(test_cont->words[8],"30");
+   strcpy(test_cont->words[9],"{");
+
+   strcpy(test_cont->words[10],"}");
+   strcpy(test_cont->words[11],"}");
+   TEST_ASSERT_EQUAL_INT(2,find_end_pos(test_cont,0));
+   test_cont->position=0;
+
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"{");
+   strcpy(test_cont->words[2],"{");
+
+
+   strcpy(test_cont->words[3],"{");
+   strcpy(test_cont->words[4],"{");
+   strcpy(test_cont->words[5],"AD");
+   strcpy(test_cont->words[6],"}");
+   strcpy(test_cont->words[7],"}");
+   strcpy(test_cont->words[8],"30");
+   strcpy(test_cont->words[9],"{");
+
+   strcpy(test_cont->words[10],"}");
+   strcpy(test_cont->words[11],"}");
+   TEST_ASSERT_EQUAL_INT(-1,find_end_pos(test_cont,0));
+
+}
 
 int main(void)
 {
@@ -1484,7 +1578,7 @@ int main(void)
    RUN_TEST(test_error_collate);
    RUN_TEST(test_run_action);
    RUN_TEST(test_fuzzy);
-
+   RUN_TEST(test_find_end);
    return UNITY_END();
 }
 

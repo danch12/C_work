@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
    }
    else
    {
+
       w_cont=read_in_file(argv[1]);
       l_cont=init_line_cont();
       if(w_cont)
@@ -31,6 +32,10 @@ int main(int argc, char* argv[])
             atexit(SDL_Quit);
             exit(EXIT_FAILURE);
          }
+         if(w_cont->capacity!=w_cont->position)
+         {
+            fprintf(stderr,"there may be code after main that has not been checked; be careful\n");
+         }
       }
    }
    do
@@ -42,40 +47,4 @@ int main(int argc, char* argv[])
    free_line_cont(l_cont);
    free_word_cont(w_cont);
    return 0;
-}
-
-
-
-
-/*your functions looked pretty good for the
-housekeeping stuff*/
-void draw_lines(line_cont* l_arr)
-{
-   SDL_Simplewin sw;
-   int i;
-   if(l_arr)
-   {
-      Neill_SDL_Init(&sw);
-      /*technically only white when all three are white
-      but MAX doesnt really give same effect*/
-      Neill_SDL_SetDrawColour(&sw,WHITE,WHITE,WHITE);
-      for(i=0;i<l_arr->size;i++)
-      {
-
-         SDL_RenderDrawLine(sw.renderer, \
-                           (int)l_arr->array[i]->start->x+MIDWIDTH,\
-                           (int)l_arr->array[i]->start->y+MIDHEIGHT, \
-                            (int)l_arr->array[i]->end->x+MIDWIDTH,\
-                         (int)l_arr->array[i]->end->y+MIDHEIGHT);
-         Neill_SDL_UpdateScreen(&sw);
-      }
-      do
-      {
-        Neill_SDL_Events(&sw);
-      }while(!sw.finished);
-      SDL_Quit();
-      atexit(SDL_Quit);
-   }
-
-
 }

@@ -247,7 +247,9 @@ void simple_draw(word_cont* to_check,line* to_draw)
                      (int)to_draw->start->y+MIDHEIGHT, \
                       (int)to_draw->end->x+MIDWIDTH,\
                    (int)to_draw->end->y+MIDHEIGHT);
+   Neill_SDL_Events(&to_check->sw);
    Neill_SDL_UpdateScreen(&to_check->sw);
+
 }
 #endif
 
@@ -419,7 +421,10 @@ bit like in c
 
 also going to allow infinite loops
 if you want to do that to yourself im not going to
-stop you*/
+stop you
+also the loop goes up to and includes the TO number
+
+*/
 bool run_do(word_cont* to_check,line_cont* line_arr)
 {
    int var_pos;
@@ -428,7 +433,15 @@ bool run_do(word_cont* to_check,line_cont* line_arr)
    if(do_helper(to_check,&var_pos,&start,&end))
    {
       beg_loop=to_check->position;
-
+      /*if we dont run loop check syntax and go to end*/
+      if(start>end)
+      {
+         if(valid_instructlist(to_check))
+         {
+            return true;
+         }
+         return false;
+      }
       for(i=start;i<=end;i++)
       {
          if(!to_check->var_array[var_pos])
@@ -452,12 +465,10 @@ bool run_do(word_cont* to_check,line_cont* line_arr)
 }
 
 
-/*checks syntax of whole loop including content of
-actual loop and stores info used by loop*/
+/*checks syntax of  loop  stores info used by loop*/
 bool do_helper(word_cont* to_check,int* var_pos,\
                double* start,double* end)
 {
-   int loop_start;
    if(to_check->position>=to_check->capacity)
    {
       return false;
@@ -480,13 +491,7 @@ bool do_helper(word_cont* to_check,int* var_pos,\
                      if(strcmp(to_check->words[to_check->position],"{")==0)
                      {
                         to_check->position++;
-                        loop_start=to_check->position;
-                        if(valid_instructlist(to_check))
-                        {
-                           to_check->position=loop_start;
-                           return true;
-                        }
-
+                        return true;
                      }
                   }
                }

@@ -6,13 +6,14 @@
 
 
 
-
-
-/*need to create new functions that do very similar things
+/*need to create some new functions that do very similar things
 to parser stage but increment at different times - this is
 because we will use old parser functions to check for
 syntax errors in do loops so even if do loop not executed
-it will throw errors for bad syntax*/
+it will throw errors for bad syntax i thought about adding
+arguments to the exsiting functions but as we call alot of them
+recursively it would be hard to pass the arguments in at the right
+time*/
 
 line_cont* init_line_cont(void);
 bool free_line_cont(line_cont* to_free);
@@ -34,7 +35,7 @@ bool valid_number(word_cont* to_check);
 bool run_instruction(word_cont* to_check,line_cont* line_arr);
 bool run_instruction_list(word_cont* to_check,line_cont* line_arr);
 bool run_main(word_cont* to_check,line_cont* line_arr);
-/*get rotation for lt and rt commands - stores them in
+/*get amount we rotate for lt and rt commands - stores them in
 a pending line and executes when fd command is issued*/
 bool get_rotation(word_cont* to_check,line_cont* line_arr);
 direction direction_helper(word_cont* to_check);

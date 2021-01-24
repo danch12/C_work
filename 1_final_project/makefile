@@ -1,5 +1,4 @@
 CFLAGSFAST= -Wall -Wextra -Wfloat-equal -pedantic -std=c90 -O3
-
 CFLAGSSAN= -Wall -Wextra -Wfloat-equal -pedantic -std=c90 -fsanitize=undefined -fsanitize=address -g3
 CFLAGSSDL= `sdl2-config --cflags` -O2 -Wall -Wextra -pedantic -Wfloat-equal -std=c90
 LIDLIBSSDL= `sdl2-config --libs` -lm
@@ -56,9 +55,6 @@ u_test_interp_san: unity_tests/Test_interp.c src/unity.c src/unity.h $(PARSEFULL
 u_test_interp_fast: unity_tests/Test_interp.c src/unity.c src/unity.h $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL)
 		$(CC) unity_tests/Test_interp.c src/unity.c interpreter/specific.c  $(PARSERUN) $(INTERPRUN) $(STACKSRUN) $(GENERALRUN) -o u_test_interp_fast $(CFLAGSFAST) $(INCINTERP) $(LIDLIBS)
 
-
-
-
 u_exten_func_san:unity_tests/Test_extension_funcs.c src/unity.c src/unity.h extension_funcs.c extension_flow.c extension_flow.h  extension_funcs.h extension_arrays.c extension_arrays.h  $(PARSEFULL) $(INTERPFULL) exten/specific.c exten/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) $(ARRFULL)
 	$(CC) unity_tests/Test_extension_funcs.c src/unity.c extension_funcs.c extension_flow.c extension_arrays.c  exten/specific.c $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN)  -o u_exten_func_san $(CFLAGSSAN) $(INCEXTEN) $(LIDLIBS)
 
@@ -106,33 +102,67 @@ interp: interpreter.c interpreter_master.h $(PARSEFULL) $(INTERPFULL) interprete
 	$(CC) -DINTERP_PRODUCTION interpreter.c $(PARSERUN) $(INTERPRUN)  interpreter/specific.c   ADTS_and_general/neillsdl2.c $(STACKSRUN) $(GENERALRUN) -o interp $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)
 
 
-run_valgrind:
-	valgrind --gen-suppressions=all --suppressions=./linux_sdl_gl.sup --leak-check=full --show-leak-kinds=all ./parse
+run_valgrind: interp extension parse debugger u_debugger_fast u_exten_arr_fast u_exten_interactions_fast u_exten_flow_fast u_exten_func_fast u_test_interp_fast u_parse_fast u_arrays_fast u_hash_map_fast
+	valgrind --leak-check=full --show-leak-kinds=all ./u_debugger_fast
+	valgrind --leak-check=full --show-leak-kinds=all ./u_exten_arr_fast
+	valgrind --leak-check=full --show-leak-kinds=all ./u_exten_interactions_fast
+	valgrind --leak-check=full --show-leak-kinds=all ./u_exten_flow_fast
+	valgrind --leak-check=full --show-leak-kinds=all ./u_exten_func_fast
+	valgrind --leak-check=full --show-leak-kinds=all ./u_test_interp_fast
+	valgrind --leak-check=full --show-leak-kinds=all ./u_parse_fast
+	valgrind --leak-check=full --show-leak-kinds=all ./u_arrays_fast
+	valgrind --leak-check=full --show-leak-kinds=all ./u_hash_map_fast
+	valgrind --leak-check=full --show-leak-kinds=all ./u_stacks_fast
+	valgrind --leak-check=full --show-leak-kinds=all ./parse
 	valgrind --gen-suppressions=all --suppressions=./linux_sdl_gl.sup --leak-check=full --show-leak-kinds=all ./interp
 	valgrind --gen-suppressions=all --suppressions=./linux_sdl_gl.sup --leak-check=full --show-leak-kinds=all ./extension
 	valgrind --gen-suppressions=all --suppressions=./linux_sdl_gl.sup --leak-check=full --show-leak-kinds=all ./debugger
 
+
+run_tests_report: u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_san u_arrays_fast u_parse_san u_parse_fast u_test_interp_san u_test_interp_fast u_exten_func_san u_exten_func_fast u_exten_flow_san u_exten_flow_fast u_exten_arr_san u_exten_arr_fast u_exten_interactions_san u_exten_interactions_fast u_debugger_san u_debugger_fast
+	./u_stacks_san > testing_results.txt
+	./u_stacks_fast >> testing_results.txt
+	./u_hash_map_san >> testing_results.txt
+	./u_hash_map_fast >> testing_results.txt
+	./u_arrays_san >> testing_results.txt
+	./u_arrays_fast >> testing_results.txt
+	./u_parse_san >> testing_results.txt
+	./u_parse_fast >> testing_results.txt
+	./u_test_interp_san >> testing_results.txt
+	./u_test_interp_fast >> testing_results.txt
+	./u_exten_func_san >> testing_results.txt
+	./u_exten_func_fast >> testing_results.txt
+	./u_exten_flow_san >> testing_results.txt
+	./u_exten_flow_fast >> testing_results.txt
+	./u_exten_arr_san >> testing_results.txt
+	./u_exten_arr_fast >> testing_results.txt
+	./u_exten_interactions_san >> testing_results.txt
+	./u_exten_interactions_fast >> testing_results.txt
+	./u_debugger_san >> testing_results.txt
+	./u_debugger_fast >> testing_results.txt
+
+
 run_tests: u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_san u_arrays_fast u_parse_san u_parse_fast u_test_interp_san u_test_interp_fast u_exten_func_san u_exten_func_fast u_exten_flow_san u_exten_flow_fast u_exten_arr_san u_exten_arr_fast u_exten_interactions_san u_exten_interactions_fast u_debugger_san u_debugger_fast
-	./u_stacks_san
-	./u_stacks_fast
-	./u_hash_map_san
-	./u_hash_map_fast
-	./u_arrays_san
-	./u_arrays_fast
-	./u_parse_san
-	./u_parse_fast
-	./u_test_interp_san
-	./u_test_interp_fast
-	./u_exten_func_san
-	./u_exten_func_fast
-	./u_exten_flow_san
-	./u_exten_flow_fast
-	./u_exten_arr_san
-	./u_exten_arr_fast
-	./u_exten_interactions_san
-	./u_exten_interactions_fast
-	./u_debugger_san
-	./u_debugger_fast
+		./u_stacks_san
+		./u_stacks_fast
+		./u_hash_map_san
+		./u_hash_map_fast
+		./u_arrays_san
+		./u_arrays_fast
+		./u_parse_san
+		./u_parse_fast
+		./u_test_interp_san
+		./u_test_interp_fast
+		./u_exten_func_san
+		./u_exten_func_fast
+		./u_exten_flow_san
+		./u_exten_flow_fast
+		./u_exten_arr_san
+		./u_exten_arr_fast
+		./u_exten_interactions_san
+		./u_exten_interactions_fast
+		./u_debugger_san
+		./u_debugger_fast
 
 
 #runs a series of invalid files and stores error message in p_errors.txt the | true stops the makefile from terminating after seeing an error

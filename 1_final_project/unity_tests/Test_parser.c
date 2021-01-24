@@ -23,47 +23,47 @@ void test_valid_nums(void)
    word_cont* test_cont;
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"1234");
-   TEST_ASSERT_TRUE(valid_num(test_cont));
+   TEST_ASSERT_TRUE(valid_num(test_cont,1));
    TEST_ASSERT_TRUE(test_cont->position==1);
    test_cont->position=0;
    TEST_ASSERT_TRUE(valid_varnum(test_cont));
    test_cont->position=0;
 
    strcpy(test_cont->words[0],"123.4");
-   TEST_ASSERT_TRUE(valid_num(test_cont));
+   TEST_ASSERT_TRUE(valid_num(test_cont,1));
    test_cont->position=0;
    strcpy(test_cont->words[0],".123");
-   TEST_ASSERT_TRUE(valid_num(test_cont));
+   TEST_ASSERT_TRUE(valid_num(test_cont,1));
    test_cont->position=0;
 
    strcpy(test_cont->words[0],"123.a");
-   TEST_ASSERT_FALSE(valid_num(test_cont));
+   TEST_ASSERT_FALSE(valid_num(test_cont,1));
    test_cont->position=0;
    TEST_ASSERT_FALSE(valid_varnum(test_cont));
    strcpy(test_cont->words[0],"");
-   TEST_ASSERT_FALSE(valid_num(test_cont));
+   TEST_ASSERT_FALSE(valid_num(test_cont,1));
    TEST_ASSERT_FALSE(valid_varnum(test_cont));
    strcpy(test_cont->words[0],"1a");
-   TEST_ASSERT_FALSE(valid_num(test_cont));
+   TEST_ASSERT_FALSE(valid_num(test_cont,1));
    strcpy(test_cont->words[0],"a1");
    TEST_ASSERT_FALSE(valid_varnum(test_cont));
-   TEST_ASSERT_FALSE(valid_num(test_cont));
+   TEST_ASSERT_FALSE(valid_num(test_cont,1));
    strcpy(test_cont->words[0],"1a1");
-   TEST_ASSERT_FALSE(valid_num(test_cont));
+   TEST_ASSERT_FALSE(valid_num(test_cont,1));
    strcpy(test_cont->words[0]," ");
-   TEST_ASSERT_FALSE(valid_num(test_cont));
+   TEST_ASSERT_FALSE(valid_num(test_cont,1));
    TEST_ASSERT_TRUE(test_cont->position==0);
 
    strcpy(test_cont->words[0],"1-1");
-   TEST_ASSERT_FALSE(valid_num(test_cont));
+   TEST_ASSERT_FALSE(valid_num(test_cont,1));
    strcpy(test_cont->words[0],"-");
-   TEST_ASSERT_FALSE(valid_num(test_cont));
+   TEST_ASSERT_FALSE(valid_num(test_cont,1));
    strcpy(test_cont->words[0],".");
-   TEST_ASSERT_FALSE(valid_num(test_cont));
+   TEST_ASSERT_FALSE(valid_num(test_cont,1));
    strcpy(test_cont->words[0],"1.1.");
-   TEST_ASSERT_FALSE(valid_num(test_cont));
+   TEST_ASSERT_FALSE(valid_num(test_cont,1));
    strcpy(test_cont->words[0],"-1.1-");
-   TEST_ASSERT_FALSE(valid_num(test_cont));
+   TEST_ASSERT_FALSE(valid_num(test_cont,1));
    free_word_cont(test_cont);
 }
 
@@ -641,100 +641,6 @@ void test_instructlist_main(void)
 }
 
 
-void test_find_end(void)
-{
-   word_cont* test_cont;
-   test_cont=init_word_cont();
-   strcpy(test_cont->words[0],"{");
-   strcpy(test_cont->words[1],"FD");
-   strcpy(test_cont->words[2],"40");
-
-
-   strcpy(test_cont->words[3],"DO");
-   strcpy(test_cont->words[4],"B");
-   strcpy(test_cont->words[5],"FROM");
-   strcpy(test_cont->words[6],"A");
-   strcpy(test_cont->words[7],"TO");
-   strcpy(test_cont->words[8],"30");
-   strcpy(test_cont->words[9],"{");
-
-   strcpy(test_cont->words[10],"}");
-   strcpy(test_cont->words[11],"}");
-   TEST_ASSERT_EQUAL_INT(12,find_end_pos(test_cont,0));
-   test_cont->position=0;
-   strcpy(test_cont->words[0],"{");
-   strcpy(test_cont->words[1],"{");
-   strcpy(test_cont->words[2],"}");
-
-
-   strcpy(test_cont->words[3],"{");
-   strcpy(test_cont->words[4],"{");
-   strcpy(test_cont->words[5],"}");
-   strcpy(test_cont->words[6],"}");
-   strcpy(test_cont->words[7],"TO");
-   strcpy(test_cont->words[8],"30");
-   strcpy(test_cont->words[9],"{");
-
-   strcpy(test_cont->words[10],"}");
-   strcpy(test_cont->words[11],"}");
-   TEST_ASSERT_EQUAL_INT(12,find_end_pos(test_cont,0));
-   test_cont->position=0;
-
-   strcpy(test_cont->words[0],"{");
-   strcpy(test_cont->words[1],"{");
-   strcpy(test_cont->words[2],"}");
-
-
-   strcpy(test_cont->words[3],"{");
-   strcpy(test_cont->words[4],"{");
-   strcpy(test_cont->words[5],"AD");
-   strcpy(test_cont->words[6],"}");
-   strcpy(test_cont->words[7],"}");
-   strcpy(test_cont->words[8],"30");
-   strcpy(test_cont->words[9],"{");
-
-   strcpy(test_cont->words[10],"}");
-   strcpy(test_cont->words[11],"}");
-   TEST_ASSERT_EQUAL_INT(12,find_end_pos(test_cont,0));
-   test_cont->position=0;
-
-
-   strcpy(test_cont->words[0],"{");
-   strcpy(test_cont->words[1],"}");
-   strcpy(test_cont->words[2],"}");
-
-
-   strcpy(test_cont->words[3],"{");
-   strcpy(test_cont->words[4],"{");
-   strcpy(test_cont->words[5],"AD");
-   strcpy(test_cont->words[6],"}");
-   strcpy(test_cont->words[7],"}");
-   strcpy(test_cont->words[8],"30");
-   strcpy(test_cont->words[9],"{");
-
-   strcpy(test_cont->words[10],"}");
-   strcpy(test_cont->words[11],"}");
-   TEST_ASSERT_EQUAL_INT(2,find_end_pos(test_cont,0));
-   test_cont->position=0;
-
-   strcpy(test_cont->words[0],"{");
-   strcpy(test_cont->words[1],"{");
-   strcpy(test_cont->words[2],"{");
-
-
-   strcpy(test_cont->words[3],"{");
-   strcpy(test_cont->words[4],"{");
-   strcpy(test_cont->words[5],"AD");
-   strcpy(test_cont->words[6],"}");
-   strcpy(test_cont->words[7],"}");
-   strcpy(test_cont->words[8],"30");
-   strcpy(test_cont->words[9],"{");
-
-   strcpy(test_cont->words[10],"}");
-   strcpy(test_cont->words[11],"}");
-   TEST_ASSERT_EQUAL_INT(-1,find_end_pos(test_cont,0));
-
-}
 
 void test_file_reading(void)
 {

@@ -98,6 +98,8 @@ To start with I'm just going to create a debugger that deals with the main offic
 
 Implemented a form of fuzzy matching to suggest commands when there is errors using Levenshtein_distance (https://en.wikipedia.org/wiki/Levenshtein_distance). Saw a version of it implemented in python that im just going to convert to c https://stackabuse.com/levenshtein-distance-and-text-similarity-in-python/. Although since most of the words are just two letters it isn't the perfect metric.
 
+To start the debugger after compilation you enter path to debugger and a ttl file path.
+
 For the commands you can do 
 
 single step - moves forward one instruction
@@ -105,9 +107,15 @@ advance to error - advances to error or end of program
 show code - shows the previous 5 lines of code and the next 5 lines of code
 show coords - shows last 5 coordinates of where lines finished 
 show pos - show word position that your on
-make suggestion - not that useful but tries to make a suggestion if there's an error in the command
+show vars - shows values of variables
+give suggestion - not that useful but tries to make a suggestion if there's an error in the command
+set break - sets a break point in the program - unfortunately at the moment only one can be set at a time. Also if break point is in middle of instruction debugger will sometimes go slightly over break point.
+del break - deletes break point
 visualize - draws lines in sdl up to the current position
 quit- quits the program
+
+For commands like show coords it will only show a certain amount of digits so the string does not overflow. If it gets beyond a certain amount of digits it will look like 123... 
+
 
 
 

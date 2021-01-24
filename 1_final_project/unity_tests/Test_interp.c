@@ -1550,6 +1550,51 @@ void test_main_full(void)
    strcpy(test_cont->words[1],"DO");
    strcpy(test_cont->words[2],"A");
    strcpy(test_cont->words[3],"FROM");
+   strcpy(test_cont->words[4],"10");
+   strcpy(test_cont->words[5],"TO");
+   strcpy(test_cont->words[6],"8");
+   strcpy(test_cont->words[7],"{");
+   strcpy(test_cont->words[8],"SET");
+   strcpy(test_cont->words[9],"B");
+   strcpy(test_cont->words[10],":=");
+   strcpy(test_cont->words[11],"A");
+   strcpy(test_cont->words[12],";");
+   strcpy(test_cont->words[13],"}");
+   strcpy(test_cont->words[14],"}");
+   TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"DO");
+   strcpy(test_cont->words[2],"A");
+   strcpy(test_cont->words[3],"FROM");
+   strcpy(test_cont->words[4],"1");
+   strcpy(test_cont->words[5],"TO");
+   strcpy(test_cont->words[6],"360");
+   strcpy(test_cont->words[7],"{");
+   strcpy(test_cont->words[8],"FD");
+   strcpy(test_cont->words[9],"1");
+   strcpy(test_cont->words[10],"RT");
+   strcpy(test_cont->words[11],"1");
+   strcpy(test_cont->words[12],"}");
+   strcpy(test_cont->words[13],"}");
+   TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
+   TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[test_line_cont->size-1]->end->x,0);
+   TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[test_line_cont->size-1]->end->y,0);
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
+
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+
+   strcpy(test_cont->words[0],"{");
+   strcpy(test_cont->words[1],"DO");
+   strcpy(test_cont->words[2],"A");
+   strcpy(test_cont->words[3],"FROM");
    strcpy(test_cont->words[4],"1");
    strcpy(test_cont->words[5],"TO");
    strcpy(test_cont->words[6],"50");
