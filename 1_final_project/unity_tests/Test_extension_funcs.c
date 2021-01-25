@@ -873,9 +873,9 @@ void test_funcrun(void)
    TEST_ASSERT_TRUE(test_cont->position==15);
    TEST_ASSERT_TRUE(run_funcrun(test_cont,test_line_cont,test_d));
    TEST_ASSERT_TRUE(test_line_cont->size==2);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,-90);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,90);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[0]->end->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->end->x,-90);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->end->x,90);
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->end->y,-90);
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
@@ -1618,7 +1618,7 @@ void test_run_return(void)
    TEST_ASSERT_TRUE(run_instruction(test_cont,test_line_cont));
    TEST_ASSERT_TRUE(run_instruction(test_cont,test_line_cont));
    TEST_ASSERT_TRUE(test_cont->position==16);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,-90);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,90);
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
 
@@ -1710,7 +1710,7 @@ void test_run_return(void)
    TEST_ASSERT_TRUE(run_funcset(test_cont));
    TEST_ASSERT_TRUE(run_instruction(test_cont,test_line_cont));
    TEST_ASSERT_TRUE(test_cont->position==14);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,-90);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,90);
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
 

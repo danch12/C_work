@@ -109,7 +109,7 @@ show coords - shows last 5 coordinates of where lines finished
 show pos - show word position that your on
 show vars - shows values of variables
 give suggestion - not that useful but tries to make a suggestion if there's an error in the command
-set break - sets a break point in the program - unfortunately at the moment only one can be set at a time. Also if break point is in middle of instruction debugger will sometimes go slightly over break point.
+set break - sets a break point in the program - unfortunately at the moment only one can be set at a time. Also if break point is in middle of instruction debugger will sometimes go slightly over break point. Also if breakpoint is set in a unexecuted loop program will run to end of the loop. Eg if we have a loop like DO A FROM 10 TO 4 it will just go to the first instruction outside of the loop.
 del break - deletes break point
 visualize - draws lines in sdl up to the current position
 quit- quits the program

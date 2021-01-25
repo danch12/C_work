@@ -158,29 +158,29 @@ void test_directions(void)
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,0);
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->y,0);
    TEST_ASSERT_TRUE(get_rotation(test_cont,test_line_cont));
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,123.4);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,236.6);
    TEST_ASSERT_TRUE(test_cont->position==2);
 
    strcpy(test_cont->words[2],"LT");
    strcpy(test_cont->words[3],"500");
    get_rotation(test_cont,test_line_cont);
 
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,263.4);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,96.6);
    strcpy(test_cont->words[4],"LT");
    strcpy(test_cont->words[5],"50");
    get_rotation(test_cont,test_line_cont);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,313.4);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,46.6);
 
    strcpy(test_cont->words[6],"RT");
    strcpy(test_cont->words[7],"50");
    get_rotation(test_cont,test_line_cont);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,263.4);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,96.6);
 
    strcpy(test_cont->words[8],"RT");
    strcpy(test_cont->words[9],"500");
    get_rotation(test_cont,test_line_cont);
 
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,123.4);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,236.6);
 
    strcpy(test_cont->words[10],"RT");
    strcpy(test_cont->words[11],"123.4");
@@ -244,9 +244,9 @@ void test_move_forward(void)
    TEST_ASSERT_TRUE(move_forward(test_cont,test_line_cont));
 
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->end->y,30);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->end->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->end->x,30);
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->y,30);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,30);
    free_line_cont(test_line_cont);
 
 
@@ -260,10 +260,10 @@ void test_move_forward(void)
    TEST_ASSERT_TRUE(get_rotation(test_cont,test_line_cont));
    TEST_ASSERT_TRUE(move_forward(test_cont,test_line_cont));
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[0]->end->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,-30);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->pending_line->start->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,30);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,270);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,90);
 
    free_line_cont(test_line_cont);
 
@@ -343,7 +343,7 @@ void test_run_instruct_basic(void)
 
 
    TEST_ASSERT_TRUE(run_instruction(test_cont,test_line_cont));
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,90);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,270);
    TEST_ASSERT_TRUE(test_cont->position==2);
    TEST_ASSERT_TRUE(test_line_cont->size==0);
 
@@ -351,9 +351,9 @@ void test_run_instruct_basic(void)
    TEST_ASSERT_TRUE(test_cont->position==4);
    TEST_ASSERT_TRUE(test_line_cont->size==1);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[0]->end->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,30);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->pending_line->start->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,30);
 
    strcpy(test_cont->words[0],"L");
    test_cont->position=0;
@@ -395,9 +395,9 @@ void test_basic_instruct_list(void)
    TEST_ASSERT_TRUE(test_cont->position==5);
    TEST_ASSERT_TRUE(test_line_cont->size==1);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[0]->end->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,30);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->pending_line->start->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,30);
 
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
@@ -451,23 +451,23 @@ void test_basic_instruct_list(void)
    TEST_ASSERT_TRUE(test_line_cont->size==4);
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,180);
 
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->rotation,90);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->rotation,270);
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->rotation,180);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[2]->rotation,270);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[2]->rotation,90);
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[3]->rotation,180);
 
 
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[0]->start->x,0);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[0]->start->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,30);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[0]->end->y,0);
 
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->start->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->start->x,30);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[1]->start->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->end->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->end->x,30);
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[1]->end->y,-30);
 
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[2]->start->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[2]->start->x,30);
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[2]->start->y,-30);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[2]->end->x,0);
    TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[2]->end->y,-30);
@@ -580,7 +580,7 @@ void test_basic_main(void)
 
    TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
 
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,357);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,3);
 
    free_line_cont(test_line_cont);
 
@@ -612,7 +612,7 @@ void test_basic_main(void)
    strcpy(test_cont->words[17],"}");
 
    TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,341);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->rotation,19);
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
 }
@@ -1051,9 +1051,9 @@ void test_instruct_vars(void)
    TEST_ASSERT_TRUE(test_cont->position==10);
    TEST_ASSERT_TRUE(test_line_cont->size==1);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[0]->end->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,30);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->pending_line->start->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,30);
 
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
@@ -1082,9 +1082,9 @@ void test_instruct_vars(void)
    TEST_ASSERT_TRUE(test_cont->position==15);
    TEST_ASSERT_TRUE(test_line_cont->size==1);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->array[0]->end->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,30);
    TEST_ASSERT_DOUBLE_WITHIN(EPSILON,test_line_cont->pending_line->start->y,0);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,-30);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->pending_line->start->x,30);
 
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);

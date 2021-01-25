@@ -81,7 +81,7 @@ void test_step_instruction_basic(void)
    strcpy(test_d->program->words[0],"LT");
    strcpy(test_d->program->words[1],".1");
    TEST_ASSERT_TRUE(step_instruction(test_d));
-   TEST_ASSERT_EQUAL_DOUBLE(test_d->output->pending_line->rotation,0.1);
+   TEST_ASSERT_EQUAL_DOUBLE(test_d->output->pending_line->rotation,359.9);
    free_debugger(test_d);
 
    test_d=init_debugger();
@@ -90,7 +90,7 @@ void test_step_instruction_basic(void)
    strcpy(test_d->program->words[0],"RT");
    strcpy(test_d->program->words[1],".1");
    TEST_ASSERT_TRUE(step_instruction(test_d));
-   TEST_ASSERT_EQUAL_DOUBLE(test_d->output->pending_line->rotation,359.9);
+   TEST_ASSERT_EQUAL_DOUBLE(test_d->output->pending_line->rotation,0.1);
    free_debugger(test_d);
 
    test_d=init_debugger();
@@ -99,7 +99,7 @@ void test_step_instruction_basic(void)
    strcpy(test_d->program->words[0],"RT");
    strcpy(test_d->program->words[1],"-.1");
    TEST_ASSERT_TRUE(step_instruction(test_d));
-   TEST_ASSERT_EQUAL_DOUBLE(test_d->output->pending_line->rotation,0.1);
+   TEST_ASSERT_EQUAL_DOUBLE(test_d->output->pending_line->rotation,359.9);
    free_debugger(test_d);
 
    test_d=init_debugger();
@@ -108,7 +108,7 @@ void test_step_instruction_basic(void)
    strcpy(test_d->program->words[0],"LT");
    strcpy(test_d->program->words[1],"-.1");
    TEST_ASSERT_TRUE(step_instruction(test_d));
-   TEST_ASSERT_EQUAL_DOUBLE(test_d->output->pending_line->rotation,359.9);
+   TEST_ASSERT_EQUAL_DOUBLE(test_d->output->pending_line->rotation,0.1);
    free_debugger(test_d);
 
    test_d=init_debugger();
@@ -1157,8 +1157,7 @@ void test_show_recent_coords(void)
    strcpy(test_d->program->words[12],"}");
    TEST_ASSERT_TRUE(advance_to_mistake(test_d));
    show_recent_coords(test_d,test_str_2);
-
-   TEST_ASSERT_TRUE(strcmp(test_str_2,"  0 y = 1.00 | x = 0.00 \n  1 y = 2.99 | x = -0.03 \n  2 y = 5.99 | x = -0.19 \n  3 y = 9.97 | x = -0.61 \n")==0);
+   TEST_ASSERT_TRUE(strcmp(test_str_2,"  0 y = 1.00 | x = 0.00 \n  1 y = 2.99 | x = 0.03 \n  2 y = 5.99 | x = 0.19 \n  3 y = 9.97 | x = 0.61 \n")==0);
    test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
@@ -1308,6 +1307,7 @@ void test_error_collate(void)
 void test_run_action(void)
 {
    debugger* test_d;
+   char word1[MAXACTIONLEN];
    char test_str_2[FULLARGSTRLEN];
    test_d=init_debugger();
    test_d->program = init_word_cont();
@@ -1324,12 +1324,12 @@ void test_run_action(void)
    strcpy(test_d->program->words[8],"A");
    strcpy(test_d->program->words[9],"}");
    strcpy(test_d->program->words[10],"}");
-   TEST_ASSERT_TRUE(run_action(test_d,"show vars\n",test_str_2));
+   TEST_ASSERT_TRUE(run_action(test_d,"show vars\n",word1,test_str_2));
    TEST_ASSERT_TRUE(strcmp(test_str_2,"A= NA B= NA C= NA D= NA E= NA \nF= NA G= NA H= NA I= NA J= NA \nK= NA L= NA M= NA N= NA O= NA \nP= NA Q= NA R= NA S= NA T= NA \nU= NA V= NA W= NA X= NA Y= NA \nZ= NA ")==0);
-   TEST_ASSERT_TRUE(run_action(test_d,"single step\n",test_str_2));
-   TEST_ASSERT_TRUE(run_action(test_d,"show vars\n",test_str_2));
+   TEST_ASSERT_TRUE(run_action(test_d,"single step\n",word1,test_str_2));
+   TEST_ASSERT_TRUE(run_action(test_d,"show vars\n",word1,test_str_2));
    TEST_ASSERT_TRUE(strcmp(test_str_2,"A= 1.00 B= NA C= NA D= NA E= NA \nF= NA G= NA H= NA I= NA J= NA \nK= NA L= NA M= NA N= NA O= NA \nP= NA Q= NA R= NA S= NA T= NA \nU= NA V= NA W= NA X= NA Y= NA \nZ= NA ")==0);
-   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",test_str_2));
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_str_2));
    TEST_ASSERT_TRUE(test_d->program->position==10);
 
    test_d->program->capacity=MAXTESTCAP;
@@ -1342,7 +1342,7 @@ void test_run_action(void)
    test_d->program->position=1;
    strcpy(test_d->program->words[0],"{");
    strcpy(test_d->program->words[1],"}");
-   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",test_str_2));
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_str_2));
    TEST_ASSERT_EQUAL_INT(test_d->program->position,1);
    collate_instruct_messages(test_d,test_str_2);
    TEST_ASSERT_TRUE(strcmp(test_str_2,"no mistakes found. At end of program")==0);
@@ -1355,7 +1355,7 @@ void test_run_action(void)
    test_d->output= init_line_cont();
    test_d->program->capacity=1;
    strcpy(test_d->program->words[0],"{{");
-   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",test_str_2));
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_str_2));
    TEST_ASSERT_EQUAL_INT(test_d->program->position,0);
    collate_instruct_messages(test_d,test_str_2);
    TEST_ASSERT_TRUE(strcmp("error around word 0 {{\nmissing bracket in code\n",test_str_2)==0);
@@ -1392,7 +1392,7 @@ void test_run_action(void)
    test_d->output= init_line_cont();
    TEST_ASSERT_TRUE(check_start(test_d));
    test_d->program->position++;
-   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",test_str_2));
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_str_2));
    TEST_ASSERT_EQUAL_INT(test_d->program->position,32);
    free_debugger(test_d);
 
@@ -1563,6 +1563,166 @@ void test_find_end(void)
 
 }
 
+void test_break_points(void)
+{
+   debugger* test_d;
+   char word1[MAXACTIONLEN],test_s[FULLARGSTRLEN];
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=7;
+   strcpy(test_d->program->words[0],"FD");
+   strcpy(test_d->program->words[1],"10");
+   strcpy(test_d->program->words[2],"FD");
+   strcpy(test_d->program->words[3],"10");
+   strcpy(test_d->program->words[4],"FD");
+   strcpy(test_d->program->words[5],"10");
+   strcpy(test_d->program->words[6],"}");
+   run_set_break(test_d,"4",test_s);
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,4);
+   TEST_ASSERT_TRUE(strcmp(test_d->info,"at break point")==0);
+   run_rm_break(test_d);
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,6);
+   TEST_ASSERT_TRUE(strcmp(test_d->info,"no mistakes found. At end of program")==0);
+   free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=7;
+   strcpy(test_d->program->words[0],"FD");
+   strcpy(test_d->program->words[1],"10");
+   strcpy(test_d->program->words[2],"FD");
+   strcpy(test_d->program->words[3],"10");
+   strcpy(test_d->program->words[4],"FD");
+   strcpy(test_d->program->words[5],"10");
+   strcpy(test_d->program->words[6],"}");
+   run_set_break(test_d,"3",test_s);
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,4);
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,4);
+   TEST_ASSERT_TRUE(strcmp(test_d->info,"at break point")==0);
+   run_rm_break(test_d);
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,6);
+   free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=7;
+   strcpy(test_d->program->words[0],"FD");
+   strcpy(test_d->program->words[1],"10");
+   strcpy(test_d->program->words[2],"FD");
+   strcpy(test_d->program->words[3],"10");
+   strcpy(test_d->program->words[4],"FD");
+   strcpy(test_d->program->words[5],"10");
+   strcpy(test_d->program->words[6],"}");
+   TEST_ASSERT_TRUE(run_action(test_d,"single step\n",word1,test_s));
+   run_set_break(test_d,"0",test_s);
+   TEST_ASSERT_TRUE(run_action(test_d,"single step\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,2);
+   TEST_ASSERT_TRUE(run_action(test_d,"single step\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,2);
+   run_rm_break(test_d);
+   run_set_break(test_d,"-10",test_s);
+   TEST_ASSERT_TRUE(strcmp(test_s,"cant set negative break points")==0);
+   TEST_ASSERT_EQUAL_INT(test_d->break_p,-1);
+   run_set_break(test_d,"1aaaaa",test_s);
+   TEST_ASSERT_EQUAL_INT(test_d->break_p,1);
+   free_debugger(test_d);
+
+   /*if loop not executed and breakpoint set in loop
+   program will go to end of loop*/
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=13;
+   strcpy(test_d->program->words[0],"FD");
+   strcpy(test_d->program->words[1],"10");
+   strcpy(test_d->program->words[2],"DO");
+   strcpy(test_d->program->words[3],"A");
+   strcpy(test_d->program->words[4],"FROM");
+   strcpy(test_d->program->words[5],"10");
+   strcpy(test_d->program->words[6],"TO");
+   strcpy(test_d->program->words[7],"9");
+   strcpy(test_d->program->words[8],"{");
+   strcpy(test_d->program->words[9],"FD");
+   strcpy(test_d->program->words[10],"10");
+   strcpy(test_d->program->words[11],"}");
+   strcpy(test_d->program->words[12],"FD");
+   strcpy(test_d->program->words[13],"10");
+   strcpy(test_d->program->words[14],"}");
+   run_set_break(test_d,"9",test_s);
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,12);
+   TEST_ASSERT_TRUE(run_action(test_d,"single step\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,12);
+
+   free_debugger(test_d);
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=13;
+   strcpy(test_d->program->words[0],"FD");
+   strcpy(test_d->program->words[1],"10");
+   strcpy(test_d->program->words[2],"DO");
+   strcpy(test_d->program->words[3],"A");
+   strcpy(test_d->program->words[4],"FROM");
+   strcpy(test_d->program->words[5],"8");
+   strcpy(test_d->program->words[6],"TO");
+   strcpy(test_d->program->words[7],"9");
+   strcpy(test_d->program->words[8],"{");
+   strcpy(test_d->program->words[9],"FD");
+   strcpy(test_d->program->words[10],"10");
+   strcpy(test_d->program->words[11],"}");
+   strcpy(test_d->program->words[12],"FD");
+   strcpy(test_d->program->words[13],"10");
+   strcpy(test_d->program->words[14],"}");
+   run_set_break(test_d,"9",test_s);
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,9);
+   TEST_ASSERT_TRUE(run_action(test_d,"single step\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,9);
+
+   free_debugger(test_d);
+
+
+   test_d=init_debugger();
+   test_d->program = init_word_cont();
+   test_d->output= init_line_cont();
+   test_d->program->capacity=13;
+   strcpy(test_d->program->words[0],"FD");
+   strcpy(test_d->program->words[1],"10");
+   strcpy(test_d->program->words[2],"DO");
+   strcpy(test_d->program->words[3],"A");
+   strcpy(test_d->program->words[4],"FROM");
+   strcpy(test_d->program->words[5],"8");
+   strcpy(test_d->program->words[6],"TO");
+   strcpy(test_d->program->words[7],"9");
+   strcpy(test_d->program->words[8],"{");
+   strcpy(test_d->program->words[9],"FD");
+   strcpy(test_d->program->words[10],"10");
+   strcpy(test_d->program->words[11],"}");
+   strcpy(test_d->program->words[12],"FD");
+   strcpy(test_d->program->words[13],"10");
+   strcpy(test_d->program->words[14],"}");
+   TEST_ASSERT_TRUE(run_action(test_d,"set break\n","9",test_s));
+   TEST_ASSERT_TRUE(run_action(test_d,"advance to error\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,9);
+   TEST_ASSERT_TRUE(run_action(test_d,"single step\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,9);
+   TEST_ASSERT_TRUE(run_action(test_d,"rm break\n",word1,test_s));
+   TEST_ASSERT_TRUE(run_action(test_d,"single step\n",word1,test_s));
+   TEST_ASSERT_EQUAL_INT(test_d->program->position,11);
+   free_debugger(test_d);
+
+}
+
 int main(void)
 {
    UNITY_BEGIN();
@@ -1579,6 +1739,7 @@ int main(void)
    RUN_TEST(test_run_action);
    RUN_TEST(test_fuzzy);
    RUN_TEST(test_find_end);
+   RUN_TEST(test_break_points);
    return UNITY_END();
 }
 

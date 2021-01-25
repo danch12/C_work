@@ -91,7 +91,7 @@ bool check_step_end(debugger* to_check);
 action get_action(char action_str[MAXACTIONLEN]);
 /*returns false if weird action entered*/
 bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
-               char result_str[FULLARGSTRLEN]);
+               char num[MAXACTIONLEN],char result_str[FULLARGSTRLEN]);
 bool initial_checks(debugger* to_check);
 bool check_start(debugger* to_check);
 /*will show 5 words behind and 5 ahead*/
@@ -122,5 +122,5 @@ take as many numbers as possible with strtol
 if the user enter 123abc it will still work*/
 void run_set_break(debugger* to_check,char num[MAXACTIONLEN],\
                   char result_str[FULLARGSTRLEN]);
-void run_rm_break(debugger* to_check,char result_str[FULLARGSTRLEN]);
+void run_rm_break(debugger* to_check);
 #endif

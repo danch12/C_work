@@ -596,7 +596,7 @@ bool get_rotation(word_cont* to_check,line_cont* line_arr)
    }
    if(get_varnum(to_check,&num,line_arr))
    {
-      if(dir==left)
+      if(dir==right)
       {
          temp=num+line_arr->pending_line->rotation;
       }

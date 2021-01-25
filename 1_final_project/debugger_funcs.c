@@ -418,7 +418,7 @@ and it causes memory leaks*/
 #ifdef LIVE_VERSION
 /*returns false if weird action entered*/
 bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
-               char result_str[FULLARGSTRLEN])
+               char num[MAXACTIONLEN],char result_str[FULLARGSTRLEN])
 {
    action curr_action;
    curr_action=get_action(action_str);
@@ -458,6 +458,12 @@ bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
       return true;
       case visualize:
       draw_lines(to_check->output);
+      return true;
+      case set_break:
+      run_set_break(to_check,num,result_str);
+      return true;
+      case rm_break:
+      run_rm_break(to_check);
       return true;
       default:
       return false;
@@ -505,6 +511,12 @@ bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
       return true;
       case suggestion:
       make_suggestion(to_check,result_str);
+      return true;
+      case set_break:
+      run_set_break(to_check,num,result_str);
+      return true;
+      case rm_break:
+      run_rm_break(to_check);
       return true;
       default:
       return false;
@@ -618,16 +630,20 @@ void run_set_break(debugger* to_check,char num[MAXACTIONLEN],\
 {
    int i;
    char* ptr;
-   i= (int)strtol(num,ptr,10);
+   /*clear the result str*/
+   result_str[0]='\0';
+   i= (int)strtol(num,&ptr,10);
    if(i>=0)
    {
       to_check->break_p=i;
       strcpy(result_str,"break point set");
+
    }
+   /*easier to not allow negative numbers*/
    strcpy(result_str,"cant set negative break points");
 }
 
-void run_rm_break(debugger* to_check,char result_str[FULLARGSTRLEN])
+void run_rm_break(debugger* to_check)
 {
    to_check->break_p=NOBREAK;
 }

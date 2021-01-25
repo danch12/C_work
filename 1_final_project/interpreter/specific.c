@@ -242,14 +242,15 @@ bool polish_num(word_cont* to_check)
 #ifdef INTERP_PRODUCTION
 void simple_draw(word_cont* to_check,line* to_draw)
 {
+
    SDL_RenderDrawLine(to_check->sw.renderer, \
                      (int)to_draw->start->x+MIDWIDTH,\
                      (int)to_draw->start->y+MIDHEIGHT, \
                       (int)to_draw->end->x+MIDWIDTH,\
                    (int)to_draw->end->y+MIDHEIGHT);
-   Neill_SDL_Events(&to_check->sw);
-   Neill_SDL_UpdateScreen(&to_check->sw);
 
+   Neill_SDL_UpdateScreen(&to_check->sw);
+   Neill_SDL_Events(&to_check->sw);
 }
 #endif
 
@@ -315,7 +316,7 @@ bool get_rotation(word_cont* to_check,line_cont* line_arr)
    }
    if(get_varnum(to_check,&num))
    {
-      if(dir==left)
+      if(dir==right)
       {
          temp=num+line_arr->pending_line->rotation;
       }

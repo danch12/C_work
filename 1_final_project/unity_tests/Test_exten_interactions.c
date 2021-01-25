@@ -169,7 +169,7 @@ void test_func_flow_interaction(void)
    TEST_ASSERT_TRUE(run_main(test_cont,test_line_cont));
 
    TEST_ASSERT_TRUE(test_line_cont->size==1);
-   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,10);
+   TEST_ASSERT_EQUAL_DOUBLE(test_line_cont->array[0]->end->x,-10);
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
 
