@@ -32,7 +32,7 @@ For FUNCVAR it can be any combination of lowercase letters up to a length of 50,
 
 For ARGSET you cant reuse variables for arguments eg cant do myfunc { A A } so that means the max amount of args you can have is 26.
 
-Additionally in the word struct for the extension I have added more features - added a pointer to parent that allows the function to use functions defined in the "main" bit of code. Cool thing about doing it this way is it sort of starts to build in scope as it will check for local functions first then go to main functions. This also means we can define functions within functions within functions etc - not that you would usually want to but I quite like having the option. 
+Additionally in the word struct for the extension I have added more features - added a pointer to parent that allows the function to use functions defined in the "main" bit of code. Cool thing about doing it this way is it sort of starts to build in scope as it will check for local functions first then go to main functions. This also means we can define functions within functions within functions etc - not that you would usually want to but I quite like having the option. I guess you could draw a parallel to this and overriding in object orientated programming where if a subclass has a function (method) with the same name as a superclass the subclass function (method) would take priority and override but its a bit different. 
 
 When I run the function I create a deep copy of the function with its arguments then just run it like it was the main bit of the code- this means that I can run as many copies of the function as I want- therefore allowing for recursion.
 
