@@ -1983,7 +1983,23 @@ void test_instructlist_returns(void)
    free_word_cont(test_cont);
    free_line_cont(test_line_cont);
 
+   test_cont=init_word_cont();
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"FD");
+   strcpy(test_cont->words[1],"1");
+   strcpy(test_cont->words[2],"LT");
+   strcpy(test_cont->words[3],"1");
 
+   strcpy(test_cont->words[4],"RETURN");
+   strcpy(test_cont->words[5],"1");
+   strcpy(test_cont->words[6],"FD");
+   strcpy(test_cont->words[7],"1");
+
+   strcpy(test_cont->words[8],"}");
+   TEST_ASSERT_TRUE(run_instruction_list(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==1);
+   free_word_cont(test_cont);
+   free_line_cont(test_line_cont);
 
 }
 

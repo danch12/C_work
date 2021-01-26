@@ -50,6 +50,7 @@ line* finish_line(line* prev_line,coord* endpoint)
    return n_line;
 }
 
+
 line* init_origin(void)
 {
    line* origin_line;
@@ -93,7 +94,11 @@ bool get_num(word_cont* to_check,double* num)
 
 
 /*pretty much the same as parser except we
-dont increase the position at the end*/
+dont increase the position at the end
+could put a argument in to specify if we wanted
+to parse or interpret but because we parse unexecuted
+do loops we dont have a easy way of passing in other
+arguments*/
 bool valid_number(word_cont* to_check)
 {
    int len;
@@ -388,7 +393,7 @@ bool valid_variable(word_cont* to_check)
 }
 
 /*pass position back through var_p
-*we see vars as A- Z but really they could be 0-25*/
+we see vars as A- Z but really they could be 0-25*/
 bool get_var_pos(word_cont* to_check,int* var_p)
 {
    if(valid_variable(to_check))

@@ -12,7 +12,4 @@
 
 
 
-void draw_lines(line_cont* l_arr);
-
-
 #endif

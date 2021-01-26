@@ -221,8 +221,8 @@ bool get_func_info(word_cont* to_check,word_cont* n_func)
    return false;
 }
 
-/*there are better ways to balance brackets out there
-but this will be adequate*/
+/*creates space in new func and copies over the words from
+setfunc instruct list*/
 bool copy_over_orig(word_cont* to_check,word_cont* n_func)
 {
 
@@ -408,7 +408,6 @@ bool get_arg(word_cont* to_check,word_cont* n_func)
          i++;
       }
       n_func->arg_placer[i]= var_pos;
-      n_func->n_args++;
       to_check->position++;
       return true;
    }

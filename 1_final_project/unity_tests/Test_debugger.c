@@ -149,6 +149,7 @@ void test_loops(void)
    debugger* test_d;
    int i;
    loop_tracker* test_t;
+   /*testing finding the end position*/
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
@@ -264,7 +265,7 @@ void test_loops(void)
    TEST_ASSERT_TRUE(((loop_tracker*)test_d->loop_stack->start->data)->end_pos==16);
    TEST_ASSERT_TRUE(((loop_tracker*)test_d->loop_stack->start->data)->var_pos==0);
    TEST_ASSERT_EQUAL_DOUBLE(*test_d->program->var_array[0],5);
-
+   /*loop tracker created even if loop doesnt get executed*/
    test_d->program->position=16;
    strcpy(test_d->program->words[16],"DO");
    strcpy(test_d->program->words[17],"B");
@@ -321,11 +322,15 @@ void test_loops(void)
    TEST_ASSERT_TRUE(step_do(test_d));
    test_d->program->position=10;
    TEST_ASSERT_TRUE(test_d->loop_stack->size==1);
+   /*position 10 is not at end of loop so loop fin is false*/
    TEST_ASSERT_TRUE(!check_loop_fin(test_d));
    TEST_ASSERT_TRUE(test_d->loop_stack->size==1);
    test_d->program->position=7;
+   /*position 7 is at end of loop and loop is finished
+   so loop fin is true and loop tracker gets popped off stack*/
    TEST_ASSERT_TRUE(check_loop_fin(test_d));
    TEST_ASSERT_TRUE(test_d->loop_stack->size==0);
+   /*no loops so returns false*/
    TEST_ASSERT_TRUE(!check_loop_fin(test_d));
    TEST_ASSERT_TRUE(test_d->loop_stack->size==0);
    free_debugger(test_d);
@@ -367,6 +372,7 @@ void test_loops(void)
    TEST_ASSERT_EQUAL_DOUBLE(*test_d->program->var_array[0],5);
    check_loop_end(test_d);
    TEST_ASSERT_TRUE(test_d->program->position==7);
+   /*once it reaches TO value the value does not get any larger*/
    TEST_ASSERT_EQUAL_DOUBLE(*test_d->program->var_array[0],5);
    free_debugger(test_d);
 
@@ -408,11 +414,15 @@ void test_loops(void)
    TEST_ASSERT_TRUE(test_d->loop_stack->size==1);
    test_d->program->position=15;
    check_loop_end(test_d);
+   /*inner loop has been popped off so position doesnt
+   change*/
    TEST_ASSERT_TRUE(test_d->program->position==15);
 
 
    test_d->program->position=16;
    check_loop_end(test_d);
+   /*outer loop still on stack so position goes back to beginning
+   of outer loop*/
    TEST_ASSERT_TRUE(test_d->program->position==7);
    TEST_ASSERT_EQUAL_DOUBLE(*test_d->program->var_array[0],5);
    free_debugger(test_d);
@@ -599,7 +609,7 @@ void test_step_instruct_set(void)
    test_d->program->capacity=MAXTESTCAP;
    free_debugger(test_d);
 
-   /*this is the real test*/
+
    test_d=init_debugger();
    test_d->program = init_word_cont();
    test_d->output= init_line_cont();
@@ -622,12 +632,17 @@ void test_step_instruct_set(void)
    strcpy(test_d->program->words[14],"}");
 
    strcpy(test_d->program->words[15],"}");
-
+   /*first step through do*/
    TEST_ASSERT_TRUE(step_instruction(test_d));
    TEST_ASSERT_TRUE(test_d->loop_stack->size==1);
+   /*then step through set*/
    TEST_ASSERT_TRUE(step_instruction(test_d));
+   /*then step through forward*/
    TEST_ASSERT_TRUE(step_instruction(test_d));
+   /*then step through instructlist bracket*/
    TEST_ASSERT_TRUE(step_instruction(test_d));
+   /*then loop finishes because A has been changed in
+   the loop and program finishes*/
    TEST_ASSERT_TRUE(!step_instruction(test_d));
    TEST_ASSERT_TRUE(test_d->output->size==1);
    TEST_ASSERT_TRUE(test_d->loop_stack->size==0);
@@ -954,7 +969,7 @@ void test_show_args(void)
 
    str_num(1.099,test_str);
    TEST_ASSERT_TRUE(strcmp(test_str,"= 1.09 ")==0);
-
+   /*doesnt overflow even with massive numbers*/
    str_num(-1487475757575757575656565656565667755555555555555555555555555555555555555555555555555555.099,test_str);
    TEST_ASSERT_TRUE(strcmp(test_str,"= -148... ")==0);
 
@@ -1303,7 +1318,7 @@ void test_error_collate(void)
    free_debugger(test_d);
 }
 
-/*need to do more */
+
 void test_run_action(void)
 {
    debugger* test_d;

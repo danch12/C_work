@@ -1,0 +1,5 @@
+{ SETFUNC bad { A }
+
+FD A 
+LT A
+FD A 

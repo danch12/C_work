@@ -227,6 +227,7 @@ bool valid_instruct(word_cont* to_check)
    return false;
 }
 
+/*extracts num if valid and puts it on the stack*/
 bool polish_num(word_cont* to_check)
 {
    double num;

@@ -235,4 +235,4 @@ run_extension_err:extension
 	./extension test_files/test_turtles/extension/invalid/non_existant_file.ttl 2>> ./report_files/ext_errors.txt | true
 
 clean:
-	rm -f u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_san u_arrays_fast u_parse_san u_parse_fast u_test_interp_san u_test_interp_fast u_exten_func_san u_exten_func_fast u_exten_flow_san u_exten_flow_fast u_exten_arr_san u_exten_arr_fast u_exten_interactions_san u_exten_interactions_fast u_debugger_san u_debugger_fast interp extension parser debugger
+	rm -f u_stacks_san u_stacks_fast u_hash_map_san u_hash_map_fast u_arrays_san u_arrays_fast u_parse_san u_parse_fast u_test_interp_san u_test_interp_fast u_exten_func_san u_exten_func_fast u_exten_flow_san u_exten_flow_fast u_exten_arr_san u_exten_arr_fast u_exten_interactions_san u_exten_interactions_fast u_debugger_san u_debugger_fast interp extension parse debugger

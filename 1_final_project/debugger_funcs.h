@@ -61,11 +61,13 @@ typedef struct debugger
 
 
 /*goes through the do command without going all the
-way through the loop and creates a loop tracker*/
+way through the loop and puts loop tracker on loop stack*/
 bool step_do(debugger* debug);
+/*creates loop tracker*/
 loop_tracker* step_do_helper(word_cont* to_check);
 debugger* init_debugger(void);
 bool free_debugger(debugger* to_free);
+/*runs one instruction */
 bool step_instruction(debugger* to_check);
 
 /*finds end of loop/ instructlist*/
@@ -84,15 +86,20 @@ bool instruct_checks(debugger* to_check);
 /*returns true if no mistakes else false*/
 bool advance_to_mistake(debugger* to_check);
 
+/*turns num into string*/
 void str_num(double num,char num_str[ONEARGLEN]);
 void show_current_vars(debugger* debug,char out_str[FULLARGSTRLEN]);
 void collate_instruct_messages(debugger* to_check,\
                               char result_str[FULLARGSTRLEN]);
+
+/*check at end of program*/
 bool check_step_end(debugger* to_check);
 action get_action(char action_str[MAXACTIONLEN]);
 /*returns false if weird action entered*/
 bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
                char num[MAXACTIONLEN],char result_str[FULLARGSTRLEN]);
+/*initial checks checks starting bracket and code after main
+because we only check starting bracket */
 bool initial_checks(debugger* to_check);
 bool check_start(debugger* to_check);
 /*will show 5 words behind and 5 ahead*/
@@ -104,7 +111,9 @@ void show_recent_coords(debugger* debug,\
 
 
 int min_three(int a,int b, int c);
-/*levenshtein matrix is 1 indexed so have to add
+/*find levenshtein distance of two words -
+ case insensitive
+levenshtein matrix is 1 indexed so have to add
 1 to a lot of things*/
 int levenshtein(char* word_1,char* word_2);
 
