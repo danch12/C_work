@@ -425,6 +425,7 @@ if you want to do that to yourself im not going to
 stop you
 also the loop goes up to and includes the TO number
 
+Loops dont go downwards only upwards
 */
 bool run_do(word_cont* to_check,line_cont* line_arr)
 {

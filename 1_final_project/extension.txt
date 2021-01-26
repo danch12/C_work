@@ -1,11 +1,11 @@
 Thought it would be cool to create functions- allowing for functions to take arguments and return stuff as well. 
 Basic idea is that running a function should be almost the same as running the main code because the main code is pretty much a function in itself. 
 
-Also had a look at how cython does their functions and stuff for a bit of inspiration but stripped the things back quite a lot as it seemed a bit overkill - https://tenthousandmeters.com/blog/python-behind-the-scenes-1-how-the-cpython-vm-works/
+Also had a look at how cython does their functions and stuff for a bit of inspiration but stripped the things back a lot/changed things as it seemed a bit overkill - https://tenthousandmeters.com/blog/python-behind-the-scenes-1-how-the-cpython-vm-works/
 
 
 
-To be able to handle positional arguments because we know there's a max of 26 variables that could be arguments so when we set the function we can record which position relates to which variable and then when running the function once you get everything set up its pretty much just running a instruction list.
+To be able to handle positional arguments because we know there's a max of 26 variables that could be arguments so when we set the function we can record which position relates to which variable. EG if the first argument is C we record a 2 in the var position array so when it comes to running the function we can translate the args to running the function. and then when actually running the function once you get everything set up its pretty much just running a instruction list.
 
 Used a hash map for holding the functions as wanted to use real identifiers for the function names - adds to clarity. Also since we have pretty much all the code made already from the last project it seemed like a good proof of concept to use a version of it. 
 
@@ -30,11 +30,15 @@ Grammar for functions
 
 For FUNCVAR it can be any combination of lowercase letters up to a length of 50, sorry I didn't know how to say it properly with a formal grammar. Thought it would be a good idea to have them lowercase so they wouldn't interfere with any reserved words.
 
+For ARGSET you cant reuse variables for arguments eg cant do myfunc { A A } so that means the max amount of args you can have is 26.
+
 Additionally in the word struct for the extension I have added more features - added a pointer to parent that allows the function to use functions defined in the "main" bit of code. Cool thing about doing it this way is it sort of starts to build in scope as it will check for local functions first then go to main functions. This also means we can define functions within functions within functions etc - not that you would usually want to but I quite like having the option. 
 
 When I run the function I create a deep copy of the function with its arguments then just run it like it was the main bit of the code- this means that I can run as many copies of the function as I want- therefore allowing for recursion.
 
-I had to create different versions of the same functions in specific c files for the interpreter and for the extension as I wanted to be able to use return values of functions as varnums. I could have potentially included the struct for the outputs in the word_cont struct but was worried that having a struct in a struct in a struct etc for individual coordinates would make functions look really strange in my head. I'm not sure if this was the right move though as we do pass in the word cont and the line cont to a lot of functions together.
+I had to create different versions of the same functions in specific c files for the interpreter and for the extension as I wanted to be able to use return values of functions as varnums. I could have potentially included the struct for the outputs in the word_cont struct but was worried that having a struct in a struct in a struct etc for individual coordinates would make functions look really strange and bloated. I'm not sure if this was the right move though as we do pass in the word cont and the line cont to a lot of functions together.
+
+
 
 Thought control flow would be another thing that comes in handy when coding. At the moment we will just use varnums but if I ever bring this product to market we could eventually have reverse polish comparisons. Using the ANSI C grammar for inspiration - https://www.lysator.liu.se/c/ANSI-C-grammar-y.html .
 
@@ -54,8 +58,10 @@ Formal grammar -
 
 
 
-Now lets do arrays - reckon this would be fun. Eventually think it would be cool to read in files or something into them. Think then it would be quite useful. Thinking about what ADT would be best to implement it. Would seem like if we didn't want to worry about setting max sizes and stuff then a reallocing array could be cool - although maybe for flexibility a linked list could be best as it allows for easier removal and insertion within the array? Been looking at how lisp does its lists (https://softwareengineering.stackexchange.com/questions/91121/lisp-benefits-of-lists-as-code-over-arrays-as-code and http://www.eecs.qmul.ac.uk/~mmh/ADSOOF/linkedlists/Lecture9.pdf) for some inspiration as they use linked lists to implement arrays but probably will do stuff quite differently as I'm not going to need that much functionality and the syntax is a bit weird.
-Also tempted to make arrays global - means that we dont have to worry about returning arrays because that would be a whole other kettle of fish. 
+Now lets do arrays. Eventually think it would be cool to read in files or something into them. Think then it would be quite useful. Thinking about what ADT would be best to implement it. Would seem like if we didn't want to worry about setting max sizes and stuff then a reallocing array could be cool - although maybe for flexibility a linked list could be best as it allows for easier removal and insertion within the array? Been looking at how lisp does its lists (https://softwareengineering.stackexchange.com/questions/91121/lisp-benefits-of-lists-as-code-over-arrays-as-code and http://www.eecs.qmul.ac.uk/~mmh/ADSOOF/linkedlists/Lecture9.pdf) for some inspiration as they use linked lists to implement arrays but probably will do stuff quite differently as I'm not going to need that much functionality and the syntax is a bit weird.
+The only other thing that worries me is in for loops being able to change the value of the array but also use the array element as a stopping point for the loop. I was reading in java there's this thing that if you change a array while iterating over it it will lead to a error which seems like a good option, but In this case thought it would make sense to "freeze" the bounds of a loop so even if you change the bounds in the loop after initialising the loop it won't have weird effects. This way it works for functions as well to stop strange behaviour from going on. Also reduces the ways a user can create infinite loops which is probably a good thing.
+Also going to make arrays global. 
+
 
 
  And then to store the various arrays we could use a hash map again. 
@@ -91,6 +97,7 @@ Because we do not know what length arrays this could result in we need another i
 
 
 Just as I was finishing doing all of the above I realised it's actually super useful to start each instruction with a identifier like CHANGE or SET, the only one that I didn't start with an identifier is runfunc because it makes the code a lot more clunky to write I think. Especially as you can use runfunc pretty much anywhere like imagine in c having to do my_arr[RUNFUNC my_func(arg_list)] - its just quite long and makes it more cumbersome to write.
+
 
 I finished the above and still got a bit of time so thought I'd try out making a debugger. Not sure where I will get with this but will try my best. The most challenging thing in this will be how to break down do loops. 
 

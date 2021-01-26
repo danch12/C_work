@@ -60,7 +60,8 @@ typedef struct debugger
 }debugger;
 
 
-
+/*goes through the do command without going all the
+way through the loop and creates a loop tracker*/
 bool step_do(debugger* debug);
 loop_tracker* step_do_helper(word_cont* to_check);
 debugger* init_debugger(void);

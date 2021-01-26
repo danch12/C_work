@@ -531,8 +531,8 @@ void simple_draw(word_cont* to_check,line* to_draw)
                      (int)to_draw->start->y+MIDHEIGHT, \
                       (int)to_draw->end->x+MIDWIDTH,\
                    (int)to_draw->end->y+MIDHEIGHT);
-   Neill_SDL_Events(&to_check->sw);
    Neill_SDL_UpdateScreen(&to_check->sw);
+   Neill_SDL_Events(&to_check->sw);
 
 }
 #endif

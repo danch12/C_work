@@ -95,7 +95,9 @@ bool initial_checks(debugger* to_check)
 bool instruct_checks(debugger* to_check)
 {
    /*end checks if we are at end of one iteration
-   fin checks if we are at the end of all iters*/
+   fin checks if we are at the end of all iters.
+   if we are finished with one loop it may cause
+   a chain reation of loops finishing so need to check*/
    check_loop_end(to_check);
    while(check_loop_fin(to_check))
    {

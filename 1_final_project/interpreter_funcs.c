@@ -349,7 +349,6 @@ bool finish_polish(word_cont* to_check,double* result)
    leftover=NULL;
    if(!stack_pop(to_check->stackptr,&ptr_result))
    {
-
       strcpy(to_check->err_message,"no numbers on the stack at end of expr");
       return false;
    }

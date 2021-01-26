@@ -364,6 +364,10 @@ bool valid_argset(word_cont* to_check)
 
 bool get_argset(word_cont* to_check,word_cont* n_func)
 {
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
    if(strcmp(to_check->words[to_check->position],"}")==0)
    {
       to_check->position++;
@@ -384,7 +388,10 @@ bool get_arg(word_cont* to_check,word_cont* n_func)
 
    int i;
    int var_pos;
-
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
    if(valid_variable(to_check))
    {
       i=0;
@@ -414,6 +421,10 @@ bool place_arg(word_cont* to_check,word_cont* n_func,\
 {
    double to_place;
    int func_var;
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
    if(get_varnum(to_check,&to_place,line_arr))
    {
       func_var= n_func->arg_placer[position];
@@ -438,7 +449,10 @@ bool place_arg(word_cont* to_check,word_cont* n_func,\
 bool place_all_args(word_cont* to_check,word_cont* n_func,\
                   int pos,line_cont* line_arr)
 {
-
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
    if(strcmp(to_check->words[to_check->position],"}")==0)
    {
 
@@ -466,6 +480,10 @@ bool run_funcrun(word_cont* to_check,\
    word_cont* to_run;
    word_cont* copy;
    to_run=NULL;
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
    if(get_funcvar(to_check,&to_run))
    {
       if(strcmp(to_check->words[to_check->position],"{")==0)
@@ -571,6 +589,10 @@ bool valid_return(word_cont* to_check)
 bool run_return(word_cont* to_check,line_cont* line_arr)
 {
    double* to_return;
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
    to_return = (double*)safe_calloc(1,sizeof(double));
    if(strcmp(to_check->words[to_check->position],"RETURN")==0)
    {
@@ -592,7 +614,10 @@ bool get_func_val(word_cont* to_check,line_cont* line_arr,\
 {
    double* r_val;
    r_val=NULL;
-
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
    if(run_funcrun(to_check,line_arr,&r_val))
    {
       if(r_val)

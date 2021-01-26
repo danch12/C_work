@@ -1,0 +1,12 @@
+{ SETFUNC writen {  } 
+{ FD 90 
+  RT 130
+  FD 140
+  LT 130
+  FD 90
+}
+
+writen { }
+
+
+ }

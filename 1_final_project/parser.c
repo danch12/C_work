@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
             }
             exit(EXIT_FAILURE);
          }
-         if(w_cont->capacity!=w_cont->position)
+         if(n_cont->capacity!=n_cont->position)
          {
             fprintf(stderr,"there may be code after main that has not been checked; be careful\n");
          }

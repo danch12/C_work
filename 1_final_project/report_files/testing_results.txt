@@ -58,26 +58,26 @@ unity_tests/Test_arrays.c:155:test_nulls:PASS
 -----------------------
 6 Tests 0 Failures 0 Ignored 
 OK
-unity_tests/Test_parser.c:828:test_valid_nums:PASS
-unity_tests/Test_parser.c:829:test_valid_move:PASS
-unity_tests/Test_parser.c:830:test_valid_move_instruct:PASS
-unity_tests/Test_parser.c:831:test_valid_ops:PASS
-unity_tests/Test_parser.c:832:test_valid_polish:PASS
-unity_tests/Test_parser.c:833:test_sets:PASS
-unity_tests/Test_parser.c:834:test_dos:PASS
-unity_tests/Test_parser.c:835:test_file_reading:PASS
+unity_tests/Test_parser.c:734:test_valid_nums:PASS
+unity_tests/Test_parser.c:735:test_valid_move:PASS
+unity_tests/Test_parser.c:736:test_valid_move_instruct:PASS
+unity_tests/Test_parser.c:737:test_valid_ops:PASS
+unity_tests/Test_parser.c:738:test_valid_polish:PASS
+unity_tests/Test_parser.c:739:test_sets:PASS
+unity_tests/Test_parser.c:740:test_dos:PASS
+unity_tests/Test_parser.c:741:test_file_reading:PASS
 
 -----------------------
 8 Tests 0 Failures 0 Ignored 
 OK
-unity_tests/Test_parser.c:828:test_valid_nums:PASS
-unity_tests/Test_parser.c:829:test_valid_move:PASS
-unity_tests/Test_parser.c:830:test_valid_move_instruct:PASS
-unity_tests/Test_parser.c:831:test_valid_ops:PASS
-unity_tests/Test_parser.c:832:test_valid_polish:PASS
-unity_tests/Test_parser.c:833:test_sets:PASS
-unity_tests/Test_parser.c:834:test_dos:PASS
-unity_tests/Test_parser.c:835:test_file_reading:PASS
+unity_tests/Test_parser.c:734:test_valid_nums:PASS
+unity_tests/Test_parser.c:735:test_valid_move:PASS
+unity_tests/Test_parser.c:736:test_valid_move_instruct:PASS
+unity_tests/Test_parser.c:737:test_valid_ops:PASS
+unity_tests/Test_parser.c:738:test_valid_polish:PASS
+unity_tests/Test_parser.c:739:test_sets:PASS
+unity_tests/Test_parser.c:740:test_dos:PASS
+unity_tests/Test_parser.c:741:test_file_reading:PASS
 
 -----------------------
 8 Tests 0 Failures 0 Ignored 
@@ -224,35 +224,39 @@ unity_tests/Test_exten_interactions.c:675:test_flow_arr_interaction:PASS
 -----------------------
 3 Tests 0 Failures 0 Ignored 
 OK
-unity_tests/Test_debugger.c:1475:test_step_instruction_basic:PASS
-unity_tests/Test_debugger.c:1476:test_loops:PASS
-unity_tests/Test_debugger.c:1477:test_step_instruct_loops:PASS
-unity_tests/Test_debugger.c:1478:test_step_instruct_set:PASS
-unity_tests/Test_debugger.c:1479:test_advance:PASS
-unity_tests/Test_debugger.c:1480:test_code_after_main:PASS
-unity_tests/Test_debugger.c:1481:test_show_args:PASS
-unity_tests/Test_debugger.c:1482:test_show_code_pos:PASS
-unity_tests/Test_debugger.c:1483:test_show_recent_coords:PASS
-unity_tests/Test_debugger.c:1484:test_error_collate:PASS
-unity_tests/Test_debugger.c:1485:test_run_action:PASS
-unity_tests/Test_debugger.c:1486:test_fuzzy:PASS
+unity_tests/Test_debugger.c:1729:test_step_instruction_basic:PASS
+unity_tests/Test_debugger.c:1730:test_loops:PASS
+unity_tests/Test_debugger.c:1731:test_step_instruct_loops:PASS
+unity_tests/Test_debugger.c:1732:test_step_instruct_set:PASS
+unity_tests/Test_debugger.c:1733:test_advance:PASS
+unity_tests/Test_debugger.c:1734:test_code_after_main:PASS
+unity_tests/Test_debugger.c:1735:test_show_args:PASS
+unity_tests/Test_debugger.c:1736:test_show_code_pos:PASS
+unity_tests/Test_debugger.c:1737:test_show_recent_coords:PASS
+unity_tests/Test_debugger.c:1738:test_error_collate:PASS
+unity_tests/Test_debugger.c:1739:test_run_action:PASS
+unity_tests/Test_debugger.c:1740:test_fuzzy:PASS
+unity_tests/Test_debugger.c:1741:test_find_end:PASS
+unity_tests/Test_debugger.c:1742:test_break_points:PASS
 
 -----------------------
-12 Tests 0 Failures 0 Ignored 
+14 Tests 0 Failures 0 Ignored 
 OK
-unity_tests/Test_debugger.c:1475:test_step_instruction_basic:PASS
-unity_tests/Test_debugger.c:1476:test_loops:PASS
-unity_tests/Test_debugger.c:1477:test_step_instruct_loops:PASS
-unity_tests/Test_debugger.c:1478:test_step_instruct_set:PASS
-unity_tests/Test_debugger.c:1479:test_advance:PASS
-unity_tests/Test_debugger.c:1480:test_code_after_main:PASS
-unity_tests/Test_debugger.c:1481:test_show_args:PASS
-unity_tests/Test_debugger.c:1482:test_show_code_pos:PASS
-unity_tests/Test_debugger.c:1483:test_show_recent_coords:PASS
-unity_tests/Test_debugger.c:1484:test_error_collate:PASS
-unity_tests/Test_debugger.c:1485:test_run_action:PASS
-unity_tests/Test_debugger.c:1486:test_fuzzy:PASS
+unity_tests/Test_debugger.c:1729:test_step_instruction_basic:PASS
+unity_tests/Test_debugger.c:1730:test_loops:PASS
+unity_tests/Test_debugger.c:1731:test_step_instruct_loops:PASS
+unity_tests/Test_debugger.c:1732:test_step_instruct_set:PASS
+unity_tests/Test_debugger.c:1733:test_advance:PASS
+unity_tests/Test_debugger.c:1734:test_code_after_main:PASS
+unity_tests/Test_debugger.c:1735:test_show_args:PASS
+unity_tests/Test_debugger.c:1736:test_show_code_pos:PASS
+unity_tests/Test_debugger.c:1737:test_show_recent_coords:PASS
+unity_tests/Test_debugger.c:1738:test_error_collate:PASS
+unity_tests/Test_debugger.c:1739:test_run_action:PASS
+unity_tests/Test_debugger.c:1740:test_fuzzy:PASS
+unity_tests/Test_debugger.c:1741:test_find_end:PASS
+unity_tests/Test_debugger.c:1742:test_break_points:PASS
 
 -----------------------
-12 Tests 0 Failures 0 Ignored 
+14 Tests 0 Failures 0 Ignored 
 OK

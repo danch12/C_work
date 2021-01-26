@@ -1,0 +1,171 @@
+{ 
+
+SETFUNC rule { A B C }
+{
+  IF  A == 0 
+  {
+     IF  B == 0 
+     {
+        IF  C == 0 
+        {
+           RETURN 0
+        }
+        ELSE 
+        {
+           RETURN 1
+        } 
+     }     
+     ELSE 
+     {
+        RETURN 1
+     } 
+  }
+  ELSE
+  {
+     IF  B == C 
+     {
+        RETURN 0
+     }
+     RETURN 1
+  }  
+
+}
+
+
+SETFUNC safeindex { A }
+{ 
+    IF A < 0
+    { 
+       RETURN 0
+    }
+    IF A > 59 
+    { 
+       RETURN 0
+    }
+    RETURN A
+}
+
+
+
+SETFUNC fillrow { A }
+{
+   IF A == 0 
+   {
+      DO B FROM 0 TO 59 
+      {
+         SET D := B 1 - ;
+         SET D := a_toprow [ safeindex { D } ] ;
+
+         SET E := a_toprow [ safeindex { B } ] ;
+         
+         SET F := B 1 + ;
+         SET F := a_toprow  [ safeindex { F } ] ;
+         CHANGE a_secrow [ B ] := rule { D E F } ;
+	 
+      }
+    }
+    ELSE 
+    { 
+        DO B FROM 0 TO 59 
+      {
+         SET D := B 1 - ;
+         SET D := a_secrow [ safeindex { D } ] ;
+
+         SET E := a_secrow [ safeindex { B } ] ;
+         
+         SET F := B 1 + ;
+         SET F := a_secrow  [ safeindex { F } ] ;
+         CHANGE a_toprow [ B ] := rule { D E F } ;
+	 
+      }
+    }
+}
+
+SETFUNC fillsq { A }
+{ 
+  SET C := A 2 / ;
+     RT 90
+     FD A
+     LT 90
+  DO B FROM 1 TO C 
+  {
+     FD A
+     LT 90
+     FD 1
+     LT 90
+     FD A
+     RT 90
+     FD 1
+     RT 90
+   }
+}
+
+SETFUNC doline { A }
+{
+   DO B FROM 0 TO 59
+   {
+      FD 3
+      IF A == 1 
+      { 
+         IF a_toprow [ B ] == 1
+         { 
+            fillsq { 8 }
+          }
+      }
+      IF A == 0 
+      {
+         IF a_secrow [ B ] == 1
+         {
+             fillsq { 8 }
+          }
+       }
+     }
+}
+         
+      
+
+INITARR a_toprow
+INITARR a_secrow
+
+DO A FROM 1 TO 60
+{
+   IF A == 45 
+   {
+     APPEND a_toprow 1 ;
+   }
+   ELSE 
+   {
+      APPEND a_toprow 0 ;
+   }
+}
+
+DO A FROM 1 TO 60
+{
+  APPEND a_secrow 0 ;
+}
+
+SET E := 1 ;
+LT 90 
+
+DO A FROM 1 TO 60
+{
+   IF E == 0
+   {
+      SET E := 1 ;
+    }
+   ELSE
+   {
+       SET E := 0 ;
+   }
+
+    fillrow { E }
+
+    doline { E }
+    RT 90
+    FD 8
+    RT 90
+    FD 180
+    RT 180
+
+}
+}

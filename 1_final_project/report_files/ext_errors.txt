@@ -1,36 +1,36 @@
 test_files/test_turtles/extension/invalid/no_arguments.ttl
-error in processing file around word 8 abc
+error in processing file around word 10 }
 incorrect amount of args passed to function
 test_files/test_turtles/extension/invalid/too_many_args.ttl
-error in processing file around word 7 abc
+error in processing file around word 10 }
 too many arguments for function
 test_files/test_turtles/extension/invalid/unknown_func.ttl
 error in processing file around word 8 bca
 function name not found, has it been set?
 test_files/test_turtles/extension/invalid/same_var.ttl
-error in processing file around word 1 SETFUNC
+error in processing file around word 5 A
 used same var twice when defining function
 ./extension test_files/test_turtles/extension/invalid/unknown_array.ttl
 error in processing file around word 1 a_array
-array not found - potentially not initalised yet
+invalid opcode used
 ./extension test_files/test_turtles/extension/invalid/invalid_array_name.ttl
-error in processing file around word 1 INITARR
+error in processing file around word 2 array
 invalid array name - they have to start with a_
 ./extension test_files/test_turtles/extension/invalid/too_big.ttl
 error in processing file around word 3 a_arr
-potentially trying to change a position greater than the size of array
+invalid opcode used
 ./extension test_files/test_turtles/extension/invalid/negative_ind.ttl
-error in processing file around word 7 a_arr
-negative indexes not allowed
+error in processing file around word 3 a_arr
+invalid opcode used
 ./extension test_files/test_turtles/extension/invalid/decimal_ind.ttl
-error in processing file around word 7 a_arr
-decimal indexes not allowed
+error in processing file around word 3 a_arr
+invalid opcode used
 ./extension test_files/test_turtles/extension/invalid/invalid_file.ttl
-error in processing file around word 3 LOAD
+error in processing file around word 5 ./thisisnotafile.f
 not valid file path, make sure it's a txt file
 ./extension test_files/test_turtles/extension/invalid/wrong_format_file.ttl
-error in processing file around word 3 LOAD
+error in processing file around word 5 ./eng_370k_shuffle.txt
 error reading data in file
 ./extension test_files/test_turtles/extension/invalid/non_existant_file.ttl
-error in processing file around word 3 LOAD
+error in processing file around word 5 ./filetonowhere.txt
 error while opening file- does it exist?
