@@ -142,18 +142,18 @@ bool valid_funcset(word_cont* to_check)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"SETFUNC")==0)
+   if(safe_samestr(to_check,"SETFUNC"))
    {
       to_check->position++;
       if(valid_funcvar(to_check))
       {
          to_check->position++;
-         if(strcmp(to_check->words[to_check->position],"{")==0)
+         if(safe_samestr(to_check,"{"))
          {
             to_check->position++;
             if(valid_argset(to_check))
             {
-               if(strcmp(to_check->words[to_check->position],"{")==0)
+               if(safe_samestr(to_check,"{"))
                {
                   to_check->position++;
                   {
@@ -178,7 +178,6 @@ bool get_funcvar(word_cont* to_check,word_cont** to_get)
       /*first look for local functions*/
       *to_get=assoc_lookup(to_check->func_map,\
                            to_check->words[to_check->position]);
-
       if(*to_get!=NULL)
       {
          to_check->position++;
@@ -235,11 +234,11 @@ bool copy_over_orig(word_cont* to_check,word_cont* n_func)
       {
          return false;
       }
-      if(strcmp(to_check->words[to_check->position],"}")==0)
+      if(safe_samestr(to_check,"}"))
       {
          right_brackets++;
       }
-      if(strcmp(to_check->words[to_check->position],"{")==0)
+      if(safe_samestr(to_check,"{"))
       {
          left_brackets++;
       }
@@ -284,7 +283,6 @@ void resize(word_cont* n_func)
       {
          free(temp[i]);
       }
-
    }
    n_func->capacity=n_func->capacity*FUNCSCALE;
    free(temp);
@@ -304,17 +302,17 @@ bool run_funcset(word_cont* to_check)
    n_func=init_func_cont();
    /*set here so easier testing with init_func_cont*/
    n_func->parent=to_check;
-   if(strcmp(to_check->words[to_check->position],"SETFUNC")==0)
+   if(safe_samestr(to_check,"SETFUNC"))
    {
       to_check->position++;
       if(set_funcvar(to_check,func_name))
       {
-         if(strcmp(to_check->words[to_check->position],"{")==0)
+         if(safe_samestr(to_check,"{"))
          {
             to_check->position++;
             if(get_argset(to_check,n_func))
             {
-               if(strcmp(to_check->words[to_check->position],"{")==0)
+               if(safe_samestr(to_check,"{"))
                {
                   to_check->position++;
                   if(get_func_info(to_check,n_func))
@@ -345,7 +343,7 @@ bool valid_argset(word_cont* to_check)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"}")==0)
+   if(safe_samestr(to_check,"}"))
    {
       to_check->position++;
       return true;
@@ -368,7 +366,7 @@ bool get_argset(word_cont* to_check,word_cont* n_func)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"}")==0)
+   if(safe_samestr(to_check,"}"))
    {
       to_check->position++;
       return true;
@@ -408,6 +406,7 @@ bool get_arg(word_cont* to_check,word_cont* n_func)
          i++;
       }
       n_func->arg_placer[i]= var_pos;
+      n_func->n_args++;
       to_check->position++;
       return true;
    }
@@ -452,7 +451,7 @@ bool place_all_args(word_cont* to_check,word_cont* n_func,\
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"}")==0)
+   if(safe_samestr(to_check,"}"))
    {
 
       if(pos!=n_func->n_args)
@@ -485,7 +484,7 @@ bool run_funcrun(word_cont* to_check,\
    }
    if(get_funcvar(to_check,&to_run))
    {
-      if(strcmp(to_check->words[to_check->position],"{")==0)
+      if(safe_samestr(to_check,"{"))
       {
          to_check->position++;
          if(place_all_args(to_check,to_run,START,line_arr))
@@ -519,7 +518,7 @@ bool valid_argsrun(word_cont* to_check)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"}")==0)
+   if(safe_samestr(to_check,"}"))
    {
       to_check->position++;
       return true;
@@ -543,7 +542,7 @@ bool valid_funcrun(word_cont* to_check)
    if(valid_funcvar(to_check))
    {
       to_check->position++;
-      if(strcmp(to_check->words[to_check->position],"{")==0)
+      if(safe_samestr(to_check,"{"))
       {
          to_check->position++;
          if(valid_argsrun(to_check))
@@ -573,7 +572,7 @@ void reset_func(word_cont* func)
 
 bool valid_return(word_cont* to_check)
 {
-   if(strcmp(to_check->words[to_check->position],"RETURN")==0)
+   if(safe_samestr(to_check,"RETURN"))
    {
       to_check->position++;
       if(valid_varnum(to_check))
@@ -593,7 +592,7 @@ bool run_return(word_cont* to_check,line_cont* line_arr)
       return false;
    }
    to_return = (double*)safe_calloc(1,sizeof(double));
-   if(strcmp(to_check->words[to_check->position],"RETURN")==0)
+   if(safe_samestr(to_check,"RETURN"))
    {
       to_check->position++;
       if(get_varnum(to_check,to_return,line_arr))

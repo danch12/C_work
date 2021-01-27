@@ -49,7 +49,7 @@ bool run_len(word_cont* to_check,double* num);
 bool valid_len(word_cont* to_check);
 bool run_file_to_array(word_cont* to_check);
 bool valid_file_to_array(word_cont* to_check);
-
+bool safe_samestr(word_cont* to_check,char* str);
 
 void deep_free_assoc(assoc* a,assoc_type t)
 {
@@ -72,7 +72,6 @@ void deep_free_assoc(assoc* a,assoc_type t)
                   free_arr(a->arr[i]->value);
                }
             }
-
             free(a->arr[i]);
          }
       }
@@ -93,9 +92,7 @@ bool free_word_cont(word_cont* to_free)
    {
       for(i=0;i<to_free->capacity;i++)
       {
-
          free(to_free->words[i]);
-
       }
       for(i=0;i<NUMVARS;i++)
       {
@@ -185,52 +182,52 @@ FILE* get_file_words(char* filename,int* lines)
 
 opcode get_opcode(word_cont* to_check)
 {
-   if(strcmp(to_check->words[to_check->position],"FD")==0)
+   if(safe_samestr(to_check,"FD"))
    {
       return fd;
    }
-   if((strcmp(to_check->words[to_check->position],"LT")==0)||\
-      (strcmp(to_check->words[to_check->position],"RT")==0))
+   if((safe_samestr(to_check,"LT"))||\
+      (safe_samestr(to_check,"RT")))
    {
       return rot;
    }
-   if(strcmp(to_check->words[to_check->position],"DO")==0)
+   if(safe_samestr(to_check,"DO"))
    {
       return do_loop;
    }
-   if(strcmp(to_check->words[to_check->position],"SET")==0)
+   if(safe_samestr(to_check,"SET"))
    {
       return set;
    }
-   if(strcmp(to_check->words[to_check->position],"SETFUNC")==0)
+   if(safe_samestr(to_check,"SETFUNC"))
    {
       return set_func;
    }
-   if(strcmp(to_check->words[to_check->position],"RETURN")==0)
+   if(safe_samestr(to_check,"RETURN"))
    {
       return return_val;
    }
-   if(strcmp(to_check->words[to_check->position],"IF")==0)
+   if(safe_samestr(to_check,"IF"))
    {
       return flowstate;
    }
-   if(strcmp(to_check->words[to_check->position],"INITARR")==0)
+   if(safe_samestr(to_check,"INITARR"))
    {
       return initarr;
    }
-   if(strcmp(to_check->words[to_check->position],"APPEND")==0)
+   if(safe_samestr(to_check,"APPEND"))
    {
       return append;
    }
-   if(strcmp(to_check->words[to_check->position],"CHANGE")==0)
+   if(safe_samestr(to_check,"CHANGE"))
    {
       return change;
    }
-   if(strcmp(to_check->words[to_check->position],"DEL")==0)
+   if(safe_samestr(to_check,"DEL"))
    {
       return del;
    }
-   if(strcmp(to_check->words[to_check->position],"LOAD")==0)
+   if(safe_samestr(to_check,"LOAD"))
    {
       return load;
    }
@@ -502,10 +499,8 @@ bool get_varnum(word_cont* to_check,double* num,line_cont* line_arr)
    {
       return true;
    }
-
    if(get_func_val(to_check,line_arr,num))
    {
-
       return true;
    }
    if(run_access_val(to_check,line_arr,num))
@@ -543,7 +538,7 @@ bool move_forward(word_cont* to_check,line_cont* l_arr)
    double n_y;
    coord* end_coord;
    line* finished_line;
-   if(strcmp(to_check->words[to_check->position],"FD")==0)
+   if(safe_samestr(to_check,"FD"))
    {
       to_check->position++;
       if(get_varnum(to_check,&num,l_arr))
@@ -652,22 +647,22 @@ bool do_helper(word_cont* to_check,int* var_pos,\
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"DO")==0)
+   if(safe_samestr(to_check,"DO"))
    {
       to_check->position++;
       if(get_var_pos(to_check,var_pos))
       {
-         if(strcmp(to_check->words[to_check->position],"FROM")==0)
+         if(safe_samestr(to_check,"FROM"))
          {
             to_check->position++;
             if(get_varnum(to_check,start,line_arr))
             {
-               if(strcmp(to_check->words[to_check->position],"TO")==0)
+               if(safe_samestr(to_check,"TO"))
                {
                   to_check->position++;
                   if(get_varnum(to_check,end,line_arr))
                   {
-                     if(strcmp(to_check->words[to_check->position],"{")==0)
+                     if(safe_samestr(to_check,"{"))
                      {
                         to_check->position++;
                         loop_start=to_check->position;
@@ -708,7 +703,7 @@ bool run_polish(word_cont* to_check,double* num,line_cont* line_arr)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],";")==0)
+   if(safe_samestr(to_check,";"))
    {
       /*need to get num and check only one num here*/
       if(finish_polish(to_check,num))
@@ -743,12 +738,12 @@ bool run_set(word_cont* to_check,line_cont* line_arr)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"SET")==0)
+   if(safe_samestr(to_check,"SET"))
    {
       to_check->position++;
       if(get_var_pos(to_check,&var_p))
       {
-         if(strcmp(to_check->words[to_check->position],":=")==0)
+         if(safe_samestr(to_check,":="))
          {
             to_check->position++;
 

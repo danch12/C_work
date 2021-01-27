@@ -18,6 +18,27 @@ void tearDown(void)
 }
 
 
+void test_samestr(void)
+{
+   word_cont* test_cont;
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"1234");
+   TEST_ASSERT_TRUE(safe_samestr(test_cont,"1234"));
+   TEST_ASSERT_TRUE(!safe_samestr(test_cont,"4321"));
+   strcpy(test_cont->words[0],"abc");
+   TEST_ASSERT_TRUE(safe_samestr(test_cont,"abc"));
+   TEST_ASSERT_TRUE(!safe_samestr(test_cont,"jfhdjndk"));
+   strcpy(test_cont->words[0],"");
+   TEST_ASSERT_TRUE(safe_samestr(test_cont,""));
+   strcpy(test_cont->words[0],"! ");
+   TEST_ASSERT_TRUE(safe_samestr(test_cont,"! "));
+   TEST_ASSERT_TRUE(!safe_samestr(test_cont,"!"));
+   test_cont->capacity=0;
+   strcpy(test_cont->words[0],"abc");
+   TEST_ASSERT_TRUE(!safe_samestr(test_cont,"abc"));
+   free_word_cont(test_cont);
+}
+
 void test_valid_nums(void)
 {
    word_cont* test_cont;
@@ -731,6 +752,7 @@ void test_file_reading(void)
 int main(void)
 {
     UNITY_BEGIN();
+    RUN_TEST(test_samestr);
     RUN_TEST(test_valid_nums);
     RUN_TEST(test_valid_move);
     RUN_TEST(test_valid_move_instruct);

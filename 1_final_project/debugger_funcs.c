@@ -67,8 +67,7 @@ bool step_instruction(debugger* to_check)
 bool check_start(debugger* to_check)
 {
 
-   if(strcmp(to_check->program->words\
-      [to_check->program->position],"{")!=0)
+   if(!safe_samestr(to_check->program,"{"))
    {
       strcpy(to_check->info,"error in starting bracket");
       return false;
@@ -221,23 +220,23 @@ loop_tracker* step_do_helper(word_cont* to_check)
    loop_tracker* record;
    int end_pos;
    record=NULL;
-   if(strcmp(to_check->words[to_check->position],"DO")==0)
+   if(safe_samestr(to_check,"DO"))
    {
       record=(loop_tracker*)safe_calloc(1,sizeof(loop_tracker));
       to_check->position++;
       if(get_var_pos(to_check,&record->var_pos))
       {
-         if(strcmp(to_check->words[to_check->position],"FROM")==0)
+         if(safe_samestr(to_check,"FROM"))
          {
             to_check->position++;
             if(get_varnum(to_check,&record->start_val))
             {
-               if(strcmp(to_check->words[to_check->position],"TO")==0)
+               if(safe_samestr(to_check,"TO"))
                {
                   to_check->position++;
                   if(get_varnum(to_check,&record->end_val))
                   {
-                     if(strcmp(to_check->words[to_check->position],"{")==0)
+                     if(safe_samestr(to_check,"{"))
                      {
                         to_check->position++;
                         record->start_pos=to_check->position;
@@ -559,8 +558,7 @@ bool check_step_end(debugger* to_check)
 {
    if(to_check->program->position==to_check->program->capacity-INDEX)
    {
-      if(strcmp(to_check->program->words[to_check->program->position],\
-         "}")==0)
+      if(safe_samestr(to_check->program,"}"))
       {
          if(to_check->loop_stack->size==0)
          {

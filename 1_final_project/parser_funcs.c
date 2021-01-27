@@ -100,7 +100,7 @@ bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN])
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],move)==0)
+   if(safe_samestr(to_check,move))
    {
       to_check->position++;
       if(valid_varnum(to_check))
@@ -120,7 +120,7 @@ bool valid_instructlist(word_cont* to_check)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"}")==0)
+   if(safe_samestr(to_check,"}"))
    {
       /*doesnt matter for end but for do loops important
       to increase position*/
@@ -147,7 +147,7 @@ bool valid_main(word_cont* to_check)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"{")==0)
+   if(safe_samestr(to_check,"{"))
    {
       to_check->position++;
       if(valid_instructlist(to_check))
@@ -165,22 +165,22 @@ bool valid_op(word_cont* to_check)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"+")==0)
+   if(safe_samestr(to_check,"+"))
    {
       to_check->position++;
       return true;
    }
-   if(strcmp(to_check->words[to_check->position],"-")==0)
+   if(safe_samestr(to_check,"-"))
    {
       to_check->position++;
       return true;
    }
-   if(strcmp(to_check->words[to_check->position],"*")==0)
+   if(safe_samestr(to_check,"*"))
    {
       to_check->position++;
       return true;
    }
-   if(strcmp(to_check->words[to_check->position],"/")==0)
+   if(safe_samestr(to_check,"/"))
    {
       to_check->position++;
       return true;
@@ -195,7 +195,7 @@ bool valid_polish(word_cont* to_check)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],";")==0)
+   if(safe_samestr(to_check,";"))
    {
       to_check->position++;
       return true;
@@ -224,12 +224,12 @@ bool valid_set(word_cont* to_check)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"SET")==0)
+   if(safe_samestr(to_check,"SET"))
    {
       to_check->position++;
       if(valid_var(to_check))
       {
-         if(strcmp(to_check->words[to_check->position],":=")==0)
+         if(safe_samestr(to_check,":="))
          {
             to_check->position++;
             if(valid_polish(to_check))
@@ -248,22 +248,22 @@ bool valid_do(word_cont* to_check)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"DO")==0)
+   if(safe_samestr(to_check,"DO"))
    {
       to_check->position++;
       if(valid_var(to_check))
       {
-         if(strcmp(to_check->words[to_check->position],"FROM")==0)
+         if(safe_samestr(to_check,"FROM"))
          {
             to_check->position++;
             if(valid_varnum(to_check))
             {
-               if(strcmp(to_check->words[to_check->position],"TO")==0)
+               if(safe_samestr(to_check,"TO"))
                {
                   to_check->position++;
                   if(valid_varnum(to_check))
                   {
-                     if(strcmp(to_check->words[to_check->position],"{")==0)
+                     if(safe_samestr(to_check,"{"))
                      {
                         to_check->position++;
                         if(valid_instructlist(to_check))
@@ -276,6 +276,21 @@ bool valid_do(word_cont* to_check)
             }
          }
       }
+   }
+   return false;
+}
+
+
+
+bool safe_samestr(word_cont* to_check,char* str)
+{
+   if(to_check->position>=to_check->capacity)
+   {
+      return false;
+   }
+   if(strcmp(to_check->words[to_check->position],str)==0)
+   {
+      return true;
    }
    return false;
 }

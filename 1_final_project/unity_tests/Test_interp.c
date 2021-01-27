@@ -938,6 +938,14 @@ void test_set(void)
    strcpy(test_cont->words[0],"SET");
    strcpy(test_cont->words[1],"Z");
    strcpy(test_cont->words[2],":=");
+   
+   TEST_ASSERT_TRUE(!run_set(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"Z");
+   strcpy(test_cont->words[2],":=");
    strcpy(test_cont->words[3],"90.5");
    strcpy(test_cont->words[4],"/");
    strcpy(test_cont->words[5],";");
@@ -1258,6 +1266,21 @@ void test_do(void)
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
 
+
+   test_cont=init_word_cont();
+
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"DO");
+   strcpy(test_cont->words[1],"A");
+
+   TEST_ASSERT_TRUE(!run_do(test_cont,test_line_cont));
+   TEST_ASSERT_TRUE(test_line_cont->size==0);
+
+
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
+
    test_cont=init_word_cont();
 
    test_line_cont=init_line_cont();
@@ -1303,7 +1326,7 @@ void test_do(void)
    strcpy(test_cont->words[9],"}");
    TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
    TEST_ASSERT_TRUE(test_line_cont->size==5);
-
+   TEST_ASSERT_EQUAL_DOUBLE(*test_cont->var_array[0],3);
 
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);

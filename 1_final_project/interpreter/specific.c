@@ -20,35 +20,35 @@ bool do_operation(word_cont* to_check);
 op get_op(word_cont* to_check);
 bool valid_var(word_cont* to_check);
 bool valid_num(word_cont* to_check);
-
+bool safe_samestr(word_cont* to_check,char* str);
 /*going to pretty much just try to emulate how cython do opcodes
 with a big switch statement - cant emulate it perfectly because
-we have to do the strcmp first but still speeds up the code
+we have to do the strcmp first but still probably speeds up the code
 compared to just brute force running all the functions and seeing
 which one returns true*/
 
 opcode get_opcode(word_cont* to_check)
 {
-   if(strcmp(to_check->words[to_check->position],"FD")==0)
+   if(safe_samestr(to_check,"FD"))
    {
       return fd;
    }
-   if((strcmp(to_check->words[to_check->position],"LT")==0)||\
-      (strcmp(to_check->words[to_check->position],"RT")==0))
+   if((safe_samestr(to_check,"LT"))||\
+      (safe_samestr(to_check,"RT")))
    {
       return rot;
    }
-   if(strcmp(to_check->words[to_check->position],"DO")==0)
+   if(safe_samestr(to_check,"DO"))
    {
       return do_loop;
    }
-   if(strcmp(to_check->words[to_check->position],"SET")==0)
+   if(safe_samestr(to_check,"SET"))
    {
       return set;
    }
-   /*for debugger in the interpreting stage these will
+   /*for debugger. In the interpreting stage this will
       get eaten by the switch default*/
-   if(strcmp(to_check->words[to_check->position],"}")==0)
+   if(safe_samestr(to_check,"}"))
    {
       return i_list;
    }
@@ -264,7 +264,7 @@ bool move_forward(word_cont* to_check,line_cont* l_arr)
    double n_y;
    coord* end_coord;
    line* finished_line;
-   if(strcmp(to_check->words[to_check->position],"FD")==0)
+   if(safe_samestr(to_check,"FD"))
    {
       to_check->position++;
       if(get_varnum(to_check,&num))
@@ -341,7 +341,7 @@ bool run_polish(word_cont* to_check,double* num)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],";")==0)
+   if(safe_samestr(to_check,";"))
    {
       /*need to get num and check only one num here*/
       if(finish_polish(to_check,num))
@@ -377,12 +377,12 @@ bool run_set(word_cont* to_check)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"SET")==0)
+   if(safe_samestr(to_check,"SET"))
    {
       to_check->position++;
       if(get_var_pos(to_check,&var_p))
       {
-         if(strcmp(to_check->words[to_check->position],":=")==0)
+         if(safe_samestr(to_check,":="))
          {
             to_check->position++;
 
@@ -476,22 +476,22 @@ bool do_helper(word_cont* to_check,int* var_pos,\
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"DO")==0)
+   if(safe_samestr(to_check,"DO"))
    {
       to_check->position++;
       if(get_var_pos(to_check,var_pos))
       {
-         if(strcmp(to_check->words[to_check->position],"FROM")==0)
+         if(safe_samestr(to_check,"FROM"))
          {
             to_check->position++;
             if(get_varnum(to_check,start))
             {
-               if(strcmp(to_check->words[to_check->position],"TO")==0)
+               if(safe_samestr(to_check,"TO"))
                {
                   to_check->position++;
                   if(get_varnum(to_check,end))
                   {
-                     if(strcmp(to_check->words[to_check->position],"{")==0)
+                     if(safe_samestr(to_check,"{"))
                      {
                         to_check->position++;
                         return true;

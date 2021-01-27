@@ -136,7 +136,7 @@ bool run_main(word_cont* to_check,line_cont* line_arr)
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"{")==0)
+   if(safe_samestr(to_check,"{"))
    {
       to_check->position++;
 
@@ -157,7 +157,7 @@ bool run_instruction_list(word_cont* to_check,\
    {
       return false;
    }
-   if(strcmp(to_check->words[to_check->position],"}")==0)
+   if(safe_samestr(to_check,"}"))
    {
       /*doesnt matter for end but for do loops important
       to increase position*/
@@ -183,13 +183,13 @@ bool run_instruction_list(word_cont* to_check,\
 direction direction_helper(word_cont* to_check)
 {
    direction dir;
-   if(strcmp(to_check->words[to_check->position],"LT")==0)
+   if(safe_samestr(to_check,"LT"))
    {
       to_check->position++;
       dir=left;
       return dir;
    }
-   if(strcmp(to_check->words[to_check->position],"RT")==0)
+   if(safe_samestr(to_check,"RT"))
    {
       to_check->position++;
       dir=right;
@@ -261,19 +261,19 @@ op get_op(word_cont* to_check)
    {
       return invalid_op;
    }
-   if(strcmp(to_check->words[to_check->position],"+")==0)
+   if(safe_samestr(to_check,"+"))
    {
       return plus;
    }
-   if(strcmp(to_check->words[to_check->position],"-")==0)
+   if(safe_samestr(to_check,"-"))
    {
       return minus;
    }
-   if(strcmp(to_check->words[to_check->position],"*")==0)
+   if(safe_samestr(to_check,"*"))
    {
       return mult;
    }
-   if(strcmp(to_check->words[to_check->position],"/")==0)
+   if(safe_samestr(to_check,"/"))
    {
       return divide;
    }

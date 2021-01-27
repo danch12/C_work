@@ -30,7 +30,11 @@ bool run_true(word_cont* to_check,line_cont* line_arr)
 {
    if(run_main(to_check,line_arr))
    {
-      if(strcmp(to_check->words[to_check->position],"ELSE")!=0)
+      if(to_check->position>=to_check->capacity)
+      {
+         return false;
+      }
+      if(!safe_samestr(to_check,"ELSE"))
       {
          return true;
       }
@@ -46,7 +50,11 @@ bool run_false(word_cont* to_check,line_cont* line_arr)
 {
    if(valid_main(to_check))
    {
-      if(strcmp(to_check->words[to_check->position],"ELSE")!=0)
+      if(to_check->position>=to_check->capacity)
+      {
+         return false;
+      }
+      if(!safe_samestr(to_check,"ELSE"))
       {
          return true;
       }
@@ -60,10 +68,10 @@ bool run_false(word_cont* to_check,line_cont* line_arr)
 
 bool run_else(word_cont* to_check,line_cont* line_arr)
 {
-   if(strcmp(to_check->words[to_check->position],"ELSE")==0)
+   if(safe_samestr(to_check,"ELSE"))
    {
       to_check->position++;
-      if(strcmp(to_check->words[to_check->position],"{")==0)
+      if(safe_samestr(to_check,"{"))
       {
          to_check->position++;
 
@@ -80,7 +88,7 @@ bool do_comparison(word_cont* to_check,bool* result,line_cont* line_arr)
 {
    double vn_1, vn_2;
    comparator cmp;
-   if(strcmp(to_check->words[to_check->position],"IF")==0)
+   if(safe_samestr(to_check,"IF"))
    {
       to_check->position++;
       if(get_varnum(to_check,&vn_1,line_arr))
@@ -128,17 +136,21 @@ do not increase the position- we want to recheck this
 word*/
 bool valid_flowstate(word_cont* to_check)
 {
-   if(strcmp(to_check->words[to_check->position],"IF")==0)
+   if(safe_samestr(to_check,"IF"))
    {
       to_check->position++;
       if(valid_expression(to_check))
       {
-         if(strcmp(to_check->words[to_check->position],"{")==0)
+         if(safe_samestr(to_check,"{"))
          {
             to_check->position++;
             if(valid_instructlist(to_check))
             {
-               if(strcmp(to_check->words[to_check->position],"ELSE")!=0)
+               if(to_check->position>=to_check->capacity)
+               {
+                  return false;
+               }
+               if(!safe_samestr(to_check,"ELSE"))
                {
                   return true;
                }
@@ -159,10 +171,10 @@ bool valid_flowstate(word_cont* to_check)
 bool valid_else(word_cont* to_check)
 {
 
-   if(strcmp(to_check->words[to_check->position],"ELSE")==0)
+   if(safe_samestr(to_check,"ELSE"))
    {
       to_check->position++;
-      if(strcmp(to_check->words[to_check->position],"{")==0)
+      if(safe_samestr(to_check,"{"))
       {
          to_check->position++;
          if(valid_instructlist(to_check))
@@ -194,23 +206,23 @@ bool valid_expression(word_cont* to_check)
 
 comparator get_comparator(word_cont* to_check)
 {
-   if(strcmp(to_check->words[to_check->position],"==")==0)
+   if(safe_samestr(to_check,"=="))
    {
       return equal;
    }
-   if(strcmp(to_check->words[to_check->position],"<")==0)
+   if(safe_samestr(to_check,"<"))
    {
       return less;
    }
-   if(strcmp(to_check->words[to_check->position],">")==0)
+   if(safe_samestr(to_check,">"))
    {
       return greater;
    }
-   if(strcmp(to_check->words[to_check->position],">=")==0)
+   if(safe_samestr(to_check,">="))
    {
       return greater_equal;
    }
-   if(strcmp(to_check->words[to_check->position],"<=")==0)
+   if(safe_samestr(to_check,"<="))
    {
       return less_equal;
    }

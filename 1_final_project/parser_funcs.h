@@ -33,7 +33,8 @@ bool valid_varnum(word_cont* to_check);
 bool valid_polish(word_cont* to_check);
 bool valid_set(word_cont* to_check);
 bool valid_do(word_cont* to_check);
-
+/*checks capacity first then does strcmp*/
+bool safe_samestr(word_cont* to_check,char* str);
 
 
 #endif

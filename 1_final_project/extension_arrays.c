@@ -6,7 +6,7 @@
 
 bool valid_init_arr(word_cont* to_check)
 {
-   if(strcmp(to_check->words[to_check->position],"INITARR")==0)
+   if(safe_samestr(to_check,"INITARR"))
    {
       to_check->position++;
       if(valid_arr_identifier(to_check))
@@ -23,7 +23,7 @@ bool run_init_arr(word_cont* to_check)
    char* arr_name;
    turt_arr* n_arr;
    arr_name=(char*)safe_calloc(MAXARRLEN,sizeof(char));
-   if(strcmp(to_check->words[to_check->position],"INITARR")==0)
+   if(safe_samestr(to_check,"INITARR"))
    {
       to_check->position++;
       if(get_arr_identifier(to_check,arr_name))
@@ -63,7 +63,6 @@ bool get_arr_identifier(word_cont* to_check,char arr_name[MAXARRLEN])
       to_check->position++;
       return true;
    }
-   /*this error message would cannabalize a lot of other ones*/
    if(strlen(to_check->err_message)==0)
    {
       strcpy(to_check->err_message,"invalid array name - they have to start with a_");
@@ -110,7 +109,7 @@ bool valid_arr_identifier(word_cont* to_check)
 
 bool valid_append(word_cont* to_check)
 {
-   if(strcmp(to_check->words[to_check->position],"APPEND")==0)
+   if(safe_samestr(to_check,"APPEND"))
    {
       to_check->position++;
       if(valid_arr_identifier(to_check))
@@ -132,7 +131,7 @@ bool run_append(word_cont* to_check,line_cont* line_arr)
    turt_arr* arr;
    double num;
 
-   if(strcmp(to_check->words[to_check->position],"APPEND")==0)
+   if(safe_samestr(to_check,"APPEND"))
    {
       to_check->position++;
       if(get_arr_identifier(to_check,arr_name))
@@ -157,21 +156,21 @@ bool run_append(word_cont* to_check,line_cont* line_arr)
 
 bool valid_change(word_cont* to_check)
 {
-   if(strcmp(to_check->words[to_check->position],"CHANGE")==0)
+   if(safe_samestr(to_check,"CHANGE"))
    {
       to_check->position++;
       if(valid_arr_identifier(to_check))
       {
          to_check->position++;
-         if(strcmp(to_check->words[to_check->position],"[")==0)
+         if(safe_samestr(to_check,"["))
          {
             to_check->position++;
             if(valid_varnum(to_check))
             {
-               if(strcmp(to_check->words[to_check->position],"]")==0)
+               if(safe_samestr(to_check,"]"))
                {
                   to_check->position++;
-                  if(strcmp(to_check->words[to_check->position],":=")==0)
+                  if(safe_samestr(to_check,":="))
                   {
                      to_check->position++;
                      if(valid_polish(to_check))
@@ -219,21 +218,21 @@ bool run_change(word_cont* to_check,line_cont* line_arr)
 bool change_helper(word_cont* to_check, line_cont* line_arr,\
                   int* ind,double* num,char arr_name[MAXARRLEN])
 {
-   if(strcmp(to_check->words[to_check->position],"CHANGE")==0)
+   if(safe_samestr(to_check,"CHANGE"))
    {
       to_check->position++;
       if(get_arr_identifier(to_check,arr_name))
       {
-         if(strcmp(to_check->words[to_check->position],"[")==0)
+         if(safe_samestr(to_check,"["))
          {
             to_check->position++;
             {
                if(get_valid_ind(to_check,line_arr,ind))
                {
-                  if(strcmp(to_check->words[to_check->position],"]")==0)
+                  if(safe_samestr(to_check,"]"))
                   {
                      to_check->position++;
-                     if(strcmp(to_check->words[to_check->position],":=")==0)
+                     if(safe_samestr(to_check,":="))
                      {
                         to_check->position++;
                         if(run_polish(to_check,num,line_arr))
@@ -278,18 +277,18 @@ bool get_valid_ind(word_cont* to_check,line_cont* line_arr,int* ind)
 bool valid_delete_arr_val(word_cont* to_check)
 {
 
-   if(strcmp(to_check->words[to_check->position],"DEL")==0)
+   if(safe_samestr(to_check,"DEL"))
    {
       to_check->position++;
       if(valid_arr_identifier(to_check))
       {
          to_check->position++;
-         if(strcmp(to_check->words[to_check->position],"[")==0)
+         if(safe_samestr(to_check,"["))
          {
             to_check->position++;
             if(valid_varnum(to_check))
             {
-               if(strcmp(to_check->words[to_check->position],"]")==0)
+               if(safe_samestr(to_check,"]"))
                {
                   to_check->position++;
                   return true;
@@ -325,17 +324,17 @@ bool run_delete_arr_val(word_cont* to_check,line_cont* line_arr)
 bool delete_helper(word_cont* to_check,line_cont* line_arr,\
                   int* ind,char arr_name[MAXARRLEN])
 {
-   if(strcmp(to_check->words[to_check->position],"DEL")==0)
+   if(safe_samestr(to_check,"DEL"))
    {
       to_check->position++;
       if(get_arr_identifier(to_check,arr_name))
       {
-         if(strcmp(to_check->words[to_check->position],"[")==0)
+         if(safe_samestr(to_check,"["))
          {
             to_check->position++;
             if(get_valid_ind(to_check,line_arr,ind))
             {
-               if(strcmp(to_check->words[to_check->position],"]")==0)
+               if(safe_samestr(to_check,"]"))
                {
                   to_check->position++;
                   return true;
@@ -353,12 +352,12 @@ bool valid_access_val(word_cont* to_check)
    if(valid_arr_identifier(to_check))
    {
       to_check->position++;
-      if(strcmp(to_check->words[to_check->position],"[")==0)
+      if(safe_samestr(to_check,"["))
       {
          to_check->position++;
          if(valid_varnum(to_check))
          {
-            if(strcmp(to_check->words[to_check->position],"]")==0)
+            if(safe_samestr(to_check,"]"))
             {
                to_check->position++;
                return true;
@@ -400,12 +399,12 @@ bool access_helper(word_cont* to_check,line_cont* line_arr,\
 {
    if(get_arr_identifier(to_check,arr_name))
    {
-      if(strcmp(to_check->words[to_check->position],"[")==0)
+      if(safe_samestr(to_check,"["))
       {
          to_check->position++;
          if(get_valid_ind(to_check,line_arr,ind))
          {
-            if(strcmp(to_check->words[to_check->position],"]")==0)
+            if(safe_samestr(to_check,"]"))
             {
                to_check->position++;
                return true;
@@ -438,7 +437,7 @@ bool valid_filepath(word_cont* to_check)
 
 bool valid_len(word_cont* to_check)
 {
-   if(strcmp(to_check->words[to_check->position],"LEN")==0)
+   if(safe_samestr(to_check,"LEN"))
    {
       to_check->position++;
       if(valid_arr_identifier(to_check))
@@ -455,7 +454,7 @@ bool run_len(word_cont* to_check,double* num)
    char arr_name[MAXARRLEN];
    turt_arr* arr;
    int size;
-   if(strcmp(to_check->words[to_check->position],"LEN")==0)
+   if(safe_samestr(to_check,"LEN"))
    {
       to_check->position++;
       if(get_arr_identifier(to_check,arr_name))
@@ -475,7 +474,7 @@ bool run_len(word_cont* to_check,double* num)
 
 bool valid_file_to_array(word_cont* to_check)
 {
-   if(strcmp(to_check->words[to_check->position],"LOAD")==0)
+   if(safe_samestr(to_check,"LOAD"))
    {
       to_check->position++;
       if(valid_arr_identifier(to_check))
@@ -500,7 +499,7 @@ bool run_file_to_array(word_cont* to_check)
    char arr_name[MAXARRLEN];
    turt_arr* arr;
 
-   if(strcmp(to_check->words[to_check->position],"LOAD")==0)
+   if(safe_samestr(to_check,"LOAD"))
    {
       to_check->position++;
       if(get_arr_identifier(to_check,arr_name))
