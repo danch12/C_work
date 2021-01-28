@@ -91,20 +91,20 @@ FILE* get_file_words(char* filename,int* lines)
 
 opcode get_opcode(word_cont* to_check)
 {
-   if(strcmp(to_check->words[to_check->position],"FD")==0)
+   if(safe_samestr(to_check,"FD"))
    {
       return fd;
    }
-   if((strcmp(to_check->words[to_check->position],"LT")==0)||\
-      (strcmp(to_check->words[to_check->position],"RT")==0))
+   if((safe_samestr(to_check,"LT"))||\
+      (safe_samestr(to_check,"RT")))
    {
       return rot;
    }
-   if(strcmp(to_check->words[to_check->position],"DO")==0)
+   if(safe_samestr(to_check,"DO"))
    {
       return do_loop;
    }
-   if(strcmp(to_check->words[to_check->position],"SET")==0)
+   if(safe_samestr(to_check,"SET"))
    {
       return set;
    }

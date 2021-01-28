@@ -394,6 +394,7 @@ bool run_access_val(word_cont* to_check,line_cont* line_arr,double* num)
 
 }
 
+/*basically checks syntax*/
 bool access_helper(word_cont* to_check,line_cont* line_arr,\
                   char arr_name[MAXARRLEN],int* ind)
 {
@@ -526,7 +527,7 @@ bool run_file_to_array(word_cont* to_check)
    return false;
 }
 
-/*weird valgrind leak here think from open file?*/
+/*reads numbers from file and loads them into linked list*/
 bool load_in(word_cont* to_check,turt_arr* arr,char* filepath)
 {
    FILE* fp;

@@ -145,6 +145,7 @@ DO A FROM 1 TO 60
 }
 
 SET E := 1 ;
+
 LT 90 
 
 DO A FROM 1 TO 60

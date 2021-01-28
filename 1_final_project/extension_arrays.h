@@ -56,11 +56,12 @@ bool access_helper(word_cont* to_check,line_cont* line_arr,\
 
 bool valid_filepath(word_cont* to_check);
 bool valid_file_to_array(word_cont* to_check);
-
+/*reads numbers from file and loads them into linked list*/
 bool load_in(word_cont* to_check,turt_arr* arr,char* filepath);
 bool run_file_to_array(word_cont* to_check);
 
 bool valid_len(word_cont* to_check);
+/*gets length of a turtle array*/
 bool run_len(word_cont* to_check,double* num);
 
 #endif

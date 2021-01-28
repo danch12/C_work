@@ -355,7 +355,7 @@ void UnityPrintFloat(const UNITY_DOUBLE input_number)
     }
 
     /* handle zero, NaN, and +/- infinity */
-    if (number - 0.0f<0.0000001)
+    if (number == 0.0f)
     {
         UnityPrint("0");
     }
@@ -420,7 +420,7 @@ void UnityPrintFloat(const UNITY_DOUBLE input_number)
 
 #ifndef UNITY_ROUND_TIES_AWAY_FROM_ZERO
         /* round to even if exactly between two integers */
-        if ((n & 1) && ((((UNITY_DOUBLE)n - number) - 0.5f)<0.0000001))
+        if ((n & 1) && (((UNITY_DOUBLE)n - number) == 0.5f))
             n--;
 #endif
 
