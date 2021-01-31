@@ -2,7 +2,7 @@
 #include "../extension_funcs.h"
 
 #define MAXTESTCAP 100
-#define MAXTESTLEN 50
+#define MAXTESTLEN 51
 
 
 
@@ -49,6 +49,11 @@ void test_set_funcvar(void)
    TEST_ASSERT_TRUE(set_funcvar(test_cont,word));
    TEST_ASSERT_TRUE(strcmp(word,"aaabbbccc")==0);
    TEST_ASSERT_TRUE(test_cont->position==1);
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+   TEST_ASSERT_TRUE(set_funcvar(test_cont,word));
+   TEST_ASSERT_TRUE(strcmp(word,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")==0);
 
    strcpy(test_cont->words[0],"aaaAaa");
    test_cont->position=0;
@@ -108,6 +113,10 @@ void test_get_arg(void)
 
    test_cont->position=0;
    strcpy(test_cont->words[0],"AA");
+   TEST_ASSERT_TRUE(!get_arg(test_cont,test_func));
+
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"1");
    TEST_ASSERT_TRUE(!get_arg(test_cont,test_func));
 
    free_word_cont(test_func);
@@ -258,6 +267,35 @@ void test_funcset(void)
    TEST_ASSERT_TRUE(strcmp(test_func->words[1],"A")==0);
    TEST_ASSERT_TRUE(test_func->arg_placer[0]==0);
    TEST_ASSERT_TRUE(test_cont->position==9);
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SETFUNC");
+   strcpy(test_cont->words[1],"abc");
+   strcpy(test_cont->words[2],"{");
+   strcpy(test_cont->words[3],"A");
+   strcpy(test_cont->words[4],"}");
+   strcpy(test_cont->words[5],"{");
+   strcpy(test_cont->words[6],"FD");
+   strcpy(test_cont->words[7],"A");
+   strcpy(test_cont->words[8],"}");
+   strcpy(test_cont->words[9],"SETFUNC");
+   strcpy(test_cont->words[10],"abc");
+   strcpy(test_cont->words[11],"{");
+   strcpy(test_cont->words[12],"A");
+   strcpy(test_cont->words[13],"}");
+   strcpy(test_cont->words[14],"{");
+   strcpy(test_cont->words[15],"FD");
+   strcpy(test_cont->words[16],"1");
+   strcpy(test_cont->words[17],"}");
+   TEST_ASSERT_TRUE(run_funcset(test_cont));
+   TEST_ASSERT_TRUE(run_funcset(test_cont));
+   test_func=assoc_lookup(test_cont->func_map,"abc");
+   TEST_ASSERT_TRUE(test_func);
+   TEST_ASSERT_TRUE(strcmp(test_func->words[0],"FD")==0);
+   TEST_ASSERT_TRUE(strcmp(test_func->words[1],"1")==0);
+   TEST_ASSERT_TRUE(test_func->arg_placer[0]==0);
+   TEST_ASSERT_TRUE(test_cont->position==18);
    free_word_cont(test_cont);
 
 

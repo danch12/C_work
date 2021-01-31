@@ -96,10 +96,6 @@ bool valid_var(word_cont* to_check)
 
 bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN])
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
    if(safe_samestr(to_check,move))
    {
       to_check->position++;
@@ -116,10 +112,7 @@ bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN])
 
 bool valid_instructlist(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
+
    if(safe_samestr(to_check,"}"))
    {
       /*doesnt matter for end but for do loops important
@@ -143,10 +136,7 @@ bool valid_instructlist(word_cont* to_check)
 
 bool valid_main(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
+
    if(safe_samestr(to_check,"{"))
    {
       to_check->position++;
@@ -161,10 +151,7 @@ bool valid_main(word_cont* to_check)
 
 bool valid_op(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
+
    if(safe_samestr(to_check,"+"))
    {
       to_check->position++;
@@ -191,10 +178,7 @@ bool valid_op(word_cont* to_check)
 
 bool valid_polish(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
+
    if(safe_samestr(to_check,";"))
    {
       to_check->position++;
@@ -220,10 +204,7 @@ bool valid_polish(word_cont* to_check)
 
 bool valid_set(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
+
    if(safe_samestr(to_check,"SET"))
    {
       to_check->position++;
@@ -244,10 +225,7 @@ bool valid_set(word_cont* to_check)
 
 bool valid_do(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
+
    if(safe_samestr(to_check,"DO"))
    {
       to_check->position++;

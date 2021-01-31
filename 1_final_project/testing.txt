@@ -1,10 +1,10 @@
-Before I get into the nitty gritty of my thinking behind how I tested each function- I am using unity to test all my files and following their layout for how to test stuff.All of the testing files are in unity_tests folder. This means that functions are defined before main which goes against the house style guidelines but thought it would be ok in this instance. The source code for the unity tests is in the folder src. Using unity and following its framework has forced me to think of how to test each bit of my code separately which is really useful.Also just a neat way of comparing doubles is great. Here is the link to the website - https://www.throwtheswitch.org/unity
+Before I get into the nitty gritty of my thinking behind how I tested everything- I am using unity to test all my files and following their layout for how to test stuff.All of the testing files are in unity_tests folder. This means that functions are defined before main which goes against the house style guidelines but thought it would be ok in this instance. The source code for the unity tests is in the folder src. Using unity and following its framework has forced me to think of how to test each bit of my code separately which is really useful.Also just a neat way of comparing doubles is great. Here is the link to the website - https://www.throwtheswitch.org/unity
 Although it does throw some warnings for comparing floats/doubles because it does things like num==inf and stuff. Not sure if this is a problem?
 
 
 Basic Idea for testing parsing section was to start with the commands that do not rely on the other commands eg VAR, OP etc. and then build the commands which use purely those and so on. Additionally I tried to first test each command by itself in its own struct before adding in other commands- so created a new struct to test POLISH, then a new struct for SET and so on. Was important to test the position that the functions move the struct to as well as this will be basis for how we move to next command.
 
-For my overall testing of parser.c I have added in two commands to my makefile - run_parser_err which runs a series of invalid files and feeds the error messages into p_error.txt and run_parser_val which runs a series of valid files. These files are in the report_files folder.
+For my overall testing of parser.c I have added in two commands to my makefile - run_parser_err which runs a series of invalid files and feeds the error messages into report_files/p_error.txt and run_parser_val which runs a series of valid files. These files are in the report_files folder.
 
 Additionally created each of the ADTS separately tested them by themselves in their own test file and then introduced them into the parsing/interpreting functions. The only functions that relate to the ADTS that are not in the ADT files are the freeing of the hash maps because we need to include specific free functions for the implementation of arrays and for functions.
 
@@ -23,7 +23,7 @@ move_forward - dependancies - get_num and rotate
 This allows for easier testing as we test each function thoroughly before moving onto the next so if there is a problem we do not have to dive deep into multiple layers of functions- instead abstracting away the complexities of rotating around a point or getting numbers as we go. This sort of permeates into how I set up my test files - basically split up the test files into smaller bits eg testing stacks or testing the functions part of my extension then mix different parts of the project together - not sure if its the most efficient way of testing but makes it clear what bit of the project you are testing at each stage and you can compartmentalise a lot easier. Also means you can focus on one specific part of the code at a time so makes spotting bugs and stuff easier. Only downside is it makes my makefile huge.
 
 
-For testing how everything runs in regards to the interpreting stage I did a similar thing to the parsing stage where I threw a load of invalid inputs into the makefile and sent the outputs to i_error.txt. Added to this in turtle outputs you can see the output of different files - the name of the picture correlates to the file ran. I did the same thing for the extension as well.
+For testing how everything runs in regards to the interpreting stage I did a similar thing to the parsing stage where I threw a load of invalid inputs into the makefile and sent the outputs to report_files/i_error.txt. Added to this in turtle outputs you can see the output of different files - the name of the picture correlates to the file ran. I did the same thing for the extension as well.
 
 Also not sure if this is the correct place to say this but I put functions that are specific to each part of the project into their own specific.c and specific.h along with struct definitions. 
 
@@ -34,10 +34,172 @@ Lastly for the extension I followed pretty much the same ideas as the interprete
 
 One thing I didn't test for throughout the files is testing to see how the functions handle a NULL word container - this is because there is no situation where I'm going to be giving the functions NULLs so seemed a bit pointless. Like at the start of every run we create a word container and a line container so I know that the functions will receive non null values. I could have potentially included guards against NULL values but because of the above reasons it just sort of bloats the code a bit for not that much gain.
 
-As a last bit of testing I implemented Rule 110 only using turtle code to make sure everything worked well with each other. Mostly because I couldn't test my extension code on other peoples turtle files so thought the next best thing would be to do a preset problem. 
+As a last bit of testing I implemented Rule 110 only using turtle code to make sure everything worked well with each other. Mostly because I couldn't test my extension code on other peoples turtle files so thought the next best thing would be to do a preset problem that required the use of all the extended grammar. 
 
 
-For testing the debugger I did something a bit extra. I got a working basic version done and then basically just gave out the executable to other people on the course - because I had a bit of time to get ahead a lot of people were still doing the interpreting stage so some of them were quite keen to use it (and help me find bugs). I was reading this thing from Spotify about how Spotify build their products using continuous improvement and shipping regularly and wanted to sort of emulate that. Obviously not going to be that realistic but was fun to have a go and iteratively build a "product". I will include the pdf from Spotify in the zip file for reference. This is in addition to all the usual testing I  did for all the other parts. This has the added benefit of people giving me suggestions for improvements to debugger that I haven't thought about and also does some form of black box testing as well because I have no control over what files they use/what commands they do.
+For testing the debugger I did something a bit extra. I got a working basic version done and then basically just gave out the executable to other people on the course - because I had a bit of time to get ahead a lot of people were still doing the interpreting stage so some of them were quite keen to use it (and help me find bugs). I was reading this thing from Spotify about how Spotify build their products using continuous improvement and shipping regularly and wanted to sort of emulate that. Obviously not going to be that realistic but was fun to have a go and iteratively build a "product". I will include the pdf from Spotify in the zip file for reference. This is in addition to all the usual testing I  did for all the other parts. This has the added benefit of people giving me suggestions for improvements to debugger that I haven't thought about and also does some form of black box testing as well because I have no control over what files they use/what commands they do. 
+This is in part to make up for the difficulty in testing how our program reacts to commands given from the command line as well.
 
 
 Also when making the debugger I tried to use as many of the functions from previous sections as possible - not sure if this is testing but by putting the functions to use in a different way made it easier to spot limitations and mistakes I had made in my previous code.
+
+
+Below I am going to give brief overview of my unit testing in the parsing and interpreting stage.
+
+*************
+*Test_parser*
+*************
+
+Test samestr
+Testing that numbers worked
+Testing that the same chars in a different order dont count as the same
+Testing that letters work
+Testing that symbols and spaces work
+Testing that it will return false when at capacity
+
+
+test_valid_nums
+Testing a normal number works
+Testing that finding a number valid will increase the position of the word cont by one
+Testing that a . At the start of a number is valid
+Testing that a . In the middle of a number is valid 
+Testing that letters in the number make the number invalid
+Testing that having a - sign anywhere but the first char makes the num invalid 
+Testing that having two decimal points is invalid 
+Testing that only having a decimal point is invalid
+Testing that a blank string is invalid
+
+Test valid move 
+Testing that a standard move works and increases position by 2
+Testing various spelling mistakes/ invalid numbers doesn't work
+Testing that blank strings dont work 
+Testing that no spaces between the commands work
+
+test_valid_move_instruct
+Very similar to valid move but included more general valid instruct / introducing valid instructlist 
+Testing that each instruction advances to correct position when successful
+
+
+test_valid_ops
+
+Testing that each of the op signs work and that they cant be concatenated like ++ 
+Testing various vars that they can only be single capital letters
+Testing blank strings dont count somehow
+
+test_valid_polish
+
+Testing both sensical and nonsensical polish calculations that they work as long as they follow the grammar and that they move the position of the program to the right place
+Testing that invalid variables makes the polish calculation invalid
+Testing that not using a semi colon makes the polish expression invalid
+
+test_sets
+
+Testing that normal set works 
+Testing that a set with only a ; works
+Testing that not having spaces between numbers doesnt work 
+Testing that using a invalid variable doesnt work
+Testing that blank strings dont work
+Testing that having no variable doesnt work
+Testing that having a variable by itself doesnt work
+
+test_dos
+
+Testing that a standard do works and the position is in the right place after executing
+Testing nested loops works 
+Testing that errors within the loop with cause error in the do
+Testing that errors in do cause errors
+
+test_instructlist_main
+
+Putting everything together and making sure things work nicely with each other
+
+test_file_reading
+
+Testing that we can get the amount of words in a file right
+Testing that we can read in files correctly 
+
+*************
+*Test_interp*
+*************
+
+test_coord_funcs
+
+Basically a load of testing that rotating from various points worked
+Paid special attention that repeatedly rotating wouldn't lead to floating point rounding errors
+
+test_get_num
+
+Testing whole numbers, floating point numbers, negative numbers, numbers with lots of digits all work
+Also testing that numbers with just zeros still work
+Testing that invalid numbers dont work
+
+test_directions
+
+Test that we pick up correct direction
+Test that we pick up correct amount - even when we start not at zero
+Test that we wrap around correctly from 0 - 360 - 0
+
+test_line_cont
+
+Mostly just stress test to see if it can hold a lot of lines and can still keep track of them all 
+
+
+test_move_forward
+
+Test moving straight and also from an angle that it arrives at the right place
+Testing moving when the turtle already has a rotation as well
+Tested briefly that things that are not FD will be invalid FD commands 
+Tested going forward a negative amount works
+Testing going forward a really large number works
+
+
+test_run_instruct_basic 
+
+Basically just testing that run instruction will work with commands tested so far- not really testing anything new 
+
+test_basic_instruct_list + test_basic_main
+Testing that we can chain together instructions in a instruct list/main using the basic instructions and that all the instructions fit with each other.
+
+
+test_polish
+
+Tested that the ops all return the correct op
+Testing that we pass numbers to the stack properly 
+Testing that things that aren't valid numbers or vars return false
+Testing that doing an operation works as intended+ chaining together operations works 
+Testing that trying to divide by 0 will raise an error
+Testing that leaving numbers on the stack will raise error
+Testing that having no numbers on stack at end will raise error
+
+test_set
+
+Testing valid variables similarly to the parser
+Testing that we can get the right position for each variable in our var array with var pos and that it rejects things that shouldn't be variables
+Testing that calculations are saved correctly in right position
+Testing that wrong syntax will result In error
+Testing trying to retrieve vars after setting them
+Testing trying to retrieve vars that have not been set - will result in error
+Testing trying to set var with invalid polish expression will result in error
+
+
+test_instruct_vars
+
+Testing run instruct list with set as well as the basic commands to see that variables dont cause problems with basic instructs.
+
+test_do
+
+Test normal loops
+Test that loops going from eg  1 to 1 run once
+Test that we can run negative numbers and decimal numbers
+Test that loops with a bigger first number than second number dont throw errors unless there is a syntax error in the loop
+Test that syntax errors in the loop statement cause the function to return false
+Test that nested loops work and produce the right amount of commands 
+
+test_main_full
+
+Just a general test that everything is working together and also testing that we can read in from files and everything still works as we create the word cont slightly differently when we read in from files.
+
+
+
+
+

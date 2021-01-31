@@ -12,7 +12,8 @@ assoc* assoc_init(void)
    n_assoc=safe_calloc(1,sizeof(assoc));
    n_assoc->capacity=INIT_SIZE_HASH;
 
-   n_assoc->arr=(k_v_pair**)safe_calloc(INIT_SIZE_HASH,sizeof(k_v_pair*));
+   n_assoc->arr=(k_v_pair**)safe_calloc(INIT_SIZE_HASH,\
+                                       sizeof(k_v_pair*));
    /*set to 0 because insertion function updates this*/
    n_assoc->size=0;
    n_assoc->lower_prime=INITLOWPRIME;
@@ -26,7 +27,8 @@ assoc* _assoc_resized(int n_cap,int old_cap)
    n_assoc=safe_calloc(1,sizeof(assoc));
    n_assoc->capacity=n_cap;
 
-   n_assoc->arr=(k_v_pair**)safe_calloc(n_cap,sizeof(k_v_pair*));
+   n_assoc->arr=(k_v_pair**)safe_calloc(n_cap,\
+                                 sizeof(k_v_pair*));
    /*set to 0 because insertion function updates this*/
    n_assoc->size=0;
    n_assoc->lower_prime=old_cap;
@@ -152,7 +154,8 @@ bool _insertion(assoc* a,k_v_pair* kv)
 }
 
 
-bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point)
+bool _insertion_helper(assoc* a,k_v_pair* kv,\
+                     int insertion_point)
 {
 
    if(kv)
@@ -166,7 +169,8 @@ bool _insertion_helper(assoc* a,k_v_pair* kv,int insertion_point)
       }
       else
       {
-         if(_same_key(a->arr[insertion_point]->key,kv->key))
+         if(_same_key(a->arr[insertion_point]->key,\
+                     kv->key))
          {
 
             free(a->arr[insertion_point]->key);

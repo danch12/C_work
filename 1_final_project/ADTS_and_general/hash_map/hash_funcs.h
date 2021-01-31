@@ -19,6 +19,7 @@
 #define START_P 2
 #define SDBM_ROLL_1 6
 #define SDBM_ROLL_2 16
+
 /*not sure if we get penalised for plagerising ourselves
 but a lot of this code for the hashmaps is from the previous project*/
 

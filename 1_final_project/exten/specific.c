@@ -1,55 +1,9 @@
 #include "specific.h"
-
-
-
-bool run_funcset(word_cont* to_check);
-bool run_funcrun(word_cont* to_check,line_cont* line_arr,double** return_val);
-bool run_flowstate(word_cont* to_check,line_cont* line_arr);
-bool run_return(word_cont* to_check,line_cont* line_arr);
-bool valid_funcvar(word_cont* to_check);
-bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN]);
-bool valid_set(word_cont* to_check);
-bool valid_do(word_cont* to_check);
-bool valid_funcrun(word_cont* to_check);
-bool valid_funcset(word_cont* to_check);
-bool valid_flowstate(word_cont* to_check);
-bool valid_return(word_cont* to_check);
-bool valid_var(word_cont* to_check);
-bool valid_num(word_cont* to_check);
-bool finish_polish(word_cont* to_check,double* result);
-bool get_var_pos(word_cont* to_check,int* var_p);
-bool get_var(word_cont* to_check,double* num);
-bool do_operation(word_cont* to_check);
-op get_op(word_cont* to_check);
-void store_line(line_cont* l_arr, line* to_add);
-direction direction_helper(word_cont* to_check);
-bool valid_instructlist(word_cont* to_check);
-
-
-line* finish_line(line* prev_line,coord* endpoint);
-coord* init_coords(double x, double y);
-bool rotate(double degrees,coord* to_rotate, coord* rotation_point);
-bool get_num(word_cont* to_check,double* num);
-bool run_instruction_list(word_cont* to_check,\
-                        line_cont* line_arr);
-bool get_func_val(word_cont* to_check,line_cont* line_arr,\
-                     double* num);
-
-bool valid_init_arr(word_cont* to_check);
-bool valid_append(word_cont* to_check);
-bool valid_change(word_cont* to_check);
-bool valid_delete_arr_val(word_cont* to_check);
-bool valid_access_val(word_cont* to_check);
-bool run_access_val(word_cont* to_check,line_cont* line_arr,double* num);
-bool run_init_arr(word_cont* to_check);
-bool run_append(word_cont* to_check,line_cont* line_arr);
-bool run_delete_arr_val(word_cont* to_check,line_cont* line_arr);
-bool run_change(word_cont* to_check,line_cont* line_arr);
-bool run_len(word_cont* to_check,double* num);
-bool valid_len(word_cont* to_check);
-bool run_file_to_array(word_cont* to_check);
-bool valid_file_to_array(word_cont* to_check);
-bool safe_samestr(word_cont* to_check,char* str);
+#include "../extension_funcs.h"
+#include "../interpreter_funcs.h"
+#include "../extension_flow.h"
+#include "../extension_arrays.h"
+#include "../parser_funcs.h"
 
 void deep_free_assoc(assoc* a,assoc_type t)
 {
@@ -121,7 +75,8 @@ void read_words(char* filename,word_cont* n_cont)
    num_lines=0;
    fp=get_file_words(filename,&num_lines);
    n_cont->capacity=num_lines;
-   n_cont->words= (char**)safe_calloc(num_lines,sizeof(char*));
+   n_cont->words= (char**)safe_calloc(num_lines,\
+                                    sizeof(char*));
    count=0;
    while(fscanf(fp,"%s",buffer)==1)
    {
@@ -247,13 +202,8 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
    double* placeholder;
    opcode current_op;
    placeholder=NULL;
-
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
-   /*if we have already seen a return then we do not execute any more
-   commands just check syntax*/
+   /*if we have already seen a return then we do
+    not execute any more commands just check syntax*/
    if(to_check->return_val)
    {
       if(valid_instruct(to_check))
@@ -358,10 +308,7 @@ bool run_instruction(word_cont* to_check,line_cont* line_arr)
 
 bool valid_varnum(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
+
    if(valid_num(to_check))
    {
       return true;
@@ -488,7 +435,8 @@ bool valid_instruct(word_cont* to_check)
 
 
 
-bool get_varnum(word_cont* to_check,double* num,line_cont* line_arr)
+bool get_varnum(word_cont* to_check,double* num,\
+               line_cont* line_arr)
 {
    /*will return false before increaing position*/
    if(get_var(to_check,num))
@@ -550,12 +498,12 @@ bool move_forward(word_cont* to_check,line_cont* l_arr)
          if(rotate(l_arr->pending_line->rotation,\
             end_coord,l_arr->pending_line->start))
          {
-            finished_line=finish_line(l_arr->pending_line,end_coord);
+            finished_line=finish_line(l_arr->pending_line,\
+                                       end_coord);
             #ifdef INTERP_PRODUCTION
             simple_draw(to_check,finished_line);
             #endif
             store_line(l_arr,finished_line);
-
             /*reusing pending_line over and over by just
              changing its start point to the last lines
              end point*/
@@ -582,7 +530,7 @@ double wrap_around(double i, double i_max)
 bool get_rotation(word_cont* to_check,line_cont* line_arr)
 {
    double num;
-   double temp;
+   double new_rot;
    direction dir;
    dir=direction_helper(to_check);
    if(dir==invalid)
@@ -593,15 +541,16 @@ bool get_rotation(word_cont* to_check,line_cont* line_arr)
    {
       if(dir==right)
       {
-         temp=num+line_arr->pending_line->rotation;
+         new_rot=num+line_arr->pending_line->rotation;
       }
       else
       {
-         temp= (DEGREES-num)+line_arr->pending_line->rotation;
+         new_rot= (DEGREES-num)+\
+                  line_arr->pending_line->rotation;
       }
-      temp=wrap_around(temp,DEGREES);
+      new_rot=wrap_around(new_rot,DEGREES);
 
-      line_arr->pending_line->rotation=temp;
+      line_arr->pending_line->rotation=new_rot;
       return true;
    }
    return false;
@@ -617,11 +566,21 @@ bool run_do(word_cont* to_check,line_cont* line_arr)
    if(do_helper(to_check,&var_pos,&start,&end,line_arr))
    {
       beg_loop=to_check->position;
+      /*if we dont run loop check syntax and go to end*/
+      if(start>end)
+      {
+         if(valid_instructlist(to_check))
+         {
+            return true;
+         }
+         return false;
+      }
       for(i=start;i<=end;i++)
       {
          if(!to_check->var_array[var_pos])
          {
-            to_check->var_array[var_pos]=(double*)safe_calloc(1,sizeof(double));
+            to_check->var_array[var_pos]=(double*)safe_calloc(1,\
+                                                   sizeof(double));
          }
          *to_check->var_array[var_pos]=i;
          to_check->position=beg_loop;
@@ -642,11 +601,6 @@ bool run_do(word_cont* to_check,line_cont* line_arr)
 bool do_helper(word_cont* to_check,int* var_pos,\
                double* start,double* end,line_cont* line_arr)
 {
-   int loop_start;
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
    if(safe_samestr(to_check,"DO"))
    {
       to_check->position++;
@@ -665,13 +619,7 @@ bool do_helper(word_cont* to_check,int* var_pos,\
                      if(safe_samestr(to_check,"{"))
                      {
                         to_check->position++;
-                        loop_start=to_check->position;
-                        if(valid_instructlist(to_check))
-                        {
-                           to_check->position=loop_start;
-                           return true;
-                        }
-
+                        return true;
                      }
                   }
                }
@@ -697,12 +645,9 @@ bool polish_num(word_cont* to_check,line_cont* line_arr)
 }
 
 /*num is going to be passed in by set function*/
-bool run_polish(word_cont* to_check,double* num,line_cont* line_arr)
+bool run_polish(word_cont* to_check,double* num,\
+               line_cont* line_arr)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
    if(safe_samestr(to_check,";"))
    {
       /*need to get num and check only one num here*/
@@ -734,10 +679,7 @@ bool run_set(word_cont* to_check,line_cont* line_arr)
 {
    double to_set;
    int var_p;
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
+
    if(safe_samestr(to_check,"SET"))
    {
       to_check->position++;

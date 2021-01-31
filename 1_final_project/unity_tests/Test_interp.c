@@ -108,12 +108,36 @@ void test_get_num(void)
    TEST_ASSERT_TRUE(test_cont->position==1);
    TEST_ASSERT_EQUAL_DOUBLE(test_double,123.4);
 
+   strcpy(test_cont->words[0],"-123.4");
+   test_cont->position=0;
+   TEST_ASSERT_TRUE(get_num(test_cont,&test_double));
+   TEST_ASSERT_TRUE(test_cont->position==1);
+   TEST_ASSERT_EQUAL_DOUBLE(test_double,-123.4);
+
+   strcpy(test_cont->words[0],"-123.40000000000000011111");
+   test_cont->position=0;
+   TEST_ASSERT_TRUE(get_num(test_cont,&test_double));
+   TEST_ASSERT_TRUE(test_cont->position==1);
+   TEST_ASSERT_EQUAL_DOUBLE(test_double,-123.40000000000000011111);
+
+   strcpy(test_cont->words[0],"1");
+   test_cont->position=0;
+   TEST_ASSERT_TRUE(get_num(test_cont,&test_double));
+   TEST_ASSERT_TRUE(test_cont->position==1);
+   TEST_ASSERT_EQUAL_DOUBLE(test_double,1);
+
+   strcpy(test_cont->words[0],"000000000000");
+   test_cont->position=0;
+   TEST_ASSERT_TRUE(get_num(test_cont,&test_double));
+   TEST_ASSERT_TRUE(test_cont->position==1);
+   TEST_ASSERT_EQUAL_DOUBLE(test_double,0);
 
    strcpy(test_cont->words[0],"123.b");
    test_cont->position=0;
-
    TEST_ASSERT_FALSE(get_num(test_cont,&test_double));
    TEST_ASSERT_FALSE(get_num(NULL,&test_double));
+
+
 
 
    strcpy(test_cont->words[0],"123.3.");
@@ -962,6 +986,24 @@ void test_set(void)
 
    test_cont=init_word_cont();
    strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"a");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],"90.5");
+   strcpy(test_cont->words[4],"90.5");
+   strcpy(test_cont->words[5],";");
+   TEST_ASSERT_TRUE(!run_set(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],":=");
+   strcpy(test_cont->words[3],";");
+   TEST_ASSERT_TRUE(!run_set(test_cont));
+   free_word_cont(test_cont);
+
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"SET");
    strcpy(test_cont->words[1],"A");
    strcpy(test_cont->words[2],":");
    strcpy(test_cont->words[3],"90.5");
@@ -1425,6 +1467,24 @@ void test_do(void)
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
 
+   test_cont=init_word_cont();
+
+   test_line_cont=init_line_cont();
+   strcpy(test_cont->words[0],"DO");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],"FROM");
+   strcpy(test_cont->words[3],"9");
+   strcpy(test_cont->words[4],"TO");
+   strcpy(test_cont->words[5],"3");
+   strcpy(test_cont->words[6],"{");
+   strcpy(test_cont->words[7],"FD");
+   strcpy(test_cont->words[8],"1");
+   strcpy(test_cont->words[9],"}");
+   TEST_ASSERT_TRUE(run_do(test_cont,test_line_cont));
+
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
 
    test_cont=init_word_cont();
 
@@ -1723,6 +1783,12 @@ void test_main_full(void)
    test_line_cont=init_line_cont();
    TEST_ASSERT_TRUE(!run_main(test_cont,test_line_cont));
    TEST_ASSERT_TRUE(strcmp("no numbers on the stack at end of expr",test_cont->err_message)==0);
+   free_line_cont(test_line_cont);
+   free_word_cont(test_cont);
+
+   test_cont=read_in_file("test_files/test_turtles/interpreter/invalid/unfinished.ttl");
+   test_line_cont=init_line_cont();
+   TEST_ASSERT_TRUE(!run_main(test_cont,test_line_cont));
    free_line_cont(test_line_cont);
    free_word_cont(test_cont);
 }

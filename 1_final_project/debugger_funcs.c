@@ -1,7 +1,5 @@
 #include "debugger_funcs.h"
 
-void draw_lines(line_cont* l_arr);
-
 
 /*returns true if no mistakes else false*/
 bool advance_to_mistake(debugger* to_check)
@@ -82,7 +80,7 @@ bool initial_checks(debugger* to_check)
    {
       if(!check_past_main(to_check))
       {
-         strcpy(to_check->info,"code present after main, please fix before using debugger");
+         strcpy(to_check->info,"code present after main or unbalanced brackets, please fix before using debugger");
          return false;
       }
       to_check->program->position++;
@@ -307,7 +305,8 @@ so we want to give space for wiggle room- going to say that we only want
 4 digits above the decimal point so will cut off after that. Also want to
 format it nicely so will have 5 rows of 5 and 1 row of 1 at the end
 (26 is an annoying number)*/
-void show_current_vars(debugger* debug,char out_str[FULLARGSTRLEN])
+void show_current_vars(debugger* debug,\
+            char out_str[FULLARGSTRLEN])
 {
    char temp[ONEARGLEN];
    char temp_num[ONEARGLEN];
@@ -373,14 +372,15 @@ void str_num(double num,char num_str[ONEARGLEN])
 }
 
 /*will show 5 words behind and 5 ahead*/
-void show_code_pos(debugger* to_check,char out_str[FULLARGSTRLEN])
+void show_code_pos(debugger* to_check,\
+            char out_str[FULLARGSTRLEN])
 {
    int from,to,pos,i;
    out_str[0]='\0';
    pos=to_check->program->position;
    from = (pos-SPREAD>0) ? pos-SPREAD : 0;
    to = (pos+SPREAD<to_check->program->capacity-INDEX) ? pos+SPREAD : \
-                                       to_check->program->capacity-INDEX;
+                                    to_check->program->capacity-INDEX;
    for(i=from;i<=to;i++)
    {
       strcat(out_str,to_check->program->words[i]);
@@ -393,7 +393,8 @@ void show_code_pos(debugger* to_check,char out_str[FULLARGSTRLEN])
 }
 
 /*will show last 5 coords */
-void show_recent_coords(debugger* debug,char out_str[FULLARGSTRLEN])
+void show_recent_coords(debugger* debug,\
+            char out_str[FULLARGSTRLEN])
 {
    int i,start,max_ind;
    char temp[ONEARGLEN];
@@ -502,7 +503,8 @@ bool run_action(debugger* to_check, char action_str[MAXACTIONLEN],\
       show_current_vars(to_check,result_str);
       return true;
       case show_pos:
-      sprintf(result_str,"position = %d",to_check->program->position);
+      sprintf(result_str,"position = %d",\
+      to_check->program->position);
       return true;
       case show_code:
       show_code_pos(to_check,result_str);
@@ -556,7 +558,8 @@ void collate_instruct_messages(debugger* to_check,\
 
 bool check_step_end(debugger* to_check)
 {
-   if(to_check->program->position==to_check->program->capacity-INDEX)
+   if(to_check->program->position==\
+      to_check->program->capacity-INDEX)
    {
       if(safe_samestr(to_check->program,"}"))
       {
@@ -568,7 +571,8 @@ bool check_step_end(debugger* to_check)
 
       }
    }
-   if(to_check->program->position>=to_check->program->capacity-INDEX)
+   if(to_check->program->position>=\
+      to_check->program->capacity-INDEX)
    {
       strcpy(to_check->info,"missing bracket in code");
    }
@@ -657,6 +661,22 @@ debugger* init_debugger(void)
    n_debug->loop_stack=stack_init(sizeof(loop_tracker));
    n_debug->break_p=NOBREAK;
    return n_debug;
+}
+
+bool init_debug_from_file(char* filename,debugger** n_debugptr)
+{
+   debugger* n_debug;
+   n_debug=(debugger*)safe_calloc(1,sizeof(debugger));
+   n_debug->loop_stack=stack_init(sizeof(loop_tracker));
+   n_debug->break_p=NOBREAK;
+   n_debug->program=read_in_file(filename);
+   n_debug->output=init_line_cont();
+   *n_debugptr=n_debug;
+   if(!initial_checks(n_debug))
+   {
+      return false;
+   }
+   return true;
 }
 
 bool free_debugger(debugger* to_free)
@@ -801,3 +821,35 @@ int find_low(int lev_distance[NWORDS])
    }
    return lowest_pos;
 }
+
+
+#ifdef LIVE_VERSION
+void draw_lines(line_cont* l_arr)
+{
+   SDL_Simplewin sw;
+   int i;
+   if(l_arr)
+   {
+      Neill_SDL_Init(&sw);
+      Neill_SDL_SetDrawColour(&sw,WHITE,WHITE,WHITE);
+      for(i=0;i<l_arr->size;i++)
+      {
+         SDL_RenderDrawLine(sw.renderer, \
+                           (int)l_arr->array[i]->start->x+MIDWIDTH,\
+                           (int)l_arr->array[i]->start->y+MIDHEIGHT, \
+                            (int)l_arr->array[i]->end->x+MIDWIDTH,\
+                         (int)l_arr->array[i]->end->y+MIDHEIGHT);
+         Neill_SDL_Events(&sw);
+         Neill_SDL_UpdateScreen(&sw);
+      }
+      do
+      {
+        Neill_SDL_Events(&sw);
+      }while(!sw.finished);
+      SDL_Quit();
+      atexit(SDL_Quit);
+   }
+
+
+}
+#endif

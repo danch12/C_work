@@ -1,10 +1,6 @@
 #include "specific.h"
+#include "../parser_funcs.h"
 
-bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN]);
-bool valid_set(word_cont* to_check);
-bool valid_do(word_cont* to_check);
-bool valid_var(word_cont* to_check);
-bool valid_num(word_cont* to_check);
 
 bool free_word_cont(word_cont* to_free)
 {
@@ -25,10 +21,6 @@ bool free_word_cont(word_cont* to_free)
 
 bool valid_varnum(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
    if(valid_num(to_check))
    {
       return true;

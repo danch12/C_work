@@ -36,7 +36,9 @@ Additionally in the word struct for the extension I have added more features - a
 
 When I run the function I create a deep copy of the function with its arguments then just run it like it was the main bit of the code- this means that I can run as many copies of the function as I want- therefore allowing for recursion.
 
-I had to create different versions of the same functions in specific c files for the interpreter and for the extension as I wanted to be able to use return values of functions as varnums. I could have potentially included the struct for the outputs in the word_cont struct but was worried that having a struct in a struct in a struct etc for individual coordinates would make functions look really strange and bloated. I'm not sure if this was the right move though as we do pass in the word cont and the line cont to a lot of functions together.
+I had to create different versions of the same functions in specific c files for the interpreter and for the extension as I wanted to be able to use return values of functions as varnums. I could have potentially included the struct for the outputs in the word_cont struct but was worried that having a struct in a struct in a struct etc for individual coordinates would make functions look sort of strange and bloated. I'm not sure if this was the right move though as we do pass in the word cont and the line cont to a lot of functions together.
+
+One interesting thing I thought of when I was using functions in turtle code was that originally I thought that only testing for validity of the code when I set the func would be a disadvantage but it actually allows me to write the functions at the top of the file with the names of arrays I then define below which makes coding in turtle a bit more manageable. 
 
 
 

@@ -1,26 +1,7 @@
 #include "specific.h"
-/*just the headers of functions that are defined in other places*/
+#include "../parser_funcs.h"
+#include "../interpreter_funcs.h"
 
-bool valid_mv(word_cont* to_check,char move[INSTRUCTLEN]);
-bool valid_set(word_cont* to_check);
-bool valid_do(word_cont* to_check);
-line* finish_line(line* prev_line,coord* endpoint);
-coord* init_coords(double x, double y);
-bool rotate(double degrees,coord* to_rotate, coord* rotation_point);
-bool get_num(word_cont* to_check,double* num);
-bool run_instruction_list(word_cont* to_check,\
-                        line_cont* line_arr);
-void store_line(line_cont* l_arr, line* to_add);
-direction direction_helper(word_cont* to_check);
-bool valid_instructlist(word_cont* to_check);
-bool finish_polish(word_cont* to_check,double* result);
-bool get_var_pos(word_cont* to_check,int* var_p);
-bool get_var(word_cont* to_check,double* num);
-bool do_operation(word_cont* to_check);
-op get_op(word_cont* to_check);
-bool valid_var(word_cont* to_check);
-bool valid_num(word_cont* to_check);
-bool safe_samestr(word_cont* to_check,char* str);
 /*going to pretty much just try to emulate how cython do opcodes
 with a big switch statement - cant emulate it perfectly because
 we have to do the strcmp first but still probably speeds up the code
@@ -56,13 +37,10 @@ opcode get_opcode(word_cont* to_check)
    return inv_opcode;
 }
 
-bool run_instruction(word_cont* to_check,line_cont* line_arr)
+bool run_instruction(word_cont* to_check,\
+                     line_cont* line_arr)
 {
    opcode current_op;
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
    current_op=get_opcode(to_check);
    switch(current_op)
    {
@@ -131,7 +109,8 @@ void read_words(char* filename,word_cont* n_cont)
    num_lines=0;
    fp=get_file_words(filename,&num_lines);
    n_cont->capacity=num_lines;
-   n_cont->words= (char**)safe_calloc(num_lines,sizeof(char*));
+   n_cont->words= (char**)safe_calloc(num_lines,\
+                                    sizeof(char*));
    count=0;
    while(fscanf(fp,"%s",buffer)==1)
    {
@@ -276,7 +255,8 @@ bool move_forward(word_cont* to_check,line_cont* l_arr)
          if(rotate(l_arr->pending_line->rotation,\
             end_coord,l_arr->pending_line->start))
          {
-            finished_line=finish_line(l_arr->pending_line,end_coord);
+            finished_line=finish_line(l_arr->pending_line,\
+                                       end_coord);
             #ifdef INTERP_PRODUCTION
             simple_draw(to_check,finished_line);
             #endif
@@ -308,7 +288,7 @@ double wrap_around(double i, double i_max)
 bool get_rotation(word_cont* to_check,line_cont* line_arr)
 {
    double num;
-   double temp;
+   double new_rot;
    direction dir;
    dir=direction_helper(to_check);
    if(dir==invalid)
@@ -319,14 +299,15 @@ bool get_rotation(word_cont* to_check,line_cont* line_arr)
    {
       if(dir==right)
       {
-         temp=num+line_arr->pending_line->rotation;
+         new_rot=num+line_arr->pending_line->rotation;
       }
       else
       {
-         temp= (DEGREES-num)+line_arr->pending_line->rotation;
+         new_rot= (DEGREES-num)+\
+                  line_arr->pending_line->rotation;
       }
-      temp=wrap_around(temp,DEGREES);
-      line_arr->pending_line->rotation=temp;
+      new_rot=wrap_around(new_rot,DEGREES);
+      line_arr->pending_line->rotation=new_rot;
       return true;
    }
    return false;
@@ -337,10 +318,6 @@ bool get_rotation(word_cont* to_check,line_cont* line_arr)
 
 bool run_polish(word_cont* to_check,double* num)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
    if(safe_samestr(to_check,";"))
    {
       /*need to get num and check only one num here*/
@@ -373,10 +350,6 @@ bool run_set(word_cont* to_check)
 {
    double to_set;
    int var_p;
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
    if(safe_samestr(to_check,"SET"))
    {
       to_check->position++;
@@ -472,10 +445,6 @@ bool run_do(word_cont* to_check,line_cont* line_arr)
 bool do_helper(word_cont* to_check,int* var_pos,\
                double* start,double* end)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
    if(safe_samestr(to_check,"DO"))
    {
       to_check->position++;
@@ -508,10 +477,7 @@ bool do_helper(word_cont* to_check,int* var_pos,\
 
 bool valid_varnum(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
+
    if(valid_num(to_check))
    {
       return true;

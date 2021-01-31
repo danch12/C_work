@@ -88,7 +88,9 @@ bool advance_to_mistake(debugger* to_check);
 
 /*turns num into string*/
 void str_num(double num,char num_str[ONEARGLEN]);
-void show_current_vars(debugger* debug,char out_str[FULLARGSTRLEN]);
+void show_current_vars(debugger* debug,\
+               char out_str[FULLARGSTRLEN]);
+
 void collate_instruct_messages(debugger* to_check,\
                               char result_str[FULLARGSTRLEN]);
 
@@ -133,4 +135,7 @@ if the user enter 123abc it will still work*/
 void run_set_break(debugger* to_check,char num[MAXACTIONLEN],\
                   char result_str[FULLARGSTRLEN]);
 void run_rm_break(debugger* to_check);
+bool init_debug_from_file(char* filename,\
+                        debugger** n_debugptr);
+void draw_lines(line_cont* l_arr);
 #endif

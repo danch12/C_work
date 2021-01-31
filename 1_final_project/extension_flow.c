@@ -3,9 +3,7 @@
 
 bool run_flowstate(word_cont* to_check,line_cont* line_arr)
 {
-
    bool result;
-
    if(do_comparison(to_check,&result,line_arr))
    {
       if(result==true)
@@ -30,10 +28,6 @@ bool run_true(word_cont* to_check,line_cont* line_arr)
 {
    if(run_main(to_check,line_arr))
    {
-      if(to_check->position>=to_check->capacity)
-      {
-         return false;
-      }
       if(!safe_samestr(to_check,"ELSE"))
       {
          return true;
@@ -84,7 +78,8 @@ bool run_else(word_cont* to_check,line_cont* line_arr)
    return false;
 }
 
-bool do_comparison(word_cont* to_check,bool* result,line_cont* line_arr)
+bool do_comparison(word_cont* to_check,bool* result,\
+                  line_cont* line_arr)
 {
    double vn_1, vn_2;
    comparator cmp;
@@ -110,7 +105,8 @@ bool do_comparison(word_cont* to_check,bool* result,line_cont* line_arr)
    return false;
 }
 
-bool do_comparison_helper(double vn_1,double vn_2,comparator cmp)
+bool do_comparison_helper(double vn_1,double vn_2,\
+                          comparator cmp)
 {
    switch(cmp)
    {

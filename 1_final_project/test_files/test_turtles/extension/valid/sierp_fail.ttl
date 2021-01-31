@@ -1,0 +1,112 @@
+{
+  SETFUNC squareoff { A B C }
+  {
+    SET E := B A + ;
+    SET F := C A + ;
+    DO Z FROM B TO E
+    {
+      DO X FROM C TO F
+	{
+	  SET Y := Z X * ;
+          IF Y < LEN a_board
+          {
+	  CHANGE a_board [ Y ] := 0 ;
+          }
+	}
+    }
+   }
+   
+   SETFUNC sturn { A B C D }
+   {
+     SET E := B 3 / ;
+     IF E < 1 
+     {
+        RETURN 0
+     }
+     ELSE 
+     {
+        SET F := B C + ;
+	SET G := B D + ;
+
+	squareoff {  E F G }
+      }
+      SET M := B C + ;
+      SET N := B D + ;
+      DO I FROM C TO M
+      {
+      	 DO X FROM D TO N
+	 {
+	    sturn { A E I X }
+          }
+      }
+    }
+
+
+
+
+    SETFUNC fillsq { A }
+    { 
+       SET C := A 2 / ;
+       RT 90
+       FD A
+       LT 90
+    DO B FROM 1 TO C 
+    {
+       FD A
+       LT 90
+       FD 1
+       LT 90
+       FD A
+       RT 90
+       FD 1
+       RT 90
+     }
+   }
+
+   SETFUNC printb { }
+   {
+      SET B := LEN a_board 1 - ;
+      SET P := 0 ;
+      DO A FROM 0 TO B 
+      {
+	 FD 3
+         IF a_board [ A ] == 1 
+         {
+            fillsq { 8 }
+	    
+            
+         }
+         SET P := P 1 + ;
+         IF P == 27 
+         {
+            RT 90
+    	    FD 8
+            RT 90
+            FD 90
+            RT 180
+            SET P := 0 ;
+          }
+      }
+    }
+    SETFUNC printcheck { }
+    {
+       SET B := LEN a_board 1 - ;
+       DO A FROM 0 TO B 
+       {
+          IF a_board [ A ] == 0
+          {
+             fillsq { 2 }
+	     FD 3
+          }
+       } 
+	
+    }
+    INITARR a_board 
+    DO A FROM 1 TO 729
+    {
+       APPEND a_board 1 ;
+    }
+    sturn { 27 27 0 0 }
+    LT 90 
+    printb { }
+}

@@ -10,7 +10,7 @@
 #define WHITE 255
 
 
-void draw_lines(line_cont* l_arr);
+
 
 
 #endif

@@ -75,7 +75,8 @@ void read_words(char* filename,word_cont* n_cont);
 word_cont* read_in_file(char* filename);
 bool free_word_cont(word_cont* to_free);
 opcode get_opcode(word_cont* to_check);
-bool run_instruction(word_cont* to_check,line_cont* line_arr);
+bool run_instruction(word_cont* to_check,\
+                     line_cont* line_arr);
 bool valid_instruct(word_cont* to_check);
 
 double wrap_around(double i, double i_max);

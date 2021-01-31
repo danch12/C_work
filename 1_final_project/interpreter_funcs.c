@@ -132,10 +132,6 @@ bool valid_number(word_cont* to_check)
 
 bool run_main(word_cont* to_check,line_cont* line_arr)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
    if(safe_samestr(to_check,"{"))
    {
       to_check->position++;
@@ -153,10 +149,6 @@ bool run_main(word_cont* to_check,line_cont* line_arr)
 bool run_instruction_list(word_cont* to_check,\
                         line_cont* line_arr)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
    if(safe_samestr(to_check,"}"))
    {
       /*doesnt matter for end but for do loops important
@@ -257,10 +249,6 @@ bool free_line_cont(line_cont* to_free)
 and we return a op instead of bool*/
 op get_op(word_cont* to_check)
 {
-   if(to_check->position>=to_check->capacity)
-   {
-      return invalid_op;
-   }
    if(safe_samestr(to_check,"+"))
    {
       return plus;
@@ -292,7 +280,6 @@ bool do_operation(word_cont* to_check)
    num1=NULL;
    num2=NULL;
    operator=get_op(to_check);
-
    if(operator==invalid_op)
    {
       return false;

@@ -36,6 +36,7 @@ void test_samestr(void)
    test_cont->capacity=0;
    strcpy(test_cont->words[0],"abc");
    TEST_ASSERT_TRUE(!safe_samestr(test_cont,"abc"));
+   test_cont->capacity=MAXTESTCAP;
    free_word_cont(test_cont);
 }
 
@@ -287,6 +288,9 @@ void test_valid_ops(void)
    TEST_ASSERT_TRUE(test_cont->position==1);
    test_cont->position=0;
    TEST_ASSERT_TRUE(valid_varnum(test_cont));
+   test_cont->position=0;
+   strcpy(test_cont->words[0],"");
+   TEST_ASSERT_TRUE(!valid_var(test_cont));
    test_cont->capacity=MAXTESTCAP;
    free_word_cont(test_cont);
 }
@@ -385,9 +389,6 @@ void test_sets(void)
    strcpy(test_cont->words[1],"A");
    strcpy(test_cont->words[2],":=");
    strcpy(test_cont->words[3],";");
-   strcpy(test_cont->words[4],"/");
-   strcpy(test_cont->words[5],"A");
-   strcpy(test_cont->words[6],";");
    TEST_ASSERT_TRUE(valid_set(test_cont));
    TEST_ASSERT_TRUE(test_cont->position==4);
    test_cont->position=0;
@@ -440,6 +441,17 @@ void test_sets(void)
    strcpy(test_cont->words[4],"/");
    strcpy(test_cont->words[5],"A");
    strcpy(test_cont->words[6],";");
+   TEST_ASSERT_TRUE(!valid_set(test_cont));
+   test_cont->position=0;
+   TEST_ASSERT_TRUE(!valid_instruct(test_cont));
+   test_cont->position=0;
+
+   strcpy(test_cont->words[0],"SET");
+   strcpy(test_cont->words[1],":=");
+   strcpy(test_cont->words[2],"1-1");
+   strcpy(test_cont->words[3],"/");
+   strcpy(test_cont->words[4],"A");
+   strcpy(test_cont->words[5],";");
    TEST_ASSERT_TRUE(!valid_set(test_cont));
    test_cont->position=0;
    TEST_ASSERT_TRUE(!valid_instruct(test_cont));
@@ -572,6 +584,25 @@ void test_dos(void)
    test_cont->capacity=MAXTESTCAP;
    free_word_cont(test_cont);
 
+   test_cont=init_word_cont();
+   strcpy(test_cont->words[0],"DO");
+   strcpy(test_cont->words[1],"A");
+   strcpy(test_cont->words[2],"FROM");
+   strcpy(test_cont->words[3],"3");
+   strcpy(test_cont->words[4],"TO");
+   strcpy(test_cont->words[5],"9");
+   strcpy(test_cont->words[6],"{");
+   strcpy(test_cont->words[7],"DO");
+   strcpy(test_cont->words[8],"A");
+   strcpy(test_cont->words[9],"FROM");
+   strcpy(test_cont->words[10],"3");
+   strcpy(test_cont->words[11],"TO");
+   strcpy(test_cont->words[12],"9");
+   strcpy(test_cont->words[13],"{");
+   strcpy(test_cont->words[14],"}");
+   strcpy(test_cont->words[15],"}");
+   TEST_ASSERT_TRUE(valid_do(test_cont));
+   TEST_ASSERT_TRUE(test_cont->position==16);
 
 }
 

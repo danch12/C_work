@@ -3,7 +3,7 @@ CFLAGSSAN= -Wall -Wextra -Wfloat-equal -pedantic -std=c90 -fsanitize=undefined -
 CFLAGSSDL= `sdl2-config --cflags` -O2 -Wall -Wextra -pedantic -Wfloat-equal -std=c90
 LIDLIBSSDL= `sdl2-config --libs` -lm
 LIDLIBS = -lm
-CC =/usr/local/bin/gcc-10
+CC =gcc
 INCPARSE = -Iparser
 INCINTERP = -Iinterpreter
 INCEXTEN = -Iexten
@@ -22,7 +22,7 @@ PARSEFULL = parser_funcs.c parser_funcs.h
 PARSERUN = parser_funcs.c
 
 
-
+#testing files
 
 u_stacks_san: unity_tests/Test_stacks.c  src/unity.c  src/unity.h $(STACKSFULL) $(GENERALFULL)
 	$(CC) unity_tests/Test_stacks.c src/unity.c $(STACKSRUN) $(GENERALRUN) -o u_stacks_san $(CFLAGSSAN) $(LIDLIBS)
@@ -88,6 +88,9 @@ u_debugger_fast:unity_tests/Test_debugger.c src/unity.c src/unity.h debugger_fun
 
 parser_san: parser.c $(PARSEFULL) $(GENERALFULL) parser/specific.h parser/specific.c
 	$(CC) parser.c $(PARSERUN) $(GENERALRUN) parser/specific.c  -o parser_san $(CFLAGSSAN) $(INCPARSE) $(LIDLIBS)
+
+
+#actual programs
 
 debugger:debugger.c debugger_funcs.c debugger_funcs.h  $(PARSEFULL) $(INTERPFULL) interpreter/specific.c interpreter/specific.h $(STACKSFULL) $(GENERALFULL) $(HASHFULL) ADTS_and_general/neillsdl2.c ADTS_and_general/neillsdl2.h
 	$(CC) -DLIVE_VERSION debugger.c debugger_funcs.c  interpreter/specific.c  $(PARSERUN) $(INTERPRUN)  $(STACKSRUN) $(GENERALRUN) $(HASHRUN) $(ARRRUN) ADTS_and_general/neillsdl2.c -o debugger $(CFLAGSSDL) $(INCINTERP) $(LIDLIBSSDL)

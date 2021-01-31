@@ -37,7 +37,8 @@ bool run_init_arr(word_cont* to_check)
    return false;
 }
 
-void store_arr(word_cont* to_check,char arr_name[MAXARRLEN],turt_arr* n_arr)
+void store_arr(word_cont* to_check,char arr_name[MAXARRLEN],\
+               turt_arr* n_arr)
 {
    /*find mains hash map for arrays as arrays are global*/
    turt_arr* existing;
@@ -55,7 +56,8 @@ void store_arr(word_cont* to_check,char arr_name[MAXARRLEN],turt_arr* n_arr)
 }
 
 
-bool get_arr_identifier(word_cont* to_check,char arr_name[MAXARRLEN])
+bool get_arr_identifier(word_cont* to_check,\
+                     char arr_name[MAXARRLEN])
 {
    if(valid_arr_identifier(to_check))
    {
@@ -75,10 +77,6 @@ bool get_arr_identifier(word_cont* to_check,char arr_name[MAXARRLEN])
 bool valid_arr_identifier(word_cont* to_check)
 {
    int i;
-   if(to_check->position>=to_check->capacity)
-   {
-      return false;
-   }
    if(strlen(to_check->words[to_check->position])<MINARRLEN)
    {
       return false;
@@ -250,7 +248,8 @@ bool change_helper(word_cont* to_check, line_cont* line_arr,\
 }
 
 /*guard aginst decimals and negative nums being used as index*/
-bool get_valid_ind(word_cont* to_check,line_cont* line_arr,int* ind)
+bool get_valid_ind(word_cont* to_check,line_cont* line_arr,\
+                  int* ind)
 {
    double num;
    int i_num;
@@ -301,7 +300,8 @@ bool valid_delete_arr_val(word_cont* to_check)
    return false;
 }
 
-bool run_delete_arr_val(word_cont* to_check,line_cont* line_arr)
+bool run_delete_arr_val(word_cont* to_check,\
+                        line_cont* line_arr)
 {
    char arr_name[MAXARRLEN];
    turt_arr* arr;
@@ -370,7 +370,8 @@ bool valid_access_val(word_cont* to_check)
 }
 
 
-bool run_access_val(word_cont* to_check,line_cont* line_arr,double* num)
+bool run_access_val(word_cont* to_check,line_cont* line_arr,\
+                     double* num)
 {
    int ind;
    char arr_name[MAXARRLEN];
@@ -514,7 +515,8 @@ bool run_file_to_array(word_cont* to_check)
                strcpy(to_check->err_message,"array not found - potentially not initalised yet");
                return false;
             }
-            if(load_in(to_check,arr,to_check->words[to_check->position]))
+            if(load_in(to_check,arr,\
+            to_check->words[to_check->position]))
             {
                to_check->position++;
                return true;
@@ -528,7 +530,8 @@ bool run_file_to_array(word_cont* to_check)
 }
 
 /*reads numbers from file and loads them into linked list*/
-bool load_in(word_cont* to_check,turt_arr* arr,char* filepath)
+bool load_in(word_cont* to_check,turt_arr* arr,\
+            char* filepath)
 {
    FILE* fp;
    double num;
@@ -557,7 +560,8 @@ bool load_in(word_cont* to_check,turt_arr* arr,char* filepath)
 
 
 
-turt_arr* get_arr(word_cont* to_check,char arr_name[MAXARRLEN])
+turt_arr* get_arr(word_cont* to_check,\
+            char arr_name[MAXARRLEN])
 {
    /*find "main" word_cont*/
    while(to_check->parent)

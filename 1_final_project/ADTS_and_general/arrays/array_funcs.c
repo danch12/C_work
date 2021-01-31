@@ -38,7 +38,8 @@ bool append_arr(double data,turt_arr* t_arr)
    return false;
 }
 /*if position bigger than size then just puts val at end*/
-bool insert_arr(double data,turt_arr* t_arr,int position)
+bool insert_arr(double data,turt_arr* t_arr,\
+               int position)
 {
    t_node* n_node;
    t_node* temp,*previous;

@@ -24,10 +24,11 @@ bool valid_funcvar(word_cont* to_check);
 
 /*argset is the arguments used when setting the function*/
 bool valid_argset(word_cont* to_check);
-bool get_argset(word_cont* to_check,word_cont* n_func);
+
 /*get single arg - used recursively by get argset*/
 bool get_arg(word_cont* to_check,word_cont* n_func);
-/*checks that the set function is valid and then copies over
+bool get_argset(word_cont* to_check,word_cont* n_func);
+/*checks that the function to copy is valid and then copies over
 the function into a word container*/
 bool get_func_info(word_cont* to_check,word_cont* n_func);
 bool valid_funcset(word_cont* to_check);
@@ -61,4 +62,6 @@ bool free_word_cont(word_cont* to_free);
 void resize(word_cont* n_func);
 word_cont* deep_copy_func(word_cont* to_copy);
 void free_copy(word_cont* to_free);
+bool get_func_val(word_cont* to_check,line_cont* line_arr,\
+                     double* num);
  #endif

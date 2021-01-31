@@ -9,8 +9,10 @@
 /*need to create some new functions that do very similar things
 to parser stage but increment at different times - this is
 because we will use old parser functions to check for
-syntax errors in do loops so even if do loop not executed
-it will throw errors for bad syntax i thought about adding
+syntax errors in unexecuted bits of code so even if it is
+ not executed (in interp just unexecuted do loops but in extension
+includes if statements and unexecuted functions)
+it will throw errors for bad syntax. I thought about adding
 arguments to the exsiting functions but as we call alot of them
 recursively it would be hard to pass the arguments in at the right
 time*/
@@ -22,7 +24,8 @@ line* init_origin(void);
 bool free_line(line* to_free);
 line* finish_line(line* prev_line,coord* endpoint);
 /*rotate a coord around a point*/
-bool rotate(double degrees,coord* to_rotate, coord* rotation_point);
+bool rotate(double degrees,coord* to_rotate, \
+            coord* rotation_point);
 coord* init_coords(double x, double y);
 
 /*extract num from word container*/
@@ -32,8 +35,10 @@ dont increase the position at the end
 called different things because we import*/
 bool valid_number(word_cont* to_check);
 
-bool run_instruction(word_cont* to_check,line_cont* line_arr);
-bool run_instruction_list(word_cont* to_check,line_cont* line_arr);
+bool run_instruction(word_cont* to_check,\
+                     line_cont* line_arr);
+bool run_instruction_list(word_cont* to_check,\
+                           line_cont* line_arr);
 bool run_main(word_cont* to_check,line_cont* line_arr);
 /*get amount we rotate for lt and rt commands - stores them in
 a pending line and executes when fd command is issued*/
